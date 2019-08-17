@@ -1,7 +1,7 @@
 """
 /***************************************************************************
 Name                 : Workflow Manager Widget
-Description          : A widget for managing workflow and notification in
+Description          : Widget for managing workflow and notification in
                        Scheme Establishment and First, Second and
                        Third Examination FLTS modules.
 Date                 : 07/August/2019
