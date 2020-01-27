@@ -705,8 +705,6 @@ class Save(DataRoutine):
     #     :param value: Value to be saved
     #     :type value: Multiple types
     #     """
-    #     if not entity_name:
-    #         return
     #     if entity_name in self._entity_items:
     #         items = self._entity_items[entity_name]
     #         for index, columns in enumerate(items):
