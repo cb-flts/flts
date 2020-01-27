@@ -973,9 +973,8 @@ class PlotPreview(Plot):
         :param row: Preview table view row index
         :type row: Integer
         """
-        if self._plot_layer:
-            layer = PlotPreview.layers.get(self._parent_id)
-            self._plot_layer.select_feature(layer, [row])
+        layer = PlotPreview.layers.get(self._parent_id)
+        self._plot_layer.select_feature(layer, [row])
 
     def clear_feature(self, layer=None):
         """
@@ -983,10 +982,9 @@ class PlotPreview(Plot):
         :param layer: Input layer
         :type layer: QgsVectorLayer
         """
-        if self._plot_layer:
-            if not layer:
-                layer = PlotPreview.layers.get(self._parent_id)
-            self._plot_layer.clear_feature(layer)
+        if not layer:
+            layer = PlotPreview.layers.get(self._parent_id)
+        self._plot_layer.clear_feature(layer)
 
     @classmethod
     def is_dirty(cls, fpath):
