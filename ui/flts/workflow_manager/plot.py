@@ -982,13 +982,10 @@ class PlotPreview(Plot):
         :param layer: Input layer
         :type layer: QgsVectorLayer
         """
-        if not layer:
-            layer = PlotPreview.layers.get(self._parent_id)
-            # if layer is None:
-            #     return
-        if not self._plot_layer:
-            return
-        self._plot_layer.clear_feature(layer)
+        if self._plot_layer:
+            if not layer:
+                layer = PlotPreview.layers.get(self._parent_id)
+            self._plot_layer.clear_feature(layer)
 
     @classmethod
     def is_dirty(cls, fpath):
