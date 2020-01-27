@@ -553,29 +553,6 @@ class Save(DataRoutine):
             self._entity_items = items
         return valid
 
-    # def _set_save_items(self):
-    #     """
-    #     Sets valid save items; entity names, column name and values
-    #     """
-    #     try:
-    #         for row_idx, columns in self._save_items.iteritems():
-    #             query_obj = self._model_items[row_idx].get("data")
-    #             for column, new_value, entity in columns:
-    #                 if isinstance(column, dict):
-    #                     fk_name = column.keys()[0]
-    #                     if fk_name in self._fk_entity_name and hasattr(query_obj, fk_name):
-    #                         entity_name = self._query_entity_name(query_obj)
-    #                         self._set_entity_items(entity_name, column.get(fk_name), new_value)
-    #                         continue
-    #                     self._set_collection_items(query_obj, column, new_value)
-    #                     continue
-    #                 elif hasattr(query_obj, column):
-    #                     entity_name = self._query_entity_name(query_obj)
-    #                     self._set_entity_items(entity_name, column, new_value)
-    #                     continue
-    #     except (AttributeError, exc.SQLAlchemyError, Exception) as e:
-    #         raise e
-
     def _set_save_items(self):
         """
         Sets valid save items; entity names, column name and values
@@ -613,24 +590,6 @@ class Save(DataRoutine):
             if hasattr(query_obj, column):
                 return self._query_entity_name(query_obj)
         return column.entity
-
-    # def _set_collection_items(self, query_obj, column, value):
-    #     """
-    #     Sets valid save collection items; entity names, column name and values
-    #     :param query_obj: Query object
-    #     :type query_obj: Entity
-    #     :param column: Column or related entity name
-    #     :type column: Dictionary
-    #     :param value: Value to be saved
-    #     :type value: Multiple types
-    #     """
-    #     item = self.valid_collection_item(query_obj, column)
-    #     if item:
-    #         column, fk_name = self._get_mapped_entity(item, column)
-    #         if fk_name:
-    #             item = self.get_value(item, fk_name)
-    #         entity_name = self._query_entity_name(item)
-    #         self._set_entity_items(entity_name, column, value)
 
     def _set_collection_items(self, query_obj, column, value):
         """
@@ -694,27 +653,6 @@ class Save(DataRoutine):
             name = name.split(prefix, 1)[1]
             return name.capitalize()
         return name.capitalize()
-
-    # def _set_entity_items(self, entity_name, column, value):
-    #     """
-    #     Sets valid save entity items; entity names, column name and values
-    #     :param entity_name: Entity short name
-    #     :type entity_name: String
-    #     :param column: Column name
-    #     :type column: String
-    #     :param value: Value to be saved
-    #     :type value: Multiple types
-    #     """
-    #     if entity_name in self._entity_items:
-    #         items = self._entity_items[entity_name]
-    #         for index, columns in enumerate(items):
-    #             if column not in columns:
-    #                 columns[column] = value
-    #             elif column in columns and len(items) == index + 1:
-    #                 items.append({column: value})
-    #                 break
-    #     else:
-    #         self._entity_items[entity_name] = [{column: value}]
 
     def _set_entity_items(self, entity_name, column, value):
         """
