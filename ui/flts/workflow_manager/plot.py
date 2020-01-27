@@ -982,11 +982,10 @@ class PlotPreview(Plot):
         :param layer: Input layer
         :type layer: QgsVectorLayer
         """
-        try:
-            if not layer:
-                layer = PlotPreview.layers[self._parent_id]
-        except KeyError:
-            return
+        if not layer:
+            layer = PlotPreview.layers.get(self._parent_id)
+            if layer is None:
+                return
         self._plot_layer.clear_feature(layer)
 
     @classmethod
