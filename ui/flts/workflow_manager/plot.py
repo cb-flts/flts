@@ -1191,7 +1191,7 @@ class PlotFile(Plot):
                     geom_type = self._geometry_types.get(geom_type)
                     if not geom_type:
                         geom_type = "Detect"
-                    if not self.is_pdf(fpath):
+                    if self.is_pdf(fpath):
                         geom_type = ""
                     settings[pos] = geom_type
                 elif pos == CRS_ID:
