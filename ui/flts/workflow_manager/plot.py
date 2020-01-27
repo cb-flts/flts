@@ -973,8 +973,9 @@ class PlotPreview(Plot):
         :param row: Preview table view row index
         :type row: Integer
         """
-        layer = PlotPreview.layers.get(self._parent_id)
-        self._plot_layer.select_feature(layer, [row])
+        if self._plot_layer:
+            layer = PlotPreview.layers.get(self._parent_id)
+            self._plot_layer.select_feature(layer, [row])
 
     def clear_feature(self, layer=None):
         """
