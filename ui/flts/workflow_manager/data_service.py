@@ -31,6 +31,7 @@ from stdm.ui.flts.workflow_manager.config import (
     HolderConfig,
     PlotImportFileConfig,
     PlotImportPreviewConfig,
+    ServitudeImportPreviewConfig,
     SchemeConfig,
     TableModelIcons,
 )
@@ -288,8 +289,6 @@ class DocumentDataService(DataService):
     Scheme supporting documents data model service
     """
     def __init__(self, current_profile, scheme_id):
-        self._profile = current_profile
-        self._scheme_id = scheme_id
         self.entity_name = "supporting_document"
         self._document_config = DocumentConfig()
         self._table_model_icons = TableModelIcons()
@@ -629,7 +628,7 @@ class PlotImportFileDataService:
         return self._table_model_icons.icons
 
 
-class PlotImportPreviewDataService:
+class PlotPreviewDataService:
     """
     Scheme plot import preview data model service
     """
@@ -743,3 +742,57 @@ class PlotImportPreviewDataService:
             return model
         except AttributeError as e:
             raise e
+
+
+class ServitudePreviewDataService:
+    """
+    Scheme servitude import preview data model service
+    """
+    def __init__(self, current_profile, scheme_id):
+        self._servitude_config = ServitudeImportPreviewConfig()
+        self._table_model_icons = TableModelIcons()
+
+    @property
+    def columns(self):
+        """
+        Scheme servitude import preview
+        table view columns options
+        :return: Table view columns
+        :rtype: List
+        """
+        return self._servitude_config.columns
+
+    @property
+    def vertical_header(self):
+        """
+        Scheme table view vertical orientation
+        :return: True for vertical headers or False otherwise
+        :rtype: Boolean
+        """
+        return True
+
+    @property
+    def icons(self):
+        """
+        QAbstractTableModel icon options
+        :return: QAbstractTableModel icon options
+        :rtype: Dictionary
+        """
+        return self._table_model_icons.icons
+
+
+def plot_data_service(import_type):
+    """
+    Returns plot file import data service
+    based on import type
+    :param import_type: Plot file import type
+    :type import_type: String
+    :return: Plot preview data service object
+    :rtype: Service Object
+    """
+    data_service = {
+        "Plots": PlotPreviewDataService,
+        "Servitudes": ServitudePreviewDataService,
+        "Beacons": ServitudePreviewDataService,
+    }
+    return data_service[import_type]

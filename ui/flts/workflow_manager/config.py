@@ -255,6 +255,22 @@ class PlotImportPreviewConfig(Config):
         return self.get_data('plot_preview_columns')
 
 
+class ServitudeImportPreviewConfig(Config):
+    """
+    Scheme servitude import preview table view
+    configuration interface
+    """
+    @property
+    def columns(self):
+        """
+        Scheme servitude import preview
+        table view columns options
+        :return: Table view columns
+        :rtype: List
+        """
+        return self.get_data('servitude_preview_columns')
+
+
 class StyleSheet(Config):
     """
     Widget style sheet interface
@@ -846,10 +862,13 @@ configurations = {
         )
     ],
     'plot_preview_columns': [
+        Column(name='Geometry', type="text", flag=(Qt.DisplayRole,)),
         Column(name='Parcel Number', type="text", flag=(Qt.DisplayRole,)),
         Column(name='UPI Number', type="text", flag=(Qt.DisplayRole,)),
-        Column(name='Geometry', type="text", flag=(Qt.DisplayRole,)),
         Column(name='Area', type="float", flag=(Qt.DisplayRole,))
+    ],
+    'servitude_preview_columns': [
+        Column(name='Geometry', type="text", flag=(Qt.DisplayRole,))
     ],
     'tab_icons': {
         'Holders': QIcon(":/plugins/stdm/images/icons/flts_scheme_holders.png"),

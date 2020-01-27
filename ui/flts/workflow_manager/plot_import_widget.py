@@ -48,13 +48,14 @@ class PlotImportWidget(QWidget):
     """
     def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
         super(QWidget, self).__init__(parent)
+        self._profile = profile
+        self._scheme_id = scheme_id
         self._scheme_number = scheme_number
         self._parent = parent
         data_service = widget_properties["data_service"]
         self._file_service = data_service["plot_file"]
         self._file_service = self._file_service()
-        self._preview_service = data_service["plot_preview"]
-        self._preview_service = self._preview_service(profile, scheme_id)
+        self._plot_preview_service = data_service["plot_preview"]
         self._plot_file = PlotFile(self._file_service)
         self._plot_preview = self._layer = None
         self._previewed = self.is_dirty = None
@@ -78,7 +79,8 @@ class PlotImportWidget(QWidget):
         self._file_table_view.setSelectionBehavior(QTableView.SelectRows)
         self._file_table_view.setSelectionMode(QAbstractItemView.SingleSelection)
         self._preview_table_view = QTableView(self)
-        self._preview_model = WorkflowManagerModel(self._preview_service)
+        self._preview_data_service = self._preview_model = None
+        self._preview_model = WorkflowManagerModel(self._preview_data_service)
         self._preview_table_view.setModel(self._preview_model)
         self._preview_table_view.setAlternatingRowColors(True)
         self._preview_table_view.setShowGrid(False)
@@ -320,8 +322,9 @@ class PlotImportWidget(QWidget):
                 return
             if self._plot_preview and self._layer:
                 self._plot_preview.clear_feature(self._layer)
+            self._set_preview_data_service(settings.get(IMPORT_AS))
             self._plot_preview = PlotPreview(
-                self._preview_service,
+                self._preview_data_service,
                 settings,
                 self._scheme_number,
                 fpath
@@ -330,6 +333,18 @@ class PlotImportWidget(QWidget):
             self._set_preview_groupbox_title(settings[NAME])
             self._layer = self._plot_preview.layer
             self._previewed = fpath
+
+    def _set_preview_data_service(self, import_type):
+        """
+        Sets plot preview data service
+        :param import_type: Plot file import type
+        :type import_type: String
+        """
+        self._preview_data_service = self._plot_preview_service(import_type)
+        self._preview_data_service = self._preview_data_service(
+            self._profile,
+            self._scheme_id
+        )
 
     def _file_settings(self, row):
         """
@@ -382,7 +397,7 @@ class PlotImportWidget(QWidget):
                 "Failed to load: {}".format(e)
             )
         else:
-            self._preview_table_view.horizontalHeader().\
+            self._preview_table_view.horizontalHeader(). \
                 setStretchLastSection(True)
 
     @staticmethod

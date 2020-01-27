@@ -27,17 +27,33 @@ class WorkflowManagerModel(QAbstractTableModel):
     Handles data for Scheme Establishment and First, Second
     and Third Examination FLTS modules
     """
-    # itemAboutToChange = pyqtSignal(QModelIndex, object)
-
-    def __init__(self, data_service):
+    def __init__(self, data_service=None):
         super(WorkflowManagerModel, self).__init__()
         self._data_source = None
         self._data_service = data_service
-        self._icons = self._data_service.icons \
-            if hasattr(self._data_service, "icons") else None
-        self._vertical_header = self._data_service.vertical_header
         self.results = []
         self._headers = []
+
+    @property
+    def _icons(self):
+        """
+        Returns QtableView icons
+        :return: Icons
+        :return: QIcon
+        """
+        if hasattr(self._data_service, "icons"):
+            return self._data_service.icons
+
+    @property
+    def _vertical_header(self):
+        """
+        Returns True if vertical columns
+        are allowed
+        :return: True
+        :return: Boolean
+        """
+        if self._data_service:
+            return self._data_service.vertical_header
 
     def data(self, index, role=Qt.DisplayRole):
         """
@@ -291,6 +307,7 @@ class WorkflowManagerModel(QAbstractTableModel):
             self.results = data_source.load()
             self._headers = data_source.get_headers()
             self._data_source = data_source
+            self.set_data_service(data_source)
         except (AttributeError, exc.SQLAlchemyError, IOError, OSError, Exception) as e:
             raise e
 
@@ -304,8 +321,18 @@ class WorkflowManagerModel(QAbstractTableModel):
             self.results = data_source.load_collection()
             self._headers = data_source.get_headers()
             self._data_source = data_source
+            self.set_data_service(data_source)
         except (AttributeError, exc.SQLAlchemyError, IOError, OSError, Exception) as e:
             raise e
+
+    def set_data_service(self, data_source):
+        """
+        Sets the data service
+        :param data_source: Data source object
+        :rtype data_source: Object
+        """
+        if self._data_service is None:
+            self._data_service = data_source._data_service
 
     def data_source(self):
         """
@@ -315,14 +342,18 @@ class WorkflowManagerModel(QAbstractTableModel):
         """
         return self._data_source
 
-    def refresh(self):
+    def refresh(self, data_source=None):
         """
-        Refresh model
+        Refreshes the model
+        :return data_source: Data source
+        :rtype data_source: Object
         """
+        if data_source is None:
+            data_source = self._data_service
         self.layoutAboutToBeChanged.emit()
         self.results = []
         self._headers = []
-        self.load(self._data_source)
+        self.load(data_source)
         self.layoutChanged.emit()
 
     def reset(self):

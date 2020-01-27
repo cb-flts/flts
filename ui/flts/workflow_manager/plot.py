@@ -39,7 +39,7 @@ from qgis.utils import iface
 NAME, IMPORT_AS, DELIMITER, HEADER_ROW, CRS_ID, \
 GEOM_FIELD, GEOM_TYPE = range(7)
 
-PARCEL_NUM, UPI_NUM, GEOMETRY, AREA = range(4)
+GEOMETRY, PARCEL_NUM, UPI_NUM, AREA = range(4)
 
 WARNING = "Warning"
 
@@ -111,7 +111,9 @@ class PlotLayer:
             return
         feature = QgsFeature()
         feature.setGeometry(geom)
-        feature.setAttributes(self._attribute_values(attributes))
+        values = self._attribute_values(attributes)
+        if values:
+            feature.setAttributes(values)
         self._data_provider.addFeatures([feature])
 
     def _attribute_values(self, attributes):
@@ -125,8 +127,9 @@ class PlotLayer:
         if not self._fields:
             fields = self.get_fields(self._layer)
             self._fields = self._field_types(fields)
-        values = [attributes.get(name) for name, type_ in self._fields]
-        return values
+        if self._fields:
+            values = [attributes.get(name) for name, type_ in self._fields]
+            return values
 
     def get_fields(self, layer=None):
         """
@@ -555,8 +558,6 @@ class PlotPreview(Plot):
         results = []
         self._num_errors = 0
         try:
-            upi = UniqueParcelIdentifier(self._data_service, "W")
-            aucode = upi.aucode()
             with open(fpath, 'r') as csv_file:
                 clean_line = self._filter_whitespace(csv_file, self._header_row)
                 csv_reader = csv.DictReader(
@@ -565,25 +566,12 @@ class PlotPreview(Plot):
                     delimiter=self._delimiter
                 )
                 self._geom_type = self._geometry_type()
-                for row, data in enumerate(csv_reader):
-                    contents = {}
-                    self._items = {}
-                    value = self._get_wkt(data, GEOMETRY)
-                    if value:
-                        contents[GEOMETRY] = unicode(value)
-                        # value = self._get_value(
-                        #     data, ("parcel", "parcel number", "id"), PARCEL_NUM
-                        # )
-                        # contents[PARCEL_NUM] = unicode(value)
-                        value = upi.plot_number()
-                        contents[PARCEL_NUM] = unicode(value)
-                        contents[UPI_NUM] = unicode(upi.upi(aucode, value))
-                        value = self._get_value(data, ("area",), AREA)
-                        contents[AREA] = self._to_float(value, AREA)
-                        contents["items"] = self._items
-                        attributes = self._layer_attributes(contents)
-                        self._create_layer(contents[GEOMETRY], attributes)
-                        results.append(contents)
+                if self._import_as == "Plots":
+                    results = self._plot_file_contents(csv_reader)
+                elif self._import_as == "Servitudes":
+                    results = self._servitude_file_contents(csv_reader)
+                else:
+                    results = self._servitude_file_contents(csv_reader)
                 if self._plot_layer:
                     self._plot_layer.update_extents()
                     self._plot_layer.add_map_layer()
@@ -593,6 +581,60 @@ class PlotPreview(Plot):
         if results:
             PlotPreview.dirty[self._parent_id] = True
         return results
+
+    def _plot_file_contents(self, csv_reader):
+        """
+        Returns plot file contents
+        :param csv_reader: CSV dictionary reader
+        :param csv_reader: DictReader
+        :return results: File content list
+        :return results: List
+        """
+        results = []
+        upi = UniqueParcelIdentifier(self._data_service, "W")
+        aucode = upi.aucode()
+        for row, data in enumerate(csv_reader):
+            contents = {}
+            self._items = {}
+            value = self._get_wkt(data, GEOMETRY)
+            if value:
+                contents[GEOMETRY] = unicode(value)
+                # value = self._get_value(
+                #     data, ("parcel", "parcel number", "id"), PARCEL_NUM
+                # )
+                # contents[PARCEL_NUM] = unicode(value)
+                value = upi.plot_number()
+                contents[PARCEL_NUM] = unicode(value)
+                contents[UPI_NUM] = unicode(upi.upi(aucode, value))
+                value = self._get_value(data, ("area",), AREA)
+                contents[AREA] = self._to_float(value, AREA)
+                contents["items"] = self._items
+                attributes = self._layer_attributes(contents)
+                self._create_layer(contents[GEOMETRY], attributes)
+                results.append(contents)
+        return results
+
+    def _servitude_file_contents(self, csv_reader):
+        """
+        Returns servitude file contents
+        :param csv_reader: CSV dictionary reader
+        :param csv_reader: DictReader
+        :return results: File content list
+        :return results: List
+        """
+        results = []
+        for row, data in enumerate(csv_reader):
+            contents = {}
+            self._items = {}
+            value = self._get_wkt(data, GEOMETRY)
+            if value:
+                contents[GEOMETRY] = unicode(value)
+                contents["items"] = self._items
+                attributes = self._layer_attributes(contents)
+                self._create_layer(contents[GEOMETRY], attributes)
+                results.append(contents)
+        return results
+    # TODO: End trials
 
     @staticmethod
     def _filter_whitespace(in_file, hrow):
