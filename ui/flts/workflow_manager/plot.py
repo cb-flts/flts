@@ -984,8 +984,10 @@ class PlotPreview(Plot):
         """
         if not layer:
             layer = PlotPreview.layers.get(self._parent_id)
-            if layer is None:
-                return
+            # if layer is None:
+            #     return
+        if not self._plot_layer:
+            return
         self._plot_layer.clear_feature(layer)
 
     @classmethod
