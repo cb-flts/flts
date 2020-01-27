@@ -783,7 +783,7 @@ class ServitudePreviewDataService:
 
 def plot_data_service(import_type):
     """
-    Returns plot file import data service
+    Returns plot preview data service
     based on import type
     :param import_type: Plot file import type
     :type import_type: String

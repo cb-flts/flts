@@ -322,9 +322,10 @@ class PlotImportWidget(QWidget):
                 return
             if self._plot_preview and self._layer:
                 self._plot_preview.clear_feature(self._layer)
-            self._set_preview_data_service(settings.get(IMPORT_AS))
+            import_type = settings.get(IMPORT_AS)
+            self._set_preview_data_service(import_type)
             self._plot_preview = PlotPreview(
-                self._preview_data_service,
+                self._preview_data_service[import_type],
                 settings,
                 self._scheme_number,
                 fpath
@@ -340,11 +341,22 @@ class PlotImportWidget(QWidget):
         :param import_type: Plot file import type
         :type import_type: String
         """
-        self._preview_data_service = self._plot_preview_service(import_type)
-        self._preview_data_service = self._preview_data_service(
-            self._profile,
-            self._scheme_id
-        )
+        if not self._preview_data_service:
+            self._preview_data_service = {}
+        if import_type not in self._preview_data_service:
+            service = self._preview_service(import_type)
+            self._preview_data_service[import_type] = service
+
+    def _preview_service(self, import_type):
+        """
+        Returns plot preview data service
+        :param import_type: Plot file import type
+        :type import_type: String
+        :return: Plot preview data service object
+        :rtype: Service Object
+        """
+        service = self._plot_preview_service(import_type)
+        return service(self._profile, self._scheme_id)
 
     def _file_settings(self, row):
         """
