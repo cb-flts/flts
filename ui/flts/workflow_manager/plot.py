@@ -984,7 +984,7 @@ class PlotPreview(Plot):
         """
         try:
             if not layer:
-                layer = PlotPreview.layers.get(self._parent_id)
+                layer = PlotPreview.layers[self._parent_id]
         except KeyError:
             return
         self._plot_layer.clear_feature(layer)
