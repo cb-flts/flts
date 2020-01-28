@@ -40,6 +40,9 @@ from qgis.core import QgsApplication
 from stdm.ui.customcontrols.documents_table_widget import (
     DirDocumentTypeSelector
 )
+from stdm.ui.customcontrols.scheme_summary_widget import (
+    SchemeSummaryWidget
+)
 from stdm.data.pg_utils import (
     export_data,
     fetch_with_filter,
@@ -206,6 +209,9 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         self.chk_holders_validate.toggled.connect(
             self.on_validate_holders
         )
+        self.tr_summary.link_clicked.connect(
+            self._on_summary_link_clicked
+        )
 
         # Block area
         self.radio_sq_meters.setChecked(True)
@@ -229,6 +235,47 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
         # Specify MapperMixin widgets
         self.register_col_widgets()
+
+        # Temporary tooltips for demo
+        self.cbx_region.setToolTip(
+            self.tr('Select region')
+        )
+        self.cbx_relv_auth.setToolTip(
+            self.tr('Select type of relevant authority')
+        )
+        self.cbx_reg_div.setToolTip(
+            self.tr('Select registration division')
+        )
+        self.cbx_relv_auth_name.setToolTip(
+            self.tr('Select name of relevant authority')
+        )
+        self.lnedit_sg_num.setToolTip(
+            self.tr('This is the SG/General Plan number'
+                    'that is automatically generated')
+        )
+        self.lnedit_schm_num.setToolTip(
+            self.tr('This is the Scheme Number that is '
+                    'automatically generated')
+        )
+        self.dbl_spinbx_block_area.setToolTip(
+            self.tr('Insert block area')
+        )
+        self.radio_hectares.setToolTip(
+            self.tr('Click to show area in hectares')
+        )
+        self.radio_sq_meters.setToolTip(
+            self.tr('Click to show area in hectares')
+        )
+
+    def _tooltips(self, widget, tip):
+        """
+        Show tooltips on widgets
+        :param tip:
+        :return: str
+        """
+        widget.setToolTip(
+            self.tr(tip)
+        )
 
     def _populate_combo(self, cbo, lookup_name):
         """
@@ -451,7 +498,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
         # Check if length of list is empty i.e. if a scheme exist
         if len(scheme_res) == 0:
-            sg_code = u'{0}.{1}.{2}'.format(sg_prefix,
+            sg_code = u'{0}/{1}/{2}'.format(sg_prefix,
                                             str(sg_default_value).zfill(4),
                                             self._current_year)
             self.lnedit_sg_num.setText(sg_code)
@@ -459,10 +506,10 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         elif len(scheme_res) > 0:
             sch_res = scheme_object.queryObject().order_by(
                 self.schm_model.id.desc()).first()
-            sg_number = sch_res.general_plan_number.strip('][').split('.')
+            sg_number = sch_res.general_plan_number.strip('][').split('/')
             sg_count = int(sg_number[1])
             sg_count += 1
-            sg_code = u'{0}.{1}.{2}'.format(sg_prefix,
+            sg_code = u'{0}/{1}/{2}'.format(sg_prefix,
                                             str(sg_count).zfill(4),
                                             self._current_year)
             self.lnedit_sg_num.setText(sg_code)
@@ -1271,6 +1318,24 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         self.tr_summary.scm_blk_area.setText(
             1, self.dbl_spinbx_block_area.text()
         )
+
+    def _on_summary_link_clicked(self, code):
+        """
+        Slot raised when the hyperlink in summary widget is clicked
+        :param code:
+        :return:
+        """
+        ref_id = -1
+        if code == 'DOC':
+            ref_id = 1
+        elif code == 'HLD':
+            ref_id = 2
+
+        if ref_id == -1:
+            return
+
+        while self.currentId() != ref_id:
+            self.back()
 
     def _save_ra_last_value(self, scheme_number):
         # Save the last value for the given relevant authority
