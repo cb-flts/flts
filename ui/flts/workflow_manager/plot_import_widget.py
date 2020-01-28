@@ -320,8 +320,8 @@ class PlotImportWidget(QWidget):
         if not self._plot_file.is_pdf(fpath):
             if self._crs_not_set(row):
                 return
-            if self._plot_preview and self._layer:
-                self._plot_preview.clear_feature(self._layer)
+            self._on_preview_clear(fpath)
+            self._layer = None
             import_type = settings.get(IMPORT_AS)
             self._set_preview_data_service(import_type)
             self._plot_preview = PlotPreview(
@@ -334,6 +334,15 @@ class PlotImportWidget(QWidget):
             self._set_preview_groupbox_title(settings[NAME])
             self._layer = self._plot_preview.layer
             self._previewed = fpath
+
+    def _on_preview_clear(self, fpath):
+        """
+        On previewing clear selected features
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        """
+        if self._plot_preview and PlotPreview.layer_in_store(fpath):
+            self._plot_preview.clear_feature(self._layer)
 
     def _set_preview_data_service(self, import_type):
         """

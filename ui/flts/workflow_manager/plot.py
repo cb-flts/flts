@@ -555,7 +555,6 @@ class PlotPreview(Plot):
         :return results: Plot import file contents
         :rtype results: List
         """
-        results = []
         self._num_errors = 0
         try:
             with open(fpath, 'r') as csv_file:
@@ -938,11 +937,21 @@ class PlotPreview(Plot):
         if not cls.layers:
             return
         try:
-            layer_ids = [layer.id() for layer in cls.layers.values()]
+            layer_ids = cls.layer_ids()
             if layer_ids:
                 PlotLayer.remove_layers(layer_ids)
         except (RuntimeError, OSError, Exception) as e:
             raise e
+
+    @classmethod
+    def layer_ids(cls):
+        """
+        Returns all layers from the registry/map canvas
+        :return layer_ids: Layer IDs
+        :rtype layer_ids: List
+        """
+        layer_ids = [layer.id() for layer in cls.layers.values()]
+        return layer_ids
 
     @property
     def layer(self):
@@ -999,6 +1008,19 @@ class PlotPreview(Plot):
         if not self._plot_layer:
             return
         self._plot_layer.clear_feature(layer)
+
+    @classmethod
+    def layer_in_store(cls, parent_id):
+        """
+        Checks if the layer exists
+        in the layer store
+        param parent_id: Parent record/item identifier
+        :type parent_id: String
+        :return: True
+        :rtype: Boolean
+        """
+        if parent_id in cls.layers:
+            return True
 
     @classmethod
     def is_dirty(cls, fpath):
