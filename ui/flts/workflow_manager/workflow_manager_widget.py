@@ -413,8 +413,40 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
         :rtype: Dictionary
         """
         # TODO: Start Refactor by moving them to the configuration file
+        # widget_prop = {
+        #     self.plotsImportButton.objectName(): {
+        #         'data_service': {
+        #             "plot_file": PlotImportFileDataService,
+        #             "plot_preview": plot_data_service
+        #         },
+        #         'widget': PlotImportWidget,
+        #         'object_name': 'plotImport',
+        #     },
+        #     self.documentsButton.objectName(): {
+        #         'data_service': DocumentDataService,
+        #         'widget': SchemeDetailTableView,
+        #         'object_name': 'schemeDocuments',
+        #         'load_collections': False
+        #     },
+        #     self.holdersButton.objectName(): {
+        #         'data_service': HolderDataService,
+        #         'widget': SchemeDetailTableView,
+        #         'object_name': 'schemeHolders',
+        #         'load_collections': True
+        #     },
+        #     self._comments_title: {
+        #         'data_service': CommentDataService,
+        #         'widget': CommentManagerWidget,
+        #         'load_collections': True
+        #     },
+        #     self._msg_box_button: {
+        #         'data_service': CommentDataService,
+        #         'widget': CommentManagerWidget,
+        #         'load_collections': True
+        #     }
+        # }
         widget_prop = {
-            self.plotsImportButton.objectName(): {
+            'plotsImportButton': {
                 'data_service': {
                     "plot_file": PlotImportFileDataService,
                     "plot_preview": plot_data_service
@@ -422,13 +454,13 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
                 'widget': PlotImportWidget,
                 'object_name': 'plotImport',
             },
-            self.documentsButton.objectName(): {
+            'Documents': {
                 'data_service': DocumentDataService,
                 'widget': SchemeDetailTableView,
                 'object_name': 'schemeDocuments',
                 'load_collections': False
             },
-            self.holdersButton.objectName(): {
+            'Holders': {
                 'data_service': HolderDataService,
                 'widget': SchemeDetailTableView,
                 'object_name': 'schemeHolders',
