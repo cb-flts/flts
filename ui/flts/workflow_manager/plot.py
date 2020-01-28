@@ -35,12 +35,12 @@ from qgis.core import (
     QgsVectorLayer
 )
 from qgis.utils import iface
+from sqlalchemy import exc
+from stdm.ui.flts.workflow_manager.data import Save
 
 NAME, IMPORT_AS, DELIMITER, HEADER_ROW, CRS_ID, \
 GEOM_FIELD, GEOM_TYPE = range(7)
-
-PARCEL_NUM, UPI_NUM, GEOMETRY, AREA = range(4)
-
+GEOMETRY, PARCEL_NUM, UPI_NUM, AREA, SCHEME_ID, PLOT_STATUS = range(6)
 WARNING = "Warning"
 
 
@@ -111,7 +111,9 @@ class PlotLayer:
             return
         feature = QgsFeature()
         feature.setGeometry(geom)
-        feature.setAttributes(self._attribute_values(attributes))
+        values = self._attribute_values(attributes)
+        if values:
+            feature.setAttributes(values)
         self._data_provider.addFeatures([feature])
 
     def _attribute_values(self, attributes):
@@ -125,8 +127,9 @@ class PlotLayer:
         if not self._fields:
             fields = self.get_fields(self._layer)
             self._fields = self._field_types(fields)
-        values = [attributes.get(name) for name, type_ in self._fields]
-        return values
+        if self._fields:
+            values = [attributes.get(name) for name, type_ in self._fields]
+            return values
 
     def get_fields(self, layer=None):
         """
@@ -552,11 +555,8 @@ class PlotPreview(Plot):
         :return results: Plot import file contents
         :rtype results: List
         """
-        results = []
         self._num_errors = 0
         try:
-            upi = UniqueParcelIdentifier(self._data_service, "W")
-            aucode = upi.aucode()
             with open(fpath, 'r') as csv_file:
                 clean_line = self._filter_whitespace(csv_file, self._header_row)
                 csv_reader = csv.DictReader(
@@ -565,25 +565,12 @@ class PlotPreview(Plot):
                     delimiter=self._delimiter
                 )
                 self._geom_type = self._geometry_type()
-                for row, data in enumerate(csv_reader):
-                    contents = {}
-                    self._items = {}
-                    value = self._get_wkt(data, GEOMETRY)
-                    if value:
-                        contents[GEOMETRY] = unicode(value)
-                        # value = self._get_value(
-                        #     data, ("parcel", "parcel number", "id"), PARCEL_NUM
-                        # )
-                        # contents[PARCEL_NUM] = unicode(value)
-                        value = upi.plot_number()
-                        contents[PARCEL_NUM] = unicode(value)
-                        contents[UPI_NUM] = unicode(upi.upi(aucode, value))
-                        value = self._get_value(data, ("area",), AREA)
-                        contents[AREA] = self._to_float(value, AREA)
-                        contents["items"] = self._items
-                        attributes = self._layer_attributes(contents)
-                        self._create_layer(contents[GEOMETRY], attributes)
-                        results.append(contents)
+                if self._import_as == "Plots":
+                    results = self._plot_file_contents(csv_reader)
+                elif self._import_as == "Servitudes":
+                    results = self._servitude_file_contents(csv_reader)
+                else:
+                    results = self._servitude_file_contents(csv_reader)
                 if self._plot_layer:
                     self._plot_layer.update_extents()
                     self._plot_layer.add_map_layer()
@@ -593,6 +580,60 @@ class PlotPreview(Plot):
         if results:
             PlotPreview.dirty[self._parent_id] = True
         return results
+
+    def _plot_file_contents(self, csv_reader):
+        """
+        Returns plot file contents
+        :param csv_reader: CSV dictionary reader
+        :param csv_reader: DictReader
+        :return results: File content list
+        :return results: List
+        """
+        results = []
+        upi = UniqueParcelIdentifier(self._data_service, "W")
+        aucode = upi.aucode()
+        for row, data in enumerate(csv_reader):
+            contents = {}
+            self._items = {}
+            value = self._get_wkt(data, GEOMETRY)
+            if value:
+                contents[GEOMETRY] = unicode(value)
+                # value = self._get_value(
+                #     data, ("parcel", "parcel number", "id"), PARCEL_NUM
+                # )
+                # contents[PARCEL_NUM] = unicode(value)
+                value = upi.plot_number()
+                contents[PARCEL_NUM] = unicode(value)
+                contents[UPI_NUM] = unicode(upi.upi(aucode, value))
+                value = self._get_value(data, ("area",), AREA)
+                contents[AREA] = self._to_float(value, AREA)
+                contents["items"] = self._items
+                attributes = self._layer_attributes(contents)
+                self._create_layer(contents[GEOMETRY], attributes)
+                results.append(contents)
+        return results
+
+    def _servitude_file_contents(self, csv_reader):
+        """
+        Returns servitude file contents
+        :param csv_reader: CSV dictionary reader
+        :param csv_reader: DictReader
+        :return results: File content list
+        :return results: List
+        """
+        results = []
+        for row, data in enumerate(csv_reader):
+            contents = {}
+            self._items = {}
+            value = self._get_wkt(data, GEOMETRY)
+            if value:
+                contents[GEOMETRY] = unicode(value)
+                contents["items"] = self._items
+                attributes = self._layer_attributes(contents)
+                self._create_layer(contents[GEOMETRY], attributes)
+                results.append(contents)
+        return results
+    # TODO: End trials
 
     @staticmethod
     def _filter_whitespace(in_file, hrow):
@@ -815,6 +856,7 @@ class PlotPreview(Plot):
         :return:
         """
         if not self._valid_setup(wkt):
+            self._remove_previewed_layers()
             return
         if not self._plot_layer:
             geom_type, geom = self._geometry(wkt)
@@ -847,6 +889,15 @@ class PlotPreview(Plot):
                 import_type != self._import_as:
             return False
         return True
+
+    def _remove_previewed_layers(self):
+        """
+        Removes previewed layers
+        """
+        PlotPreview.remove_layer_by_id(self._parent_id)
+        layer = PlotPreview.layers.get(self._parent_id)
+        if layer:
+            self._remove_stored_layer(layer.id())
 
     def _generate_layer_name(self):
         """
@@ -886,11 +937,21 @@ class PlotPreview(Plot):
         if not cls.layers:
             return
         try:
-            layer_ids = [layer.id() for layer in cls.layers.values()]
+            layer_ids = cls.layer_ids()
             if layer_ids:
                 PlotLayer.remove_layers(layer_ids)
         except (RuntimeError, OSError, Exception) as e:
             raise e
+
+    @classmethod
+    def layer_ids(cls):
+        """
+        Returns all layers from the registry/map canvas
+        :return layer_ids: Layer IDs
+        :rtype layer_ids: List
+        """
+        layer_ids = [layer.id() for layer in cls.layers.values()]
+        return layer_ids
 
     @property
     def layer(self):
@@ -932,6 +993,8 @@ class PlotPreview(Plot):
         :type row: Integer
         """
         layer = PlotPreview.layers.get(self._parent_id)
+        if not self._plot_layer:
+            return
         self._plot_layer.select_feature(layer, [row])
 
     def clear_feature(self, layer=None):
@@ -942,7 +1005,22 @@ class PlotPreview(Plot):
         """
         if not layer:
             layer = PlotPreview.layers.get(self._parent_id)
+        if not self._plot_layer:
+            return
         self._plot_layer.clear_feature(layer)
+
+    @classmethod
+    def layer_in_store(cls, parent_id):
+        """
+        Checks if the layer exists
+        in the layer store
+        param parent_id: Parent record/item identifier
+        :type parent_id: String
+        :return: True
+        :rtype: Boolean
+        """
+        if parent_id in cls.layers:
+            return True
 
     @classmethod
     def is_dirty(cls, fpath):
@@ -993,6 +1071,69 @@ class PlotPreview(Plot):
         :rtype: List
         """
         return self._data_service.columns
+
+
+class ImportPlot:
+    """
+    Imports plot values
+    """
+    def __init__(self, model, scheme_id, srid, data_service, col_keys):
+        self._model = model
+        self._scheme_id = scheme_id
+        self._srid = srid
+        self._data_service = data_service
+        self._options = data_service.save_columns
+        self.col_keys = col_keys
+
+    def save(self):
+        """
+        Imports plots into the database
+        :return saved: Number of saved items
+        :rtype saved: Integer
+        """
+        imported = 0
+        try:
+            items = self._import_items()
+            imported = Save(
+                items,
+                self._model.results,
+                self._data_service
+            ).save()
+        except (AttributeError, exc.SQLAlchemyError, Exception) as e:
+            raise e
+        finally:
+            return imported
+
+    def _import_items(self):
+        """
+        Returns import items
+        :return import_items: Imported items
+        :rtype import_items: Dictionary
+        """
+        import_items = {}
+        for row, data in enumerate(self._model.results):
+            items = []
+            for key in self.col_keys:
+                value = data[key]
+                option = self._options[key]
+                if key == GEOMETRY:
+                    value = "SRID={0};{1}".format(self._srid, value)
+                elif key == SCHEME_ID:
+                    value = self._scheme_id
+                items.append([option.column, value, option.entity])
+            items.append(self._scheme_items())
+            import_items[row] = items
+        return import_items
+
+    def _scheme_items(self):
+        """
+        Return scheme items
+        :return: Scheme items
+        :rtype: List
+        """
+        option = self._options[SCHEME_ID]
+        scheme_id = option.column
+        return list((scheme_id, self._scheme_id, option.entity))
 
 
 class PlotFile(Plot):
@@ -1191,7 +1332,9 @@ class PlotFile(Plot):
                     geom_type = self._geometry_types.get(geom_type)
                     if not geom_type:
                         geom_type = "Detect"
-                    settings[pos] = unicode(geom_type)
+                    if self.is_pdf(fpath):
+                        geom_type = ""
+                    settings[pos] = geom_type
                 elif pos == CRS_ID:
                     if not self.is_pdf(fpath):
                         settings[pos] = unicode(WARNING)

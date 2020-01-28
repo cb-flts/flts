@@ -254,6 +254,33 @@ class PlotImportPreviewConfig(Config):
         """
         return self.get_data('plot_preview_columns')
 
+    @property
+    def plot_save_columns(self):
+        """
+        Scheme plot import preview
+        table view save column options
+        :return: Save column values
+        :rtype: List
+        """
+        return self.get_data('save_columns').\
+            get('plot_import_save', None)
+
+
+class ServitudeImportPreviewConfig(Config):
+    """
+    Scheme servitude import preview table view
+    configuration interface
+    """
+    @property
+    def columns(self):
+        """
+        Scheme servitude import preview
+        table view columns options
+        :return: Table view columns
+        :rtype: List
+        """
+        return self.get_data('servitude_preview_columns')
+
 
 class StyleSheet(Config):
     """
@@ -551,6 +578,7 @@ class ColumnSettings:
         return column
 
 
+GEOMETRY, PARCEL_NUM, UPI_NUM, AREA, SCHEME_ID, PLOT_STATUS = range(6)
 Column = namedtuple('Column', ['name', 'type', 'flag'])
 Icon = namedtuple('Icon', ['icon', 'size'])
 LookUp = namedtuple(
@@ -846,10 +874,13 @@ configurations = {
         )
     ],
     'plot_preview_columns': [
+        Column(name='Geometry', type="text", flag=(Qt.DisplayRole,)),
         Column(name='Parcel Number', type="text", flag=(Qt.DisplayRole,)),
         Column(name='UPI Number', type="text", flag=(Qt.DisplayRole,)),
-        Column(name='Geometry', type="text", flag=(Qt.DisplayRole,)),
         Column(name='Area', type="float", flag=(Qt.DisplayRole,))
+    ],
+    'servitude_preview_columns': [
+        Column(name='Geometry', type="text", flag=(Qt.DisplayRole,))
     ],
     'tab_icons': {
         'Holders': QIcon(":/plugins/stdm/images/icons/flts_scheme_holders.png"),
@@ -1115,6 +1146,23 @@ configurations = {
             # SaveColumn(
             #     column='timestamp', value=datetime.now(), entity='Comment'
             # )
-        ]
+        ],
+        'plot_import_save': {
+            GEOMETRY: SaveColumn(
+                column='geom', value=None, entity='Plot'
+            ),
+            PARCEL_NUM: SaveColumn(
+                column='plot_number', value=None, entity='Plot'
+            ),
+            UPI_NUM: SaveColumn(
+                column='upi', value=None, entity='Plot'
+            ),
+            AREA: SaveColumn(
+                column='area', value=None, entity='Plot'
+            ),
+            SCHEME_ID: SaveColumn(
+                column='scheme_id', value=None, entity='Plot'
+            )
+        }
     }
 }
