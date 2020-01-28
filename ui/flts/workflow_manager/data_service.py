@@ -289,6 +289,8 @@ class DocumentDataService(DataService):
     Scheme supporting documents data model service
     """
     def __init__(self, current_profile, scheme_id):
+        self._profile = current_profile
+        self._scheme_id = scheme_id
         self.entity_name = "supporting_document"
         self._document_config = DocumentConfig()
         self._table_model_icons = TableModelIcons()
