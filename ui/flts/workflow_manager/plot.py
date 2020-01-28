@@ -984,6 +984,8 @@ class PlotPreview(Plot):
         :type row: Integer
         """
         layer = PlotPreview.layers.get(self._parent_id)
+        if not self._plot_layer:
+            return
         self._plot_layer.select_feature(layer, [row])
 
     def clear_feature(self, layer=None):
@@ -994,6 +996,8 @@ class PlotPreview(Plot):
         """
         if not layer:
             layer = PlotPreview.layers.get(self._parent_id)
+        if not self._plot_layer:
+            return
         self._plot_layer.clear_feature(layer)
 
     @classmethod
