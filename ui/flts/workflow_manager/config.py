@@ -254,6 +254,17 @@ class PlotImportPreviewConfig(Config):
         """
         return self.get_data('plot_preview_columns')
 
+    @property
+    def plot_save_columns(self):
+        """
+        Scheme plot import preview
+        table view save column options
+        :return: Save column values
+        :rtype: List
+        """
+        return self.get_data('save_columns').\
+            get('plot_import_save', None)
+
 
 class ServitudeImportPreviewConfig(Config):
     """
@@ -1134,6 +1145,23 @@ configurations = {
             # SaveColumn(
             #     column='timestamp', value=datetime.now(), entity='Comment'
             # )
+        ],
+        'plot_import_save': [
+            SaveColumn(
+                column='upi', value=None, entity='Plot'
+            ),
+            SaveColumn(
+                column='geom', value=None, entity='Plot'
+            ),
+            SaveColumn(
+                column='plot_number', value=None, entity='Plot'
+            ),
+            SaveColumn(
+                column='area', value=None, entity='Plot'
+            ),
+            SaveColumn(
+                column='scheme_id', value=None, entity='Plot'
+            )
         ]
     }
 }

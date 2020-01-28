@@ -1073,6 +1073,25 @@ class PlotPreview(Plot):
         return self._data_service.columns
 
 
+class SavePlot:
+    """
+    Saves plot values
+    """
+    def __init__(self, data_service, model, scheme_id, srid):
+        self._data_service = data_service
+        self._model = model
+        self._scheme_id = scheme_id
+        self._srid = srid
+
+
+
+
+
+
+
+
+
+
 class PlotFile(Plot):
     """
     Manages plot import data file settings
