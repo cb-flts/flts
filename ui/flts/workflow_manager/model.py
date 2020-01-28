@@ -349,7 +349,7 @@ class WorkflowManagerModel(QAbstractTableModel):
         :rtype data_source: Object
         """
         if data_source is None:
-            data_source = self._data_service
+            data_source = self._data_source
         self.layoutAboutToBeChanged.emit()
         self.results = []
         self._headers = []
