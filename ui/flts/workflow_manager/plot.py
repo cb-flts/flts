@@ -35,12 +35,12 @@ from qgis.core import (
     QgsVectorLayer
 )
 from qgis.utils import iface
+from sqlalchemy import exc
+from stdm.ui.flts.workflow_manager.data import Save
 
 NAME, IMPORT_AS, DELIMITER, HEADER_ROW, CRS_ID, \
 GEOM_FIELD, GEOM_TYPE = range(7)
-
-GEOMETRY, PARCEL_NUM, UPI_NUM, AREA = range(4)
-
+GEOMETRY, PARCEL_NUM, UPI_NUM, AREA, SCHEME_ID, PLOT_STATUS = range(6)
 WARNING = "Warning"
 
 
@@ -1073,23 +1073,67 @@ class PlotPreview(Plot):
         return self._data_service.columns
 
 
-class SavePlot:
+class ImportPlot:
     """
-    Saves plot values
+    Imports plot values
     """
-    def __init__(self, data_service, model, scheme_id, srid):
-        self._data_service = data_service
+    def __init__(self, model, scheme_id, srid, data_service, col_keys):
         self._model = model
         self._scheme_id = scheme_id
         self._srid = srid
+        self._data_service = data_service
+        self._options = data_service.save_columns
+        self.col_keys = col_keys
 
+    def save(self):
+        """
+        Imports plots into the database
+        :return saved: Number of saved items
+        :rtype saved: Integer
+        """
+        imported = 0
+        try:
+            items = self._import_items()
+            imported = Save(
+                items,
+                self._model.results,
+                self._data_service
+            ).save()
+        except (AttributeError, exc.SQLAlchemyError, Exception) as e:
+            raise e
+        finally:
+            return imported
 
+    def _import_items(self):
+        """
+        Returns import items
+        :return import_items: Imported items
+        :rtype import_items: Dictionary
+        """
+        import_items = {}
+        for row, data in enumerate(self._model.results):
+            items = []
+            for key in self.col_keys:
+                value = data[key]
+                option = self._options[key]
+                if key == GEOMETRY:
+                    value = "SRID={0};{1}".format(self._srid, value)
+                elif key == SCHEME_ID:
+                    value = self._scheme_id
+                items.append([option.column, value, option.entity])
+            items.append(self._scheme_items())
+            import_items[row] = items
+        return import_items
 
-
-
-
-
-
+    def _scheme_items(self):
+        """
+        Return scheme items
+        :return: Scheme items
+        :rtype: List
+        """
+        option = self._options[SCHEME_ID]
+        scheme_id = option.column
+        return list((scheme_id, self._scheme_id, option.entity))
 
 
 class PlotFile(Plot):

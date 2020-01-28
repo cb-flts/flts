@@ -578,6 +578,7 @@ class ColumnSettings:
         return column
 
 
+GEOMETRY, PARCEL_NUM, UPI_NUM, AREA, SCHEME_ID, PLOT_STATUS = range(6)
 Column = namedtuple('Column', ['name', 'type', 'flag'])
 Icon = namedtuple('Icon', ['icon', 'size'])
 LookUp = namedtuple(
@@ -1146,22 +1147,22 @@ configurations = {
             #     column='timestamp', value=datetime.now(), entity='Comment'
             # )
         ],
-        'plot_import_save': [
-            SaveColumn(
-                column='upi', value=None, entity='Plot'
-            ),
-            SaveColumn(
+        'plot_import_save': {
+            GEOMETRY: SaveColumn(
                 column='geom', value=None, entity='Plot'
             ),
-            SaveColumn(
+            PARCEL_NUM: SaveColumn(
                 column='plot_number', value=None, entity='Plot'
             ),
-            SaveColumn(
+            UPI_NUM: SaveColumn(
+                column='upi', value=None, entity='Plot'
+            ),
+            AREA: SaveColumn(
                 column='area', value=None, entity='Plot'
             ),
-            SaveColumn(
+            SCHEME_ID: SaveColumn(
                 column='scheme_id', value=None, entity='Plot'
             )
-        ]
+        }
     }
 }

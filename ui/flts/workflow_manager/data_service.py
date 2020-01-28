@@ -667,6 +667,34 @@ class PlotPreviewDataService:
         """
         return self._table_model_icons.icons
 
+    @property
+    def save_columns(self):
+        """
+        Plot import save column options
+        :return: Save column values
+        :rtype: List
+        """
+        return self._plot_config.plot_save_columns
+
+    @property
+    def collections(self):
+        """
+        Related entity collection names
+        :return: Related entity collection names
+        :rtype: List
+        """
+        return False
+
+    def related_entities(self, entity_name=None):
+        """
+        Related entity name identified by foreign keys
+        :param entity_name:
+        :type entity_name: String
+        :return: Related entity names
+        :rtype: List
+        """
+        return False
+
     def _get_scheme(self):
         """
         Returns Scheme record/row

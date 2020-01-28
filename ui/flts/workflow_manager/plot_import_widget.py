@@ -29,8 +29,9 @@ from stdm.ui.flts.workflow_manager.config import (
     TabIcons,
 )
 from stdm.ui.flts.workflow_manager.plot import(
+    ImportPlot,
     PlotFile,
-    PlotPreview,
+    PlotPreview
 )
 from stdm.ui.flts.workflow_manager.model import WorkflowManagerModel
 from stdm.ui.flts.workflow_manager.delegates.plot_file_delegate import PlotFileDelegate
@@ -112,9 +113,34 @@ class PlotImportWidget(QWidget):
         self._remove_button.clicked.connect(self._remove_file)
         self._set_crs_button.clicked.connect(self._set_crs)
         self._preview_button.clicked.connect(self._preview)
+        self._import_button.clicked.connect(self._import)
         _selection_model = self._preview_table_view.selectionModel()
         _selection_model.selectionChanged.connect(self._on_preview_select)
         QTimer.singleShot(0, self._set_file_path)
+
+    def _import(self):
+        index = self._current_index(self._file_table_view)
+        if index is None:
+            return
+        row = index.row()
+        settings = self._file_settings(row)
+        import_type = settings.get(IMPORT_AS)
+        srid = settings.get(CRS_ID)
+        srid = srid.split(":")[1]
+        data_service = self._preview_data_service[import_type]
+        column_keys = range(4)
+
+        try:
+            x = ImportPlot(
+                self._preview_model,
+                self._scheme_id,
+                srid,
+                data_service,
+                column_keys
+            )
+            x.save()
+        except (AttributeError, Exception) as e:
+            raise e
 
     def _set_file_path(self):
         """

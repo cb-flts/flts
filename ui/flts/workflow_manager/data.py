@@ -570,13 +570,13 @@ class Save(DataRoutine):
                         self._set_collection_items(query_obj, column, new_value)
                         continue
                     else:
-                        entity_name = self._entity_name(query_obj, column)
+                        entity_name = self._entity_name(query_obj, column, entity)
                         self._set_entity_items(entity_name, column, new_value)
                         continue
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
 
-    def _entity_name(self, query_obj, column):
+    def _entity_name(self, query_obj, column, entity=None):
         """
         Returns entity short name
         :param query_obj: Query object
@@ -589,7 +589,8 @@ class Save(DataRoutine):
         if query_obj:
             if hasattr(query_obj, column):
                 return self._query_entity_name(query_obj)
-        return column.entity
+        # return column.entity
+        return entity
 
     def _set_collection_items(self, query_obj, column, value):
         """
