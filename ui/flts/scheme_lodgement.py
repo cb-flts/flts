@@ -236,6 +236,37 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         # Specify MapperMixin widgets
         self.register_col_widgets()
 
+        # Temporary tooltips for demo
+        self.cbx_region.setToolTip(
+            self.tr('Select region')
+        )
+        self.cbx_relv_auth.setToolTip(
+            self.tr('Select type of relevant authority')
+        )
+        self.cbx_reg_div.setToolTip(
+            self.tr('Select registration division')
+        )
+        self.cbx_relv_auth_name.setToolTip(
+            self.tr('Select name of relevant authority')
+        )
+        self.lnedit_sg_num.setToolTip(
+            self.tr('This is the SG/General Plan number'
+                    'that is automatically generated')
+        )
+        self.lnedit_schm_num.setToolTip(
+            self.tr('This is the Scheme Number that is '
+                    'automatically generated')
+        )
+        self.dbl_spinbx_block_area.setToolTip(
+            self.tr('Insert block area')
+        )
+        self.radio_hectares.setToolTip(
+            self.tr('Click to show area in hectares')
+        )
+        self.radio_sq_meters.setToolTip(
+            self.tr('Click to show area in hectares')
+        )
+
     def _tooltips(self, widget, tip):
         """
         Show tooltips on widgets
