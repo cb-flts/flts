@@ -567,8 +567,6 @@ class PlotPreview(Plot):
                 self._geom_type = self._geometry_type()
                 if self._import_as == "Plots":
                     results = self._plot_file_contents(csv_reader)
-                elif self._import_as == "Servitudes":
-                    results = self._servitude_file_contents(csv_reader)
                 else:
                     results = self._servitude_file_contents(csv_reader)
                 if self._plot_layer:
@@ -1110,20 +1108,23 @@ class ImportPlot:
         :return import_items: Imported items
         :rtype import_items: Dictionary
         """
-        import_items = {}
-        for row, data in enumerate(self._model.results):
-            items = []
-            for key in self.col_keys:
-                value = data[key]
-                option = self._options[key]
-                if key == GEOMETRY:
-                    value = "SRID={0};{1}".format(self._srid, value)
-                elif key == SCHEME_ID:
-                    value = self._scheme_id
-                items.append([option.column, value, option.entity])
-            items.append(self._scheme_items())
-            import_items[row] = items
-        return import_items
+        try:
+            import_items = {}
+            for row, data in enumerate(self._model.results):
+                items = []
+                for key in self.col_keys:
+                    value = data[key]
+                    option = self._options[key]
+                    if key == GEOMETRY:
+                        value = "SRID={0};{1}".format(self._srid, value)
+                    elif key == SCHEME_ID:
+                        value = self._scheme_id
+                    items.append([option.column, value, option.entity])
+                items.append(self._scheme_items())
+                import_items[row] = items
+            return import_items
+        except (AttributeError, KeyError, Exception) as e:
+            raise e
 
     def _scheme_items(self):
         """

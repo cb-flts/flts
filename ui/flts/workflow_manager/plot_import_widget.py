@@ -19,10 +19,12 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.gui import QgsGenericProjectionSelector
 from qgis.utils import iface
+from sqlalchemy import exc
 from stdm.settings.registryconfig import (
     last_document_path,
     set_last_document_path
 )
+from ...notification import NotificationBar
 from stdm.ui.flts.workflow_manager.config import (
     SchemeMessageBox,
     StyleSheet,
@@ -53,6 +55,7 @@ class PlotImportWidget(QWidget):
         self._scheme_id = scheme_id
         self._scheme_number = scheme_number
         self._parent = parent
+        self.notif_bar = NotificationBar(parent.vlNotification)
         data_service = widget_properties["data_service"]
         self._file_service = data_service["plot_file"]
         self._file_service = self._file_service()
@@ -110,7 +113,7 @@ class PlotImportWidget(QWidget):
         self._parent.removeTab.connect(self._on_remove_tab)
         self._file_table_view.clicked.connect(self._on_file_select)
         self._add_button.clicked.connect(self._add_file)
-        self._remove_button.clicked.connect(self._remove_file)
+        self._remove_button.clicked.connect(self._remove)
         self._set_crs_button.clicked.connect(self._set_crs)
         self._preview_button.clicked.connect(self._preview)
         self._import_button.clicked.connect(self._import)
@@ -118,29 +121,18 @@ class PlotImportWidget(QWidget):
         _selection_model.selectionChanged.connect(self._on_preview_select)
         QTimer.singleShot(0, self._set_file_path)
 
-    def _import(self):
-        index = self._current_index(self._file_table_view)
-        if index is None:
-            return
+    def _ok_to_import(self, index, import_type):
+        """
+        Returns import data message box reply
+        :return: True or False
+        """
         row = index.row()
-        settings = self._file_settings(row)
-        import_type = settings.get(IMPORT_AS)
-        srid = settings.get(CRS_ID)
-        srid = srid.split(":")[1]
-        data_service = self._preview_data_service[import_type]
-        column_keys = range(4)
-
-        try:
-            x = ImportPlot(
-                self._preview_model,
-                self._scheme_id,
-                srid,
-                data_service,
-                column_keys
-            )
-            x.save()
-        except (AttributeError, Exception) as e:
-            raise e
+        fpath = self.model.results[row].get("fpath")
+        fname = QFileInfo(fpath).fileName()
+        import_type = import_type.lower()
+        title = "Workflow Manager - Plot Import"
+        msg = "Do you want to import {0} in {1} file ?".format(import_type, fname)
+        return self._show_question_message(title, msg)
 
     def _set_file_path(self):
         """
@@ -256,29 +248,14 @@ class PlotImportWidget(QWidget):
         self._enable_widgets(self._toolbar_buttons)
         self._enable_crs_button()
 
-    def _remove_file(self):
+    def _remove(self):
         """
-        Removes plot import file and its settings from table view
+        Removes plot import file from table view
         """
-        index = self._current_index(self._file_table_view)
-        if index is None:
+        fpath = self._selected_file()
+        if not fpath or not self._ok_to_remove(fpath):
             return
-        row = index.row()
-        fpath = self.model.results[row].get("fpath")
-        if not self._ok_to_remove(fpath):
-            return
-        if self._plot_preview:
-            PlotPreview.remove_layer_by_id(fpath)
-            self._layer = None
-        self._reset_preview(fpath)
-        self._set_preview_groupbox_title()
-        self.model.removeRows(row)
-        self._plot_file.remove_filepath(fpath)
-        self._enable_crs_button()
-        if not self.model.results:
-            self.model.reset()
-            self._disable_widgets(self._toolbar_buttons)
-            self._set_crs_button.setEnabled(False)
+        self._remove_file()
 
     def _ok_to_remove(self, fpath):
         """
@@ -316,12 +293,20 @@ class PlotImportWidget(QWidget):
             if reply == QMessageBox.Cancel:
                 return False
             elif reply == QMessageBox.Yes:
-                pass
-                # call import function
-                # on finish import remove dirty file
+                self._import_plot()
             else:
-                PlotPreview.remove_dirty(fpath)
+                self._remove_dirty(fpath)
         return True
+
+    @staticmethod
+    def _remove_dirty(fpath):
+        """
+        Removes file name from dirty class variable
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        """
+        if PlotPreview.is_dirty(fpath):
+            PlotPreview.remove_dirty(fpath)
 
     def _reset_preview(self, fpath):
         """
@@ -447,6 +432,93 @@ class PlotImportWidget(QWidget):
             self._preview_table_view.horizontalHeader(). \
                 setStretchLastSection(True)
 
+    def _import(self):
+        """
+        Imports selected plot import file content
+        """
+        if self._num_errors > 0:
+            self._show_critical_message(
+                "Workflow Manager - Plot Import",
+                "{0} preview errors were reported. "
+                "Please correct the errors and import.".format(self._num_errors)
+            )
+            return
+        index = self._current_index(self._file_table_view)
+        if index is None:
+            return
+        settings = self._file_settings(index.row())
+        if settings.get(IMPORT_AS) == "Plots":
+            self._import_plot()
+        else:
+            pass
+
+    @property
+    def _num_errors(self):
+        """
+        Returns number of errors
+        :return: Number of errors
+        :rtype: Integer
+        """
+        if self._plot_preview:
+            return self._plot_preview.num_errors()
+
+    def _import_plot(self):
+        """
+        Imports plot values
+        """
+        index = self._current_index(self._file_table_view)
+        if index is None:
+            return
+        settings = self._file_settings(index.row())
+        import_type = settings.get(IMPORT_AS)
+        if not self._ok_to_import(index, import_type):
+            return
+        srid = settings.get(CRS_ID)
+        srid = srid.split(":")[1]
+        data_service = self._preview_data_service[import_type]
+        column_keys = range(4)
+        try:
+            import_plot = ImportPlot(
+                self._preview_model,
+                self._scheme_id,
+                srid,
+                data_service,
+                column_keys
+            )
+            import_plot = import_plot.save()
+        except (AttributeError, exc.SQLAlchemyError, Exception) as e:
+            self._show_critical_message(
+                "Workflow Manager - Plot Import",
+                "Failed to update: {}".format(e)
+            )
+        else:
+            msg = "Successfully imported {0} plots".format(import_plot)
+            self.notif_bar.insertInformationNotification(msg)
+            self._remove_file()
+
+    def _remove_file(self):
+        """
+        Removes plot import file and its settings from table view
+        """
+        index = self._current_index(self._file_table_view)
+        if index is None:
+            return
+        row = index.row()
+        fpath = self.model.results[row].get("fpath")
+        if self._plot_preview:
+            PlotPreview.remove_layer_by_id(fpath)
+            self._layer = None
+        self._reset_preview(fpath)
+        self._set_preview_groupbox_title()
+        self.model.removeRows(row)
+        self._remove_dirty(fpath)
+        self._plot_file.remove_filepath(fpath)
+        self._enable_crs_button()
+        if not self.model.results:
+            self.model.reset()
+            self._disable_widgets(self._toolbar_buttons)
+            self._set_crs_button.setEnabled(False)
+
     @staticmethod
     def _load(model, data_source):
         """
@@ -560,14 +632,25 @@ class PlotImportWidget(QWidget):
         """
         Enables/disables Set CRS button
         """
-        index = self._current_index(self._file_table_view)
-        if index is None:
+        fpath = self._selected_file()
+        if not fpath:
             return
-        fpath = self.model.results[index.row()].get("fpath")
         if self._plot_file.is_pdf(fpath):
             self._set_crs_button.setEnabled(False)
         else:
             self._set_crs_button.setEnabled(True)
+
+    def _selected_file(self):
+        """
+        Returns selected file
+        :return fpath: Selected file
+        :return fpath: String
+        """
+        index = self._current_index(self._file_table_view)
+        if index is None:
+            return
+        fpath = self.model.results[index.row()].get("fpath")
+        return fpath
 
     @staticmethod
     def _crs_authority_id():
