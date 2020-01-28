@@ -857,6 +857,7 @@ class PlotPreview(Plot):
         :return:
         """
         if not self._valid_setup(wkt):
+            self._remove_previewed_layers()
             return
         if not self._plot_layer:
             geom_type, geom = self._geometry(wkt)
@@ -889,6 +890,15 @@ class PlotPreview(Plot):
                 import_type != self._import_as:
             return False
         return True
+
+    def _remove_previewed_layers(self):
+        """
+        Removes previewed layers
+        """
+        PlotPreview.remove_layer_by_id(self._parent_id)
+        layer = PlotPreview.layers.get(self._parent_id)
+        if layer:
+            self._remove_stored_layer(layer.id())
 
     def _generate_layer_name(self):
         """
