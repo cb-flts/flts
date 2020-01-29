@@ -124,6 +124,10 @@
     <CodeValue value="Disapproved" code="DA"/>
     <CodeValue value="Held" code="HD"/>
    </ValueList>
+   <ValueList name="check_plot_status">
+    <CodeValue value="Uploaded" code="UP"/>
+    <CodeValue value="Not Uploaded" code="NP"/>
+   </ValueList>
   </ValueLists>
   <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to log entity of LIS_Plot" proxy="False" createId="True" supportsDocuments="False" shortName="LIS_Plot_log" name="cb_lis_plot_log" label="">
    <Columns>
@@ -285,6 +289,28 @@
     </Column>
    </Columns>
   </Entity>
+  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to scheme servitude" proxy="False" createId="True" supportsDocuments="False" shortName="Servitude" name="cb_servitude" label="lht_servitude">
+   <Columns>
+    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
+    <Column unique="False" tip="Geometry column of the Servitude" rowindex="-1" description="Geometry column of the Servitude" index="False" name="geom" searchable="False" TYPE_INFO="GEOMETRY" label="" mandatory="False">
+     <Geometry layerDisplay="" srid="4006" type="1"/>
+    </Column>
+    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="2147483647" description="Identity of the scheme" index="False" name="scheme_id" searchable="False" TYPE_INFO="FOREIGN_KEY" label="" mandatory="True">
+     <Relation name="fk_cb_scheme_id_cb_servitude_scheme_id"/>
+    </Column>
+   </Columns>
+  </Entity>
+  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to scheme beacon" proxy="False" createId="True" supportsDocuments="False" shortName="Beacon" name="cb_beacon" label="lht_beacon">
+   <Columns>
+    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="-1" description="Geometry column of the Beacon" index="False" name="geom" searchable="False" TYPE_INFO="GEOMETRY" label="" mandatory="False">
+     <Geometry layerDisplay="" srid="4006" type="0"/>
+    </Column>
+    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="2147483647" description="Identity of the scheme" index="False" name="scheme_id" searchable="False" TYPE_INFO="FOREIGN_KEY" label="" mandatory="True">
+     <Relation name="fk_cb_scheme_id_cb_beacon_scheme_id"/>
+    </Column>
+   </Columns>
+  </Entity>
   <Entity editable="True" global="False" rowindex="0" associative="False" description="Staging table for plots imported from LIS" proxy="False" createId="True" supportsDocuments="False" shortName="LIS_Plot" name="cb_lis_plot" label="LIS Plot">
    <Columns>
     <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
@@ -414,7 +440,10 @@
     <Column unique="False" tip="" rowindex="11" minimum="0" maximum="32" description="Reference number of the constitution" index="False" name="constitution_ref_number" searchable="True" TYPE_INFO="VARCHAR" label="constitution reference number" mandatory="False"/>
     <Column unique="False" tip="" rowindex="12" minimum="0" maximum="2147483647" description="Number of polts in the scheme" index="False" name="no_of_plots" searchable="True" TYPE_INFO="INT" label="number of plots" mandatory="True"/>
     <Column unique="False" tip="" rowindex="13" minimum="0" maximum="32" description="The number representing the scheme" index="False" name="scheme_number" searchable="True" TYPE_INFO="VARCHAR" label="scheme_number" mandatory="True"/>
-    <Column unique="False" tip="General Plan Number" rowindex="-1" minimum="0" maximum="32" description="The number representing general plan" index="False" name="general_plan_number" searchable="True" TYPE_INFO="VARCHAR" label="general plan number" mandatory="True"/>
+    <Column unique="False" tip="General Plan Number" rowindex="14" minimum="0" maximum="32" description="The number representing general plan" index="False" name="general_plan_number" searchable="True" TYPE_INFO="VARCHAR" label="general plan number" mandatory="True"/>
+    <Column unique="False" tip="Plot upload status" rowindex="-1" minimum="0" maximum="2147483647" description="Plot upload status" index="False" name="plot_status" searchable="True" TYPE_INFO="LOOKUP" label="" mandatory="False">
+     <Relation name="fk_cb_check_plot_status_id_cb_scheme_plot_status"/>
+    </Column>
    </Columns>
   </Entity>
   <Entity editable="True" global="False" rowindex="4" associative="False" description="Refers to the relation between holder and plot" proxy="False" createId="True" supportsDocuments="False" shortName="Holder_plot" name="cb_holder_plot" label="lht_holder_plot">
@@ -453,6 +482,13 @@
     <Column unique="False" tip="" rowindex="2" minimum="0" maximum="2147483647" description="Use of the plot of land" index="False" name="use" searchable="True" TYPE_INFO="LOOKUP" label="plot use" mandatory="False">
      <Relation name="fk_cb_check_lht_plot_use_id_cb_plot_use"/>
     </Column>
+    <Column unique="True" tip="Plot number" rowindex="-1" minimum="0" maximum="6" description="" index="True" name="plot_number" searchable="True" TYPE_INFO="VARCHAR" label="" mandatory="True"/>
+    <Column unique="False" tip="Plot area" rowindex="-1" minimum="-2.225073858507201383090232717332404064219215980462331830553327416887204434813918195854283159012511020564067339731035811005152434161553460108856012385377718821130777993532002330479610147442583636071921565046942503734208375250806650616658158948720491179968591639648500635908770118304874799780887753749949451580451605050915399856582470818645113537935804992115981085766051992433352114352390148795699609591288891602992641511063466313393663477586513029371762047325631781485664350872122828637642044846811407613911477062801689853244110024161447421618567166150540154285084716752901903161322778896729707373123334086988983175067838846926092773977972858659654941091369095406136467568702398678315290680984617210924625396728515625E-308" maximum="179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368" description="Area of the plot" index="False" name="area" searchable="False" TYPE_INFO="DOUBLE" label="" mandatory="False">
+     <Numeric scale="6" precision="18"/>
+    </Column>
+    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="2147483647" description="Identifier of the scheme" index="False" name="scheme_id" searchable="False" TYPE_INFO="FOREIGN_KEY" label="" mandatory="True">
+     <Relation name="fk_cb_scheme_id_cb_plot_scheme_id"/>
+    </Column>
    </Columns>
   </Entity>
   <Entity editable="True" global="False" rowindex="9" associative="False" description="Refers to the cadastral system title deed" proxy="False" createId="True" supportsDocuments="False" shortName="Cdrs_title_deed" name="cb_cdrs_title_deed" label="lht_cdrs_title_deed">
@@ -480,7 +516,6 @@
    <EntityRelation displayColumns="name,code" child="Holder" showInParent="True" parent="check_lht_income_level" name="fk_cb_check_lht_income_level_id_cb_holder_income_level" parentColumn="id" showInChild="True" childColumn="income_level"/>
    <EntityRelation displayColumns="name,code" child="Holder" showInParent="True" parent="check_lht_occupation" name="fk_cb_check_lht_occupation_id_cb_holder_occupation" parentColumn="id" showInChild="True" childColumn="occupation"/>
    <EntityRelation displayColumns="name,code" child="Notification" showInParent="True" parent="check_lht_notification" name="fk_cb_check_lht_notification_id_cb_notification_status" parentColumn="id" showInChild="True" childColumn="status"/>
-   <EntityRelation displayColumns="name,code" child="Plot" showInParent="True" parent="check_lht_plot_use" name="fk_cb_check_lht_plot_use_id_cb_plot_use" parentColumn="id" showInChild="True" childColumn="use"/>
    <EntityRelation displayColumns="" child="check_tenure_type_str_attrs" showInParent="True" parent="social_tenure_relationship" name="fk_cb_social_tenure_relationship_id_cb_check_tenure_type_str_attrs_social_tenure_relationship_id" parentColumn="id" showInChild="True" childColumn="social_tenure_relationship_id"/>
    <EntityRelation displayColumns="" child="Relevant_auth_reg_division" showInParent="True" parent="Relevant_authority" name="fk_cb_relevant_authority_id_cb_relevant_auth_reg_division_relv_auth_id" parentColumn="id" showInChild="True" childColumn="relv_auth_id"/>
    <EntityRelation displayColumns="name,code" child="Relevant_auth_reg_division" showInParent="True" parent="check_lht_reg_division" name="fk_cb_check_lht_reg_division_id_cb_relevant_auth_reg_division_reg_division_id" parentColumn="id" showInChild="True" childColumn="reg_division_id"/>
@@ -492,6 +527,7 @@
    <EntityRelation displayColumns="name,code" child="Scheme" showInParent="True" parent="check_lht_region" name="fk_cb_check_lht_region_id_cb_scheme_region" parentColumn="id" showInChild="True" childColumn="region"/>
    <EntityRelation displayColumns="" child="Scheme" showInParent="True" parent="Cdrs_title_deed" name="fk_cb_cdrs_title_deed_id_cb_scheme_title_deed_number" parentColumn="id" showInChild="True" childColumn="title_deed_number"/>
    <EntityRelation displayColumns="name,code" child="Scheme" showInParent="True" parent="check_lht_reg_division" name="fk_cb_check_lht_reg_division_id_cb_scheme_registration_division" parentColumn="id" showInChild="True" childColumn="registration_division"/>
+   <EntityRelation displayColumns="name,code" child="Scheme" showInParent="True" parent="check_plot_status" name="fk_cb_check_plot_status_id_cb_scheme_plot_status" parentColumn="id" showInChild="True" childColumn="plot_status"/>
    <EntityRelation displayColumns="" child="Scheme_workflow" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_scheme_workflow_scheme_id" parentColumn="id" showInChild="True" childColumn="scheme_id"/>
    <EntityRelation displayColumns="name,code" child="Scheme_workflow" showInParent="True" parent="check_lht_workflow" name="fk_cb_check_lht_workflow_id_cb_scheme_workflow_workflow_id" parentColumn="id" showInChild="True" childColumn="workflow_id"/>
    <EntityRelation displayColumns="name,code" child="Scheme_workflow" showInParent="True" parent="check_lht_approval_status" name="fk_cb_check_lht_approval_status_id_cb_scheme_workflow_approval_id" parentColumn="id" showInChild="True" childColumn="approval_id"/>
@@ -500,9 +536,13 @@
    <EntityRelation displayColumns="first_name,last_name" child="Comment" showInParent="True" parent="User" name="fk_cb_user_id_cb_comment_user_id" parentColumn="id" showInChild="True" childColumn="user_id"/>
    <EntityRelation displayColumns="" child="Scheme_comment" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_scheme_comment_scheme_id" parentColumn="id" showInChild="True" childColumn="scheme_id"/>
    <EntityRelation displayColumns="" child="Scheme_comment" showInParent="True" parent="Comment" name="fk_cb_comment_id_cb_scheme_comment_comment_id" parentColumn="id" showInChild="True" childColumn="comment_id"/>
+   <EntityRelation displayColumns="name,code" child="Plot" showInParent="True" parent="check_lht_plot_use" name="fk_cb_check_lht_plot_use_id_cb_plot_use" parentColumn="id" showInChild="True" childColumn="use"/>
+   <EntityRelation displayColumns="" child="Plot" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_plot_scheme_id" parentColumn="id" showInChild="True" childColumn="scheme_id"/>
    <EntityRelation displayColumns="" child="Holder_plot" showInParent="True" parent="Holder" name="fk_cb_holder_id_cb_holder_plot_holder_id" parentColumn="id" showInChild="True" childColumn="holder_id"/>
    <EntityRelation displayColumns="" child="Holder_plot" showInParent="True" parent="Plot" name="fk_cb_plot_id_cb_holder_plot_plot_id" parentColumn="id" showInChild="True" childColumn="plot_id"/>
    <EntityRelation displayColumns="" child="Lis_erf" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_lis_erf_scheme_identifier" parentColumn="id" showInChild="True" childColumn="scheme_identifier"/>
+   <EntityRelation displayColumns="" child="Servitude" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_servitude_scheme_id" parentColumn="id" showInChild="True" childColumn="scheme_id"/>
+   <EntityRelation displayColumns="" child="Beacon" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_beacon_scheme_id" parentColumn="id" showInChild="True" childColumn="scheme_id"/>
    <EntityRelation displayColumns="" child="social_tenure_relationship" showInParent="True" parent="Holder" name="fk_cb_holder_id_cb_social_tenure_relationship_holder_id" parentColumn="id" showInChild="True" childColumn="holder_id"/>
    <EntityRelation displayColumns="" child="social_tenure_relationship" showInParent="True" parent="Plot" name="fk_cb_plot_id_cb_social_tenure_relationship_plot_id" parentColumn="id" showInChild="True" childColumn="plot_id"/>
   </Relations>

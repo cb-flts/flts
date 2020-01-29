@@ -1126,10 +1126,10 @@ class STDMQGISLoader(object):
         )
 
         self.printCertificateAct = QAction(
-            QIcon(":/plugins/stdm/images/icons/flts_print.png"),
+            QIcon(":/plugins/stdm/images/icons/flts_import_plot_cropped.png"),
             QApplication.translate(
                 "PrintCertificateToolbarAction",
-                "Print Certificate"
+                "Plots"
             ),
             self.iface.mainWindow()
         )
