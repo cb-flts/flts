@@ -37,6 +37,7 @@ from stdm.ui.flts.workflow_manager.data_service import (
     HolderDataService,
     PlotImportFileDataService,
     plot_data_service,
+    plot_viewer_data_service,
     SchemeDataService
 )
 from stdm.ui.flts.workflow_manager.data import (
@@ -57,6 +58,7 @@ from stdm.ui.flts.workflow_manager.message_box_widget import(
 from stdm.ui.flts.workflow_manager.components.toolbar_component import get_toolbar
 from stdm.ui.flts.workflow_manager.components.pagination_component import PaginationComponent
 from stdm.ui.flts.workflow_manager.plot_import_widget import PlotImportWidget
+from stdm.ui.flts.workflow_manager.plot_viewer_widget import PlotViewerWidget
 from stdm.ui.flts.workflow_manager.scheme_detail_widget import SchemeDetailTableView
 from stdm.ui.flts.workflow_manager.ui_workflow_manager import Ui_WorkflowManagerWidget
 
@@ -94,6 +96,7 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
         layout = toolbar.layout
         self.toolbarFrame.setLayout(layout)
         self.plotsImportButton = toolbar_widgets.get("plotsImportButton")
+        self.plotsButton = toolbar_widgets.get("Plots")
         self.approveButton = toolbar_widgets.get("approveButton")
         self.disapproveButton = toolbar_widgets.get("disapproveButton")
         self.holdButton = toolbar_widgets.get("holdButton")
@@ -137,6 +140,8 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
             )
         if self.plotsImportButton:
             self.plotsImportButton.clicked.connect(self._load_scheme_detail)
+        if self.plotsButton:
+            self.plotsButton.clicked.connect(self._load_scheme_detail)
         self.documentsButton.clicked.connect(self._load_scheme_detail)
         self.holdersButton.clicked.connect(self._load_scheme_detail)
         self.commentsButton.clicked.connect(self._load_scheme_detail)
@@ -290,7 +295,7 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
         status = self._get_stored_status()
         self._enable_widget([
             self.holdersButton, self.documentsButton,
-            self.commentsButton
+            self.commentsButton, self.plotsButton
         ])
         # TODO: Start refactor. Combine with _on_uncheck_disable_widgets
         if self.approveButton and self._lookup.PENDING() in status or \
@@ -304,6 +309,8 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
             self._enable_widget(self.holdButton)
         if self.plotsImportButton and self._lookup.PENDING() in status:
             self._enable_widget(self.plotsImportButton)
+        if self.plotsButton and self._lookup.PENDING() in status:
+            self._enable_widget(self.plotsButton)
         self._on_uncheck_disable_widgets()
         # TODO: End refactor
 
@@ -453,6 +460,12 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
                 },
                 'widget': PlotImportWidget,
                 'object_name': 'plotImport',
+            },
+            'Plots': {
+                'data_service': plot_viewer_data_service,
+                'widget': PlotViewerWidget,
+                'object_name': 'plotViewer',
+                'load_collections': False
             },
             'Documents': {
                 'data_service': DocumentDataService,
@@ -1005,7 +1018,8 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
                 self._disable_widget(self.holdButton)
             self._disable_widget([
                 self.approveButton, self.holdersButton,
-                self.documentsButton, self.commentsButton
+                self.documentsButton, self.commentsButton,
+                self.plotsImportButton, self.plotsButton
             ])
 
         elif self._lookup.PENDING() not in status and \

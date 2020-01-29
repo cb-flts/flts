@@ -31,6 +31,7 @@ from stdm.ui.flts.workflow_manager.config import (
     HolderConfig,
     PlotImportFileConfig,
     PlotImportPreviewConfig,
+    PlotViewerConfig,
     ServitudeImportPreviewConfig,
     SchemeConfig,
     TableModelIcons,
@@ -591,6 +592,113 @@ class CommentDataService(DataService):
         """
         entity = self._profile.entity(name)
         return super(CommentDataService, self).entity_model_(entity)
+
+
+class PlotViewerDataService(DataService):
+    """
+    Scheme plot viewer data model service
+    """
+    def __init__(self, current_profile, scheme_id):
+        self._profile = current_profile
+        self._scheme_id = scheme_id
+        self.entity_name = "Plot"
+        self.plot_viewer_config = PlotViewerConfig()
+
+    @property
+    def columns(self):
+        """
+        Scheme plot viewer table view columns options
+        :return: Table view columns and query columns options
+        :rtype: List
+        """
+        return self.plot_viewer_config.columns
+
+    @property
+    def vertical_header(self):
+        """
+        Scheme table view vertical orientation
+        :return: True for vertical headers
+                 or False otherwise
+        :rtype: Boolean
+        """
+        return True
+
+    @property
+    def collections(self):
+        """
+        Related entity collection names
+        :return: Related entity collection names
+        :rtype: List
+        """
+        return False
+
+    def related_entities(self, entity_name=None):
+        """
+        Related entity name identified by foreign keys
+        :param entity_name:
+        :type entity_name: String
+        :return: Related entity names
+        :rtype: List
+        """
+        return False
+
+    def run_query(self):
+        """
+        Run query on an entity
+        :return query_obj: Query results
+        :rtype query_obj: List
+        """
+        model = self.entity_model_(self.entity_name)
+        entity_object = model()
+        try:
+            query_object = entity_object.queryObject(). \
+                filter(model.scheme_id == self._scheme_id)
+            return query_object.all()
+        except (AttributeError, exc.SQLAlchemyError, Exception) as e:
+            raise e
+
+    @staticmethod
+    def filter_query_by(entity_name, filters):
+        """
+        Filters query result by a column value
+        :param entity_name: Entity name
+        :type entity_name: String
+        :param filters: Column filters - column name and value
+        :type filters: Dictionary
+        :return: Filter entity query object
+        :rtype: Entity object
+        """
+        try:
+            filter_by = FilterQueryBy()
+            return filter_by(entity_name, filters)
+        except (AttributeError, exc.SQLAlchemyError, Exception) as e:
+            raise e
+
+    def entity_model_(self, name=None):
+        """
+        Gets entity model
+        :param name: Name of the entity
+        :type name: String
+        :return: Entity model
+        :rtype: DeclarativeMeta
+        """
+        entity = self._profile.entity(name)
+        return super(PlotViewerDataService, self).entity_model_(entity)
+
+
+def plot_viewer_data_service(import_type):
+    """
+    Returns plot viewier data service
+    based on import type
+    :param import_type: Plot file import type
+    :type import_type: String
+    :return: Plot viewer data service object
+    :rtype: Service Object
+    """
+    data_service = {
+        "Plots": PlotViewerDataService
+    }
+    return data_service[import_type]
 
 
 class PlotImportFileDataService:
