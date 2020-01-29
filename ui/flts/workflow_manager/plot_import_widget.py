@@ -124,7 +124,7 @@ class PlotImportWidget(QWidget):
     def _ok_to_import(self, index, import_type):
         """
         Returns import data message box reply
-        :return: True or False
+        :return: True or False.
         """
         row = index.row()
         fpath = self.model.results[row].get("fpath")
