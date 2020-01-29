@@ -302,8 +302,8 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
                              'cb_check_lht_relevant_authority')
         self._populate_combo(self.cbx_lro,
                              'cb_check_lht_land_rights_office')
-        self._populate_combo(self.cbx_reg_div,
-                             'cb_check_lht_reg_division')
+        # self._populate_combo(self.cbx_reg_div,
+        #                      'cb_check_lht_reg_division')
 
         # Sort region combobox items
         self.cbx_region.model().sort(0)
@@ -386,7 +386,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
     def update_relevant_authority(self):
         """
         Slot for updating the Relevant Authority combobox based on the
-        selections made in the two previous comboboxes
+        selections made in the two previous combo boxes
         """
         # Update the entity object and model references
         self._update_entities_and_models()
@@ -407,6 +407,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             return
 
         # Initial clear elements
+        self.cbx_relv_auth_name.clear()
         self.cbx_reg_div.clear()
         self.lnedit_sg_num.clear()
 
