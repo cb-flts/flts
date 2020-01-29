@@ -693,16 +693,19 @@ class PlotPreview(Plot):
                 self._items[column] = self._display_tooltip(
                     "Geometry type not allowed", WARNING
                 )
+                self._error_counter += 1
             elif geom_type != self._geom_type:
                 self._items[column] = self._display_tooltip(
                     "Does not match set geometry type ({})".format(self._geom_type),
                     WARNING
                 )
+                self._error_counter += 1
             elif self._import_type.get(self._geom_type) != self._import_as:
                 self._items[column] = self._display_tooltip(
                     "Does not match set import type ({})".format(self._import_as),
                     WARNING
                 )
+                self._error_counter += 1
             return value
 
     def _get_value(self, data, field_names, column):
