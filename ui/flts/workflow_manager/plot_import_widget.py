@@ -121,19 +121,6 @@ class PlotImportWidget(QWidget):
         _selection_model.selectionChanged.connect(self._on_preview_select)
         QTimer.singleShot(0, self._set_file_path)
 
-    def _ok_to_import(self, index, import_type):
-        """
-        Returns import data message box reply
-        :return: True or False.
-        """
-        row = index.row()
-        fpath = self.model.results[row].get("fpath")
-        fname = QFileInfo(fpath).fileName()
-        import_type = import_type.lower()
-        title = "Workflow Manager - Plot Import"
-        msg = "Do you want to import {0} in {1} file ?".format(import_type, fname)
-        return self._show_question_message(title, msg)
-
     def _set_file_path(self):
         """
         Sets plot import file absolute path
@@ -436,11 +423,11 @@ class PlotImportWidget(QWidget):
         """
         Imports selected plot import file content
         """
-        if self._num_errors > 0:
+        if self._import_error > 0:
             self._show_critical_message(
                 "Workflow Manager - Plot Import",
                 "{0} preview errors were reported. "
-                "Please correct the errors and import.".format(self._num_errors)
+                "Please correct the errors and import.".format(self._import_error)
             )
             return
         index = self._current_index(self._file_table_view)
@@ -453,14 +440,14 @@ class PlotImportWidget(QWidget):
             pass
 
     @property
-    def _num_errors(self):
+    def _import_error(self):
         """
         Returns number of errors
         :return: Number of errors
         :rtype: Integer
         """
         if self._plot_preview:
-            return self._plot_preview.num_errors()
+            return self._plot_preview.import_error
 
     def _import_plot(self):
         """
@@ -495,6 +482,19 @@ class PlotImportWidget(QWidget):
             msg = "Successfully imported {0} plots".format(import_plot)
             self.notif_bar.insertInformationNotification(msg)
             self._remove_file()
+
+    def _ok_to_import(self, index, import_type):
+        """
+        Returns import data message box reply
+        :return: True or False.
+        """
+        row = index.row()
+        fpath = self.model.results[row].get("fpath")
+        fname = QFileInfo(fpath).fileName()
+        import_type = import_type.lower()
+        title = "Workflow Manager - Plot Import"
+        msg = "Do you want to import {0} in {1} file ?".format(import_type, fname)
+        return self._show_question_message(title, msg)
 
     def _remove_file(self):
         """

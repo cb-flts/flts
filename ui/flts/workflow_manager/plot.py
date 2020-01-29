@@ -500,7 +500,7 @@ class PlotPreview(Plot):
         self._scheme_number = scheme_number
         self._parent_id = parent_id
         self._items = self._plot_layer = None
-        self._num_errors = 0
+        self._error_counter = 0
         self._import_type = {"Point": "Beacons", "Line": "Servitudes", "Polygon": "Plots"}
         self._header_row = file_settings.get(HEADER_ROW) - 1
         self._delimiter = self._get_delimiter(file_settings.get(DELIMITER))
@@ -525,13 +525,14 @@ class PlotPreview(Plot):
             delimiter = "\t"
         return delimiter
 
-    def num_errors(self):
+    @property
+    def import_error(self):
         """
         Returns number of errors encountered on preview
         :return: Number of errors on preview
         :return: Integer
         """
-        return self._num_errors
+        return self._error_counter
 
     def load(self):
         """
@@ -555,7 +556,7 @@ class PlotPreview(Plot):
         :return results: Plot import file contents
         :rtype results: List
         """
-        self._num_errors = 0
+        self._error_counter = 0
         try:
             with open(fpath, 'r') as csv_file:
                 clean_line = self._filter_whitespace(csv_file, self._header_row)
@@ -722,7 +723,7 @@ class PlotPreview(Plot):
             value = WARNING
             self._items[column] = \
                 self._decoration_tooltip("Missing value")
-            self._num_errors += 1
+            self._error_counter += 1
         return value
 
     @staticmethod
@@ -758,7 +759,7 @@ class PlotPreview(Plot):
             if value != WARNING:
                 self._items[column] = \
                     self._display_tooltip("Value is not a number", WARNING)
-                self._num_errors += 1
+                self._error_counter += 1
         return value
 
     @staticmethod
