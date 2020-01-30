@@ -191,6 +191,7 @@ class PlotImportWidget(QWidget):
             return
         event.accept()
         self._remove_layers()
+        PlotPreview.reset_errors()
         PlotPreview.reset_dirty()
 
     def _on_remove_tab(self):
@@ -243,6 +244,7 @@ class PlotImportWidget(QWidget):
         if not fpath or not self._ok_to_remove(fpath):
             return
         self._remove_file()
+        PlotPreview.remove_error(fpath)
 
     def _ok_to_remove(self, fpath):
         """

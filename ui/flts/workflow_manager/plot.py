@@ -584,6 +584,16 @@ class PlotPreview(Plot):
             return
         PlotPreview.errors[fpath] = self._error_counter
 
+    @classmethod
+    def remove_error(cls, fpath):
+        """
+        Removes error
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        """
+        if fpath in PlotPreview.errors:
+            del PlotPreview.errors[fpath]
+
     def _plot_file_contents(self, csv_reader):
         """
         Returns plot file contents
@@ -1078,6 +1088,13 @@ class PlotPreview(Plot):
         :return: Integer
         """
         return cls.errors.get(fpath)
+
+    @classmethod
+    def reset_errors(cls):
+        """
+        Resets the error class variable
+        """
+        cls.errors = {}
 
     def get_headers(self):
         """
