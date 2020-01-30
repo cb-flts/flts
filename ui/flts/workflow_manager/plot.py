@@ -267,8 +267,8 @@ class PlotLayer:
         if layer == iface.activeLayer():
             return True
 
-    @staticmethod
-    def clear_feature(layer):
+    @classmethod
+    def clear_feature(cls, layer):
         """
         Clears selected features in a layer
         :param layer: Input layer
@@ -1013,17 +1013,14 @@ class PlotPreview(Plot):
             return
         self._plot_layer.select_feature(layer, [row])
 
-    def clear_feature(self, layer=None):
+    @classmethod
+    def clear_feature(cls, layer):
         """
         Clears selected features in a layer
         :param layer: Input layer
         :type layer: QgsVectorLayer
         """
-        if not layer:
-            layer = PlotPreview.layers.get(self._parent_id)
-        if not self._plot_layer:
-            return
-        self._plot_layer.clear_feature(layer)
+        PlotLayer.clear_feature(layer)
 
     @classmethod
     def layer_in_store(cls, parent_id):
