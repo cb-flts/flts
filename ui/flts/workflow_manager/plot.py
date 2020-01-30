@@ -526,15 +526,6 @@ class PlotPreview(Plot):
             delimiter = "\t"
         return delimiter
 
-    @property
-    def import_error(self):
-        """
-        Returns number of errors encountered on preview
-        :return: Number of errors on preview
-        :return: Integer
-        """
-        return self._error_counter
-
     def load(self):
         """
         Loads plot import file contents
@@ -579,8 +570,19 @@ class PlotPreview(Plot):
             raise e
         if results:
             PlotPreview.dirty[self._parent_id] = True
-            PlotPreview.errors[fpath] = self._error_counter
+            self._set_errors(fpath)
         return results
+
+    def _set_errors(self, fpath):
+        """
+        Sets errors
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        """
+        if self._error_counter == 0 and fpath in PlotPreview.errors:
+            del PlotPreview.errors[fpath]
+            return
+        PlotPreview.errors[fpath] = self._error_counter
 
     def _plot_file_contents(self, csv_reader):
         """
@@ -1067,6 +1069,15 @@ class PlotPreview(Plot):
         Resets the dirty class variable
         """
         cls.dirty = {}
+
+    @classmethod
+    def import_error(cls, fpath):
+        """
+        Returns number of errors encountered on preview
+        :return: Number of errors on preview
+        :return: Integer
+        """
+        return cls.errors.get(fpath)
 
     def get_headers(self):
         """

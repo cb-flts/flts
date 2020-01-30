@@ -423,31 +423,24 @@ class PlotImportWidget(QWidget):
         """
         Imports selected plot import file content
         """
-        if self._import_error > 0:
-            self._show_critical_message(
-                "Workflow Manager - Plot Import",
-                "{0} preview errors were reported. "
-                "Please correct the errors and import.".format(self._import_error)
-            )
-            return
         index = self._current_index(self._file_table_view)
         if index is None:
             return
-        settings = self._file_settings(index.row())
+        row = index.row()
+        fpath = self.model.results[row].get("fpath")
+        error = PlotPreview.errors.get(fpath)
+        if error and error > 0:
+            self._show_critical_message(
+                "Workflow Manager - Plot Import",
+                "{0} preview errors were reported. "
+                "Please correct the errors and import.".format(error)
+            )
+            return
+        settings = self._file_settings(row)
         if settings.get(IMPORT_AS) == "Plots":
             self._import_plot()
         else:
             pass
-
-    @property
-    def _import_error(self):
-        """
-        Returns number of errors
-        :return: Number of errors
-        :rtype: Integer
-        """
-        if self._plot_preview:
-            return self._plot_preview.import_error
 
     def _import_plot(self):
         """
