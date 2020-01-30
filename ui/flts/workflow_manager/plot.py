@@ -490,6 +490,7 @@ class PlotPreview(Plot):
     """
     Manages preview of plot import data file contents
     """
+    errors = {}
     layers = {}
     dirty = {}
     type_count = {"Point": 1, "Line": 1, "Polygon": 1}
@@ -578,6 +579,7 @@ class PlotPreview(Plot):
             raise e
         if results:
             PlotPreview.dirty[self._parent_id] = True
+            PlotPreview.errors[fpath] = self._error_counter
         return results
 
     def _plot_file_contents(self, csv_reader):
