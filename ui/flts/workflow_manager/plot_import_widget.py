@@ -53,7 +53,6 @@ class PlotImportWidget(QWidget):
         super(QWidget, self).__init__(parent)
         self._profile = profile
         self._scheme_id = scheme_id
-        self._scheme_number = scheme_number
         self._parent = parent
         self.notif_bar = NotificationBar(parent.vlNotification)
         data_service = widget_properties["data_service"]
@@ -61,7 +60,6 @@ class PlotImportWidget(QWidget):
         self._file_service = self._file_service()
         self._plot_preview_service = data_service["plot_preview"]
         self._plot_file = PlotFile(self._file_service)
-        self._plot_preview = self._layer = None
         self._previewed = self.is_dirty = None
         import_component = PlotImportComponent()
         toolbar = import_component.components
@@ -84,6 +82,7 @@ class PlotImportWidget(QWidget):
         self._file_table_view.setSelectionMode(QAbstractItemView.SingleSelection)
         self._preview_table_view = QTableView(self)
         self._preview_data_service = self._preview_model = None
+        self._plot_preview = PlotPreview(scheme_number, self._preview_data_service)
         self._preview_model = WorkflowManagerModel(self._preview_data_service)
         self._preview_table_view.setModel(self._preview_model)
         self._preview_table_view.setAlternatingRowColors(True)
@@ -183,7 +182,7 @@ class PlotImportWidget(QWidget):
         """
         Handles on parent QDockWidget close event
         """
-        if not PlotPreview.dirty:
+        if not self._plot_preview or not self._plot_preview.dirty:
             event.accept()
             return
         if not self._ok_to_discard():
@@ -191,21 +190,20 @@ class PlotImportWidget(QWidget):
             return
         event.accept()
         self._remove_layers()
-        PlotPreview.reset_errors()
-        PlotPreview.reset_dirty()
+        self._plot_preview.reset_errors()
+        self._plot_preview.reset_dirty()
 
     def _on_remove_tab(self):
         """
         Handles on tab remove event
         """
-        if not PlotPreview.dirty:
+        if not self._plot_preview or not self._plot_preview.dirty:
             self.is_dirty = False
             return
         if not self._ok_to_discard():
             self.is_dirty = True
             return
         self._remove_layers()
-        PlotPreview.reset_dirty()
         self.is_dirty = False
 
     def _ok_to_discard(self):
@@ -213,7 +211,7 @@ class PlotImportWidget(QWidget):
         Returns discard data message box reply
         :return: True or False
         """
-        fnames = PlotPreview.dirty_file_names()
+        fnames = self._plot_preview.dirty_file_names()
         title = "Workflow Manager - Plot Import"
         msg = "Action will discard data. " \
               "Do you want to proceed? \n\n {}".format(", ".join(fnames))
@@ -225,7 +223,7 @@ class PlotImportWidget(QWidget):
         registry/map canvas given layer IDs
         """
         if self._plot_preview:
-            PlotPreview.remove_layers()
+            self._plot_preview.remove_layers()
 
     def _on_file_select(self, index):
         """
@@ -244,7 +242,7 @@ class PlotImportWidget(QWidget):
         if not fpath or not self._ok_to_remove(fpath):
             return
         self._remove_file()
-        PlotPreview.remove_error(fpath)
+        self._plot_preview.remove_error(fpath)
 
     def _ok_to_remove(self, fpath):
         """
@@ -259,7 +257,7 @@ class PlotImportWidget(QWidget):
         msg = 'Remove "{}" and its settings?'.format(fname)
         if not self._plot_preview:
             return self._show_question_message(title, msg)
-        elif not PlotPreview.is_dirty(fpath):
+        elif not self._plot_preview.is_dirty(fpath):
             return self._show_question_message(title, msg)
         return self._ok_to_continue(fpath)
 
@@ -271,7 +269,7 @@ class PlotImportWidget(QWidget):
         :return: True or False
         :rtype: Boolean
         """
-        if PlotPreview.is_dirty(fpath):
+        if self._plot_preview.is_dirty(fpath):
             fname = QFileInfo(fpath).fileName()
             reply = QMessageBox.question(
                 self,
@@ -286,16 +284,6 @@ class PlotImportWidget(QWidget):
             else:
                 self._remove_dirty(fpath)
         return True
-
-    @staticmethod
-    def _remove_dirty(fpath):
-        """
-        Removes file name from dirty class variable
-        :param fpath: Plot import file absolute path
-        :type fpath: String
-        """
-        if PlotPreview.is_dirty(fpath):
-            PlotPreview.remove_dirty(fpath)
 
     def _reset_preview(self, fpath):
         """
@@ -321,25 +309,23 @@ class PlotImportWidget(QWidget):
             if self._crs_not_set(row):
                 return
             self._clear_feature()
-            self._layer = None
             import_type = settings.get(IMPORT_AS)
             self._set_preview_data_service(import_type)
-            self._plot_preview = PlotPreview(
-                self._preview_data_service[import_type],
-                settings,
-                self._scheme_number,
-                fpath
-            )
+            self._plot_preview._data_service = \
+                self._preview_data_service[import_type]
+            self._plot_preview.set_settings(settings)
             self._preview_load()
             self._set_preview_groupbox_title(settings[NAME])
-            self._layer = self._plot_preview.layer
             self._previewed = fpath
 
     def _clear_feature(self):
         """
         On add/previewing clear selected features
         """
-        PlotPreview.clear_feature(self._layer)
+        if self._plot_preview.layer:
+            self._plot_preview.clear_feature(
+                self._plot_preview.layer
+            )
 
     def _set_preview_data_service(self, import_type):
         """
@@ -409,7 +395,7 @@ class PlotImportWidget(QWidget):
         """
         try:
             self._load(self._preview_model, self._plot_preview)
-        except(IOError, OSError, Exception) as e:
+        except(IOError, OSError) as e:
             self._show_critical_message(
                 "Workflow Manager - Plot Preview",
                 "Failed to load: {}".format(e)
@@ -427,8 +413,8 @@ class PlotImportWidget(QWidget):
             return
         row = index.row()
         fpath = self.model.results[row].get("fpath")
-        error = PlotPreview.errors.get(fpath)
-        if error and error > 0:
+        error = self._plot_preview.import_error(fpath)
+        if error > 0:
             self._show_critical_message(
                 "Workflow Manager - Plot Import",
                 "{0} preview errors were reported. "
@@ -498,8 +484,7 @@ class PlotImportWidget(QWidget):
         row = index.row()
         fpath = self.model.results[row].get("fpath")
         if self._plot_preview:
-            PlotPreview.remove_layer_by_id(fpath)
-            self._layer = None
+            self._plot_preview.remove_layer_by_id(fpath)
         self._reset_preview(fpath)
         self._set_preview_groupbox_title()
         self.model.removeRows(row)
@@ -510,6 +495,15 @@ class PlotImportWidget(QWidget):
             self.model.reset()
             self._disable_widgets(self._toolbar_buttons)
             self._set_crs_button.setEnabled(False)
+
+    def _remove_dirty(self, fpath):
+        """
+        Removes file name from dirty class variable
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        """
+        if self._plot_preview.is_dirty(fpath):
+            self._plot_preview.remove_dirty(fpath)
 
     @staticmethod
     def _load(model, data_source):
@@ -677,6 +671,7 @@ class PlotImportWidget(QWidget):
         :param selected: Currently selected items
         :type selected: QItemSelection
         """
-        index = selected.indexes()[0]
-        self._plot_preview.clear_feature(self._layer)
-        self._plot_preview.select_feature(index.row() + 1)
+        if self._plot_preview.layer:
+            index = selected.indexes()[0]
+            self._plot_preview.clear_feature(self._plot_preview.layer)
+            self._plot_preview.select_feature(index.row() + 1)
