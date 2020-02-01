@@ -60,7 +60,8 @@ class PlotImportWidget(QWidget):
         self._file_service = self._file_service()
         self._plot_preview_service = data_service["plot_preview"]
         self._plot_file = PlotFile(self._file_service)
-        self._previewed = self.is_dirty = None
+        self._previewed = {}
+        self.is_dirty = None
         import_component = PlotImportComponent()
         toolbar = import_component.components
         self._add_button = toolbar["addFiles"]
@@ -285,16 +286,6 @@ class PlotImportWidget(QWidget):
                 self._remove_dirty(fpath)
         return True
 
-    def _reset_preview(self, fpath):
-        """
-        Resets preview QTableView
-        :param fpath: Plot import file absolute path
-        :type fpath: String
-        """
-        if fpath == self._previewed:
-            self._preview_model.reset()
-            self._previewed = fpath
-
     def _preview(self):
         """
         Previews selected plot import file content
@@ -316,7 +307,7 @@ class PlotImportWidget(QWidget):
             self._plot_preview.set_settings(settings)
             self._preview_load()
             self._set_preview_groupbox_title(settings[NAME])
-            self._previewed = fpath
+            self._previewed[fpath] = fpath
 
     def _clear_feature(self):
         """
@@ -413,6 +404,14 @@ class PlotImportWidget(QWidget):
             return
         row = index.row()
         fpath = self.model.results[row].get("fpath")
+        if fpath not in self._previewed:
+            fname = QFileInfo(fpath).fileName()
+            self._show_critical_message(
+                "Workflow Manager - Plot Import",
+                "{} has not been previewed. "
+                "Kindly preview then import.".format(fname)
+            )
+            return
         error = self._plot_preview.import_error(fpath)
         if error > 0:
             self._show_critical_message(
@@ -573,7 +572,8 @@ class PlotImportWidget(QWidget):
         """
         buttons = [
             self._remove_button,
-            self._preview_button, self._import_button
+            self._preview_button,
+            self._import_button
         ]
         return buttons
 
@@ -664,6 +664,16 @@ class PlotImportWidget(QWidget):
         if not index.isValid():
             return
         return index
+
+    def _reset_preview(self, fpath):
+        """
+        Resets preview QTableView
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        """
+        if fpath in self._previewed:
+            self._preview_model.reset()
+            del self._previewed[fpath]
 
     def _on_preview_select(self, selected):
         """

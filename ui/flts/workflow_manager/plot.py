@@ -1034,6 +1034,8 @@ class PlotPreview(Plot):
         :param layer_ids: List
         """
         try:
+            if not self._plot_layer:
+                return
             if self._plot_layer.layer and \
                     self._plot_layer.layer.id() in layer_ids:
                 self._plot_layer.layer = None
