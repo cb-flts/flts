@@ -281,6 +281,8 @@ class PlotImportWidget(QWidget):
             if reply == QMessageBox.Cancel:
                 return False
             elif reply == QMessageBox.Yes:
+                if self._import_error_message(fpath):
+                    return False
                 self._import_plot()
             else:
                 self._remove_dirty(fpath)
@@ -341,16 +343,6 @@ class PlotImportWidget(QWidget):
         service = self._plot_preview_service(import_type)
         return service(self._profile, self._scheme_id)
 
-    def _file_settings(self, row):
-        """
-        Returns plot import file data settings
-        :param row: Table view item identifier
-        :type row: Integer
-        :return: Plot import file data settings
-        :rtype: Dictionary
-        """
-        return self.model.results[row]
-
     def _crs_not_set(self, row):
         """
         Returns Tru if CRS is not set
@@ -403,28 +395,18 @@ class PlotImportWidget(QWidget):
         if index is None:
             return
         row = index.row()
-        fpath = self.model.results[row].get("fpath")
-        if fpath not in self._previewed:
-            fname = QFileInfo(fpath).fileName()
-            self._show_critical_message(
-                "Workflow Manager - Plot Import",
-                "{} has not been previewed. "
-                "Kindly preview then import.".format(fname)
-            )
-            return
-        error = self._plot_preview.import_error(fpath)
-        if error > 0:
-            self._show_critical_message(
-                "Workflow Manager - Plot Import",
-                "{0} preview errors were reported. "
-                "Please correct the errors and import.".format(error)
-            )
-            return
         settings = self._file_settings(row)
+        import_type = settings.get(IMPORT_AS)
+        fpath = self.model.results[row].get("fpath")
+        if self._previewed_message(fpath) or \
+                self._import_error_message(fpath) or \
+                not self._ok_to_import(index, import_type):
+            return
         if settings.get(IMPORT_AS) == "Plots":
             self._import_plot()
         else:
             pass
+        self._remove_file()
 
     def _import_plot(self):
         """
@@ -435,8 +417,6 @@ class PlotImportWidget(QWidget):
             return
         settings = self._file_settings(index.row())
         import_type = settings.get(IMPORT_AS)
-        if not self._ok_to_import(index, import_type):
-            return
         srid = settings.get(CRS_ID)
         srid = srid.split(":")[1]
         data_service = self._preview_data_service[import_type]
@@ -458,7 +438,33 @@ class PlotImportWidget(QWidget):
         else:
             msg = "Successfully imported {0} plots".format(import_plot)
             self.notif_bar.insertInformationNotification(msg)
-            self._remove_file()
+
+    def _file_settings(self, row):
+        """
+        Returns plot import file data settings
+        :param row: Table view item identifier
+        :type row: Integer
+        :return: Plot import file data settings
+        :rtype: Dictionary
+        """
+        return self.model.results[row]
+
+    def _previewed_message(self, fpath):
+        """
+        Returns True if the plot import file has not been previewed
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        :return: True if not previewed
+        :rtype: Boolean
+        """
+        if fpath not in self._previewed:
+            fname = QFileInfo(fpath).fileName()
+            self._show_critical_message(
+                "Workflow Manager - Plot Import",
+                "{} has not been previewed. "
+                "Kindly preview then import.".format(fname)
+            )
+            return True
 
     def _ok_to_import(self, index, import_type):
         """
@@ -472,6 +478,23 @@ class PlotImportWidget(QWidget):
         title = "Workflow Manager - Plot Import"
         msg = "Do you want to import {0} in {1} file ?".format(import_type, fname)
         return self._show_question_message(title, msg)
+
+    def _import_error_message(self, fpath):
+        """
+        Returns True if there is an error in the import file
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        :return: True if import error
+        :rtype: Boolean
+        """
+        error = self._plot_preview.import_error(fpath)
+        if error > 0:
+            self._show_critical_message(
+                "Workflow Manager - Plot Import",
+                "{0} preview errors were reported. "
+                "Please correct the errors and import.".format(error)
+            )
+            return True
 
     def _remove_file(self):
         """
