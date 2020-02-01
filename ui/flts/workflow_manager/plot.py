@@ -904,7 +904,7 @@ class PlotPreview(Plot):
             return
         if not self._plot_layer:
             geom_type, geom = self._geometry(wkt)
-            uri = "{0}?crs={1}".format(geom_type, self._settings.crs_id)
+            uri = "{0}?crs={1}&index=yes".format(geom_type, self._settings.crs_id)
             fields = [(field, type_) for field, type_, value in attributes]
             name = self._generate_layer_name()
             self._plot_layer = PlotLayer(uri, name, fields=fields)
