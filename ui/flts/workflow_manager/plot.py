@@ -589,8 +589,10 @@ class PlotPreview(Plot):
                 self._settings.geom_type = self._geometry_type()
                 if self._settings.import_as == "Plots":
                     results = self._plot_file_contents(csv_reader)
-                else:
+                elif self._settings.import_as == "Servitudes":
                     results = self._servitude_file_contents(csv_reader)
+                else:
+                    results = self._beacon_file_contents(csv_reader)
                 if self._plot_layer:
                     self._plot_layer.update_extents()
                     self._plot_layer.add_map_layer()
