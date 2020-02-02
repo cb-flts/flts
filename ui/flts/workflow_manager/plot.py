@@ -41,6 +41,7 @@ from stdm.ui.flts.workflow_manager.data import Save
 NAME, IMPORT_AS, DELIMITER, HEADER_ROW, CRS_ID, \
 GEOM_FIELD, GEOM_TYPE = range(7)
 GEOMETRY, PARCEL_NUM, UPI_NUM, AREA, SCHEME_ID, PLOT_STATUS = range(6)
+GEOMETRY_POINT, X, Y = range(3)
 WARNING = "Warning"
 
 
@@ -668,6 +669,29 @@ class PlotPreview(Plot):
             value = self._get_wkt(data, GEOMETRY)
             if value:
                 contents[GEOMETRY] = unicode(value)
+                contents["items"] = self._items
+                attributes = self._layer_attributes(contents)
+                self._create_layer(contents[GEOMETRY], attributes)
+                results.append(contents)
+        return results
+
+    def _beacon_file_contents(self, csv_reader):
+        """
+        Returns beacon file contents
+        :param csv_reader: CSV dictionary reader
+        :param csv_reader: DictReader
+        :return results: File content list
+        :return results: List
+        """
+        results = []
+        for row, data in enumerate(csv_reader):
+            contents = {}
+            self._items = {}
+            value = self._get_wkt(data, GEOMETRY)
+            if value:
+                contents[GEOMETRY_POINT] = unicode(value)
+                contents[X] = unicode("")
+                contents[Y] = unicode("")
                 contents["items"] = self._items
                 attributes = self._layer_attributes(contents)
                 self._create_layer(contents[GEOMETRY], attributes)

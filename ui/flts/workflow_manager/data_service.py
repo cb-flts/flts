@@ -969,6 +969,6 @@ def plot_data_service(import_type):
     data_service = {
         "Plots": PlotPreviewDataService,
         "Servitudes": ServitudePreviewDataService,
-        "Beacons": ServitudePreviewDataService,
+        "Beacons": BeaconPreviewDataService
     }
     return data_service[import_type]
