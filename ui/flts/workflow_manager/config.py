@@ -282,6 +282,22 @@ class ServitudeImportPreviewConfig(Config):
         return self.get_data('servitude_preview_columns')
 
 
+class BeaconImportPreviewConfig(Config):
+    """
+    Scheme beacon import preview table view
+    configuration interface
+    """
+    @property
+    def columns(self):
+        """
+        Scheme beacon import preview
+        table view columns options
+        :return: Table view columns
+        :rtype: List
+        """
+        return self.get_data('beacon_preview_columns')
+
+
 class PlotViewerConfig(Config):
     """
     Scheme plot viewer table view configuration interface
@@ -895,6 +911,11 @@ configurations = {
     ],
     'servitude_preview_columns': [
         Column(name='Geometry', type="text", flag=(Qt.DisplayRole,))
+    ],
+    'beacon_preview_columns': [
+        Column(name='Geometry', type="text", flag=(Qt.DisplayRole,)),
+        Column(name='X', type="float", flag=(Qt.DisplayRole,)),
+        Column(name='Y', type="float", flag=(Qt.DisplayRole,))
     ],
     'plot_viewer_columns': [
         {
