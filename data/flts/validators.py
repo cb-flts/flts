@@ -381,6 +381,7 @@ class IntegerValidator(AbstractColumnValidator):
             messages = []
 
         if value:
+            value = int(value)
             if not isinstance(value, int):
                 msg = 'Value is not an integer'
                 v_msg = self._create_validation_message(WARNING, msg)
@@ -419,6 +420,12 @@ class RangeValidator(AbstractColumnValidator):
                     self.add_validation_message(v_msg)
             elif self._column.TYPE_INFO == 'INT' or \
                     self._column.TYPE_INFO == 'DOUBLE':
+                if isinstance(value, basestring):
+                    if self._column.TYPE_INFO == 'INT':
+                        value = int(value)
+                    else:
+                        value = float(value)
+
                 if value < min_len:
                     msg = 'Lower than minimum, minimum is {0}.'.format(
                         min_len
@@ -430,6 +437,8 @@ class RangeValidator(AbstractColumnValidator):
                     self.add_validation_message(v_msg)
 
                 if value > max_len:
+                    print type(value)
+                    print type(max_len)
                     msg = 'Greater than maximum, maximum is {0}.'.format(
                         max_len
                     )
