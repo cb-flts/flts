@@ -157,9 +157,9 @@ class HoldersSheetView(QTableWidget):
                 attr = f.attribute(fi.name())
                 # Correctly represent double values that are actually int
                 if fi.type() == QVariant.Double:
-                    if attr.is_integer():
-                        attr = int(attr)
-
+                    if self._is_num(attr):
+                        if attr.is_integer():
+                            attr = int(attr)
                 # Format string representation
                 # Date
                 if fi.type() == QVariant.Date:
@@ -173,6 +173,17 @@ class HoldersSheetView(QTableWidget):
                 cidx += 1
 
             ridx += 1
+
+    def _is_num(self, field_val):
+        # Test if a variable is a number
+        status = False
+        try:
+            float(field_val)
+            status = True
+        except ValueError:
+            pass
+
+        return status
 
     def format_error_cell(self, tbi):
         """
