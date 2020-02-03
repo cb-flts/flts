@@ -53,7 +53,6 @@ class PlotImportWidget(QWidget):
         super(QWidget, self).__init__(parent)
         self._profile = profile
         self._scheme_id = scheme_id
-        self._scheme_number = scheme_number
         self._parent = parent
         self.notif_bar = NotificationBar(parent.vlNotification)
         data_service = widget_properties["data_service"]
@@ -61,8 +60,8 @@ class PlotImportWidget(QWidget):
         self._file_service = self._file_service()
         self._plot_preview_service = data_service["plot_preview"]
         self._plot_file = PlotFile(self._file_service)
-        self._plot_preview = self._layer = None
-        self._previewed = self.is_dirty = None
+        self._previewed = {}
+        self.is_dirty = None
         import_component = PlotImportComponent()
         toolbar = import_component.components
         self._add_button = toolbar["addFiles"]
@@ -84,6 +83,7 @@ class PlotImportWidget(QWidget):
         self._file_table_view.setSelectionMode(QAbstractItemView.SingleSelection)
         self._preview_table_view = QTableView(self)
         self._preview_data_service = self._preview_model = None
+        self._plot_preview = PlotPreview(scheme_number, self._preview_data_service)
         self._preview_model = WorkflowManagerModel(self._preview_data_service)
         self._preview_table_view.setModel(self._preview_model)
         self._preview_table_view.setAlternatingRowColors(True)
@@ -120,19 +120,6 @@ class PlotImportWidget(QWidget):
         _selection_model = self._preview_table_view.selectionModel()
         _selection_model.selectionChanged.connect(self._on_preview_select)
         QTimer.singleShot(0, self._set_file_path)
-
-    def _ok_to_import(self, index, import_type):
-        """
-        Returns import data message box reply
-        :return: True or False.
-        """
-        row = index.row()
-        fpath = self.model.results[row].get("fpath")
-        fname = QFileInfo(fpath).fileName()
-        import_type = import_type.lower()
-        title = "Workflow Manager - Plot Import"
-        msg = "Do you want to import {0} in {1} file ?".format(import_type, fname)
-        return self._show_question_message(title, msg)
 
     def _set_file_path(self):
         """
@@ -196,7 +183,7 @@ class PlotImportWidget(QWidget):
         """
         Handles on parent QDockWidget close event
         """
-        if not PlotPreview.dirty:
+        if not self._plot_preview or not self._plot_preview.dirty:
             event.accept()
             return
         if not self._ok_to_discard():
@@ -204,20 +191,20 @@ class PlotImportWidget(QWidget):
             return
         event.accept()
         self._remove_layers()
-        PlotPreview.reset_dirty()
+        self._plot_preview.reset_errors()
+        self._plot_preview.reset_dirty()
 
     def _on_remove_tab(self):
         """
         Handles on tab remove event
         """
-        if not PlotPreview.dirty:
+        if not self._plot_preview or not self._plot_preview.dirty:
             self.is_dirty = False
             return
         if not self._ok_to_discard():
             self.is_dirty = True
             return
         self._remove_layers()
-        PlotPreview.reset_dirty()
         self.is_dirty = False
 
     def _ok_to_discard(self):
@@ -225,7 +212,7 @@ class PlotImportWidget(QWidget):
         Returns discard data message box reply
         :return: True or False
         """
-        fnames = PlotPreview.dirty_file_names()
+        fnames = self._plot_preview.dirty_file_names()
         title = "Workflow Manager - Plot Import"
         msg = "Action will discard data. " \
               "Do you want to proceed? \n\n {}".format(", ".join(fnames))
@@ -237,7 +224,7 @@ class PlotImportWidget(QWidget):
         registry/map canvas given layer IDs
         """
         if self._plot_preview:
-            PlotPreview.remove_layers()
+            self._plot_preview.remove_layers()
 
     def _on_file_select(self, index):
         """
@@ -256,6 +243,7 @@ class PlotImportWidget(QWidget):
         if not fpath or not self._ok_to_remove(fpath):
             return
         self._remove_file()
+        self._plot_preview.remove_error(fpath)
 
     def _ok_to_remove(self, fpath):
         """
@@ -270,7 +258,7 @@ class PlotImportWidget(QWidget):
         msg = 'Remove "{}" and its settings?'.format(fname)
         if not self._plot_preview:
             return self._show_question_message(title, msg)
-        elif not PlotPreview.is_dirty(fpath):
+        elif not self._plot_preview.is_dirty(fpath):
             return self._show_question_message(title, msg)
         return self._ok_to_continue(fpath)
 
@@ -282,7 +270,7 @@ class PlotImportWidget(QWidget):
         :return: True or False
         :rtype: Boolean
         """
-        if PlotPreview.is_dirty(fpath):
+        if self._plot_preview.is_dirty(fpath):
             fname = QFileInfo(fpath).fileName()
             reply = QMessageBox.question(
                 self,
@@ -293,30 +281,12 @@ class PlotImportWidget(QWidget):
             if reply == QMessageBox.Cancel:
                 return False
             elif reply == QMessageBox.Yes:
+                if self._import_error_message(fpath):
+                    return False
                 self._import_plot()
             else:
                 self._remove_dirty(fpath)
         return True
-
-    @staticmethod
-    def _remove_dirty(fpath):
-        """
-        Removes file name from dirty class variable
-        :param fpath: Plot import file absolute path
-        :type fpath: String
-        """
-        if PlotPreview.is_dirty(fpath):
-            PlotPreview.remove_dirty(fpath)
-
-    def _reset_preview(self, fpath):
-        """
-        Resets preview QTableView
-        :param fpath: Plot import file absolute path
-        :type fpath: String
-        """
-        if fpath == self._previewed:
-            self._preview_model.reset()
-            self._previewed = fpath
 
     def _preview(self):
         """
@@ -331,29 +301,24 @@ class PlotImportWidget(QWidget):
         if not self._plot_file.is_pdf(fpath):
             if self._crs_not_set(row):
                 return
-            self._on_preview_clear(fpath)
-            self._layer = None
+            self._clear_feature()
             import_type = settings.get(IMPORT_AS)
             self._set_preview_data_service(import_type)
-            self._plot_preview = PlotPreview(
-                self._preview_data_service[import_type],
-                settings,
-                self._scheme_number,
-                fpath
-            )
+            self._plot_preview._data_service = \
+                self._preview_data_service[import_type]
+            self._plot_preview.set_settings(settings)
             self._preview_load()
             self._set_preview_groupbox_title(settings[NAME])
-            self._layer = self._plot_preview.layer
-            self._previewed = fpath
+            self._previewed[fpath] = fpath
 
-    def _on_preview_clear(self, fpath):
+    def _clear_feature(self):
         """
-        On previewing clear selected features
-        :param fpath: Plot import file absolute path
-        :type fpath: String
+        On add/previewing clear selected features
         """
-        if self._plot_preview and PlotPreview.layer_in_store(fpath):
-            self._plot_preview.clear_feature(self._layer)
+        if self._plot_preview.layer:
+            self._plot_preview.clear_feature(
+                self._plot_preview.layer
+            )
 
     def _set_preview_data_service(self, import_type):
         """
@@ -377,16 +342,6 @@ class PlotImportWidget(QWidget):
         """
         service = self._plot_preview_service(import_type)
         return service(self._profile, self._scheme_id)
-
-    def _file_settings(self, row):
-        """
-        Returns plot import file data settings
-        :param row: Table view item identifier
-        :type row: Integer
-        :return: Plot import file data settings
-        :rtype: Dictionary
-        """
-        return self.model.results[row]
 
     def _crs_not_set(self, row):
         """
@@ -423,7 +378,7 @@ class PlotImportWidget(QWidget):
         """
         try:
             self._load(self._preview_model, self._plot_preview)
-        except(IOError, OSError, Exception) as e:
+        except(IOError, OSError) as e:
             self._show_critical_message(
                 "Workflow Manager - Plot Preview",
                 "Failed to load: {}".format(e)
@@ -436,31 +391,22 @@ class PlotImportWidget(QWidget):
         """
         Imports selected plot import file content
         """
-        if self._num_errors > 0:
-            self._show_critical_message(
-                "Workflow Manager - Plot Import",
-                "{0} preview errors were reported. "
-                "Please correct the errors and import.".format(self._num_errors)
-            )
-            return
         index = self._current_index(self._file_table_view)
         if index is None:
             return
-        settings = self._file_settings(index.row())
+        row = index.row()
+        settings = self._file_settings(row)
+        import_type = settings.get(IMPORT_AS)
+        fpath = self.model.results[row].get("fpath")
+        if self._previewed_message(fpath) or \
+                self._import_error_message(fpath) or \
+                not self._ok_to_import(index, import_type):
+            return
         if settings.get(IMPORT_AS) == "Plots":
             self._import_plot()
         else:
             pass
-
-    @property
-    def _num_errors(self):
-        """
-        Returns number of errors
-        :return: Number of errors
-        :rtype: Integer
-        """
-        if self._plot_preview:
-            return self._plot_preview.num_errors()
+        self._remove_file()
 
     def _import_plot(self):
         """
@@ -471,8 +417,6 @@ class PlotImportWidget(QWidget):
             return
         settings = self._file_settings(index.row())
         import_type = settings.get(IMPORT_AS)
-        if not self._ok_to_import(index, import_type):
-            return
         srid = settings.get(CRS_ID)
         srid = srid.split(":")[1]
         data_service = self._preview_data_service[import_type]
@@ -494,7 +438,63 @@ class PlotImportWidget(QWidget):
         else:
             msg = "Successfully imported {0} plots".format(import_plot)
             self.notif_bar.insertInformationNotification(msg)
-            self._remove_file()
+
+    def _file_settings(self, row):
+        """
+        Returns plot import file data settings
+        :param row: Table view item identifier
+        :type row: Integer
+        :return: Plot import file data settings
+        :rtype: Dictionary
+        """
+        return self.model.results[row]
+
+    def _previewed_message(self, fpath):
+        """
+        Returns True if the plot import file has not been previewed
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        :return: True if not previewed
+        :rtype: Boolean
+        """
+        if fpath not in self._previewed:
+            fname = QFileInfo(fpath).fileName()
+            self._show_critical_message(
+                "Workflow Manager - Plot Import",
+                "{} has not been previewed. "
+                "Kindly preview then import.".format(fname)
+            )
+            return True
+
+    def _ok_to_import(self, index, import_type):
+        """
+        Returns import data message box reply
+        :return: True or False.
+        """
+        row = index.row()
+        fpath = self.model.results[row].get("fpath")
+        fname = QFileInfo(fpath).fileName()
+        import_type = import_type.lower()
+        title = "Workflow Manager - Plot Import"
+        msg = "Do you want to import {0} in {1} file ?".format(import_type, fname)
+        return self._show_question_message(title, msg)
+
+    def _import_error_message(self, fpath):
+        """
+        Returns True if there is an error in the import file
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        :return: True if import error
+        :rtype: Boolean
+        """
+        error = self._plot_preview.import_error(fpath)
+        if error > 0:
+            self._show_critical_message(
+                "Workflow Manager - Plot Import",
+                "{0} preview errors were reported. "
+                "Please correct the errors and import.".format(error)
+            )
+            return True
 
     def _remove_file(self):
         """
@@ -506,8 +506,7 @@ class PlotImportWidget(QWidget):
         row = index.row()
         fpath = self.model.results[row].get("fpath")
         if self._plot_preview:
-            PlotPreview.remove_layer_by_id(fpath)
-            self._layer = None
+            self._plot_preview.remove_layer_by_id(fpath)
         self._reset_preview(fpath)
         self._set_preview_groupbox_title()
         self.model.removeRows(row)
@@ -518,6 +517,15 @@ class PlotImportWidget(QWidget):
             self.model.reset()
             self._disable_widgets(self._toolbar_buttons)
             self._set_crs_button.setEnabled(False)
+
+    def _remove_dirty(self, fpath):
+        """
+        Removes file name from dirty class variable
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        """
+        if self._plot_preview.is_dirty(fpath):
+            self._plot_preview.remove_dirty(fpath)
 
     @staticmethod
     def _load(model, data_source):
@@ -587,7 +595,8 @@ class PlotImportWidget(QWidget):
         """
         buttons = [
             self._remove_button,
-            self._preview_button, self._import_button
+            self._preview_button,
+            self._import_button
         ]
         return buttons
 
@@ -679,12 +688,23 @@ class PlotImportWidget(QWidget):
             return
         return index
 
+    def _reset_preview(self, fpath):
+        """
+        Resets preview QTableView
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        """
+        if fpath in self._previewed:
+            self._preview_model.reset()
+            del self._previewed[fpath]
+
     def _on_preview_select(self, selected):
         """
         Selects a layer feature on table view row
         :param selected: Currently selected items
         :type selected: QItemSelection
         """
-        index = selected.indexes()[0]
-        self._plot_preview.clear_feature()
-        self._plot_preview.select_feature(index.row() + 1)
+        if self._plot_preview.layer:
+            index = selected.indexes()[0]
+            self._plot_preview.clear_feature(self._plot_preview.layer)
+            self._plot_preview.select_feature(index.row() + 1)

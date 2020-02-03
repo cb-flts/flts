@@ -32,6 +32,7 @@ from stdm.ui.flts.workflow_manager.config import (
     PlotImportFileConfig,
     PlotImportPreviewConfig,
     PlotViewerConfig,
+    BeaconImportPreviewConfig,
     ServitudeImportPreviewConfig,
     SchemeConfig,
     TableModelIcons,
@@ -919,6 +920,43 @@ class ServitudePreviewDataService:
         return self._table_model_icons.icons
 
 
+class BeaconPreviewDataService:
+    """
+    Scheme beacon import preview data model service
+    """
+    def __init__(self, current_profile, scheme_id):
+        self._beacon_config = BeaconImportPreviewConfig()
+        self._table_model_icons = TableModelIcons()
+
+    @property
+    def columns(self):
+        """
+        Scheme beacon import preview
+        table view columns options
+        :return: Table view columns
+        :rtype: List
+        """
+        return self._beacon_config.columns
+
+    @property
+    def vertical_header(self):
+        """
+        Scheme table view vertical orientation
+        :return: True for vertical headers or False otherwise
+        :rtype: Boolean
+        """
+        return True
+
+    @property
+    def icons(self):
+        """
+        QAbstractTableModel icon options
+        :return: QAbstractTableModel icon options
+        :rtype: Dictionary
+        """
+        return self._table_model_icons.icons
+
+
 def plot_data_service(import_type):
     """
     Returns plot preview data service
@@ -931,6 +969,6 @@ def plot_data_service(import_type):
     data_service = {
         "Plots": PlotPreviewDataService,
         "Servitudes": ServitudePreviewDataService,
-        "Beacons": ServitudePreviewDataService,
+        "Beacons": BeaconPreviewDataService
     }
     return data_service[import_type]

@@ -41,6 +41,7 @@ from stdm.ui.flts.workflow_manager.data import Save
 NAME, IMPORT_AS, DELIMITER, HEADER_ROW, CRS_ID, \
 GEOM_FIELD, GEOM_TYPE = range(7)
 GEOMETRY, PARCEL_NUM, UPI_NUM, AREA, SCHEME_ID, PLOT_STATUS = range(6)
+GEOMETRY_PT, X_PT, Y_PT = range(3)
 WARNING = "Warning"
 
 
@@ -67,6 +68,15 @@ class PlotLayer:
         :rtype _layer: QgsVectorLayer
         """
         return self._layer
+
+    @layer.setter
+    def layer(self, value):
+        """
+        Returns created layer
+        :param value: Value to be set
+        :type value: Object
+        """
+        self._layer = value
 
     def create_layer(self):
         """
@@ -267,8 +277,8 @@ class PlotLayer:
         if layer == iface.activeLayer():
             return True
 
-    @staticmethod
-    def clear_feature(layer):
+    @classmethod
+    def clear_feature(cls, layer):
         """
         Clears selected features in a layer
         :param layer: Input layer
@@ -344,7 +354,7 @@ class Plot(object):
                     for value in data:
                         if value is None or isinstance(value, list):
                             continue
-                        geom_type, geom = self._geometry(value)
+                        geom_type, coordinates, geom = self._geometry(value)
                         if geom_type:
                             if geom_type not in match_count:
                                 match_count[geom_type] = 0
@@ -378,7 +388,7 @@ class Plot(object):
         :return geom: Geometry
         :rtype geom: QgsGeometry
         """
-        geom_type = geom = None
+        geom_type = geom = coordinates = None
         matches = self._reg_exes["type_str"].match(wkt)
         if matches:
             geom_type, coordinates = matches.groups()
@@ -386,7 +396,7 @@ class Plot(object):
             if geom_type:
                 geom_type = geom_type.strip()
                 geom_type = geom_type.lower().capitalize()
-        return geom_type, geom
+        return geom_type, coordinates, geom
 
     @staticmethod
     def _default_geometry_type(type_count):
@@ -486,30 +496,20 @@ class UniqueParcelIdentifier:
         return upi
 
 
-class PlotPreview(Plot):
+class PlotFileSettings:
     """
-    Manages preview of plot import data file contents
+    Manages plot file settings
     """
-    layers = {}
-    dirty = {}
-    type_count = {"Point": 1, "Line": 1, "Polygon": 1}
 
-    def __init__(self, data_service, file_settings, scheme_number, parent_id):
-        super(PlotPreview, self).__init__()
-        self._data_service = data_service
-        self._scheme_number = scheme_number
-        self._parent_id = parent_id
-        self._items = self._plot_layer = None
-        self._num_errors = 0
-        self._import_type = {"Point": "Beacons", "Line": "Servitudes", "Polygon": "Plots"}
-        self._header_row = file_settings.get(HEADER_ROW) - 1
-        self._delimiter = self._get_delimiter(file_settings.get(DELIMITER))
-        self._geom_field = file_settings.get(GEOM_FIELD)
-        self._geom_type = file_settings.get(GEOM_TYPE)
-        self._crs_id = file_settings.get(CRS_ID)
-        self._import_as = file_settings.get(IMPORT_AS)
-        self._fpath = file_settings.get("fpath")
-        self._file_fields = file_settings.get("fields")
+    def __init__(self, file_settings):
+        self.header_row = file_settings.get(HEADER_ROW) - 1
+        self.delimiter = self._get_delimiter(file_settings.get(DELIMITER))
+        self.geom_field = file_settings.get(GEOM_FIELD)
+        self.geom_type = file_settings.get(GEOM_TYPE)
+        self.crs_id = file_settings.get(CRS_ID)
+        self.import_as = file_settings.get(IMPORT_AS)
+        self.fpath = file_settings.get("fpath")
+        self.file_fields = file_settings.get("fields")
 
     @staticmethod
     def _get_delimiter(name):
@@ -525,13 +525,34 @@ class PlotPreview(Plot):
             delimiter = "\t"
         return delimiter
 
-    def num_errors(self):
+
+class PlotPreview(Plot):
+    """
+    Manages preview of plot import data file contents
+    """
+    type_count = {"Point": 1, "Line": 1, "Polygon": 1}
+
+    def __init__(self, scheme_number, data_service=None):
+        super(PlotPreview, self).__init__()
+        self._data_service = data_service
+        self._scheme_number = scheme_number
+        self._items = self._plot_layer = None
+        self._error_counter = 0
+        self._import_type = {"Point": "Beacons", "Line": "Servitudes", "Polygon": "Plots"}
+        self._settings = None
+        self._layers = {}
+        self._dirty = {}
+        self._errors = {}
+
+    def set_settings(self, settings):
         """
-        Returns number of errors encountered on preview
-        :return: Number of errors on preview
-        :return: Integer
+        Sets plot file settings
+        :param settings: Plot file settings
+        :type settings: Dictionary
         """
-        return self._num_errors
+        if not settings:
+            return
+        self._settings = PlotFileSettings(settings)
 
     def load(self):
         """
@@ -540,10 +561,10 @@ class PlotPreview(Plot):
         :rtype: List
         """
         try:
-            qfile = QFile(self._fpath)
+            qfile = QFile(self._settings.fpath)
             if not qfile.open(QIODevice.ReadOnly):
                 raise IOError(unicode(qfile.errorString()))
-            return self._file_contents(self._fpath)
+            return self._file_contents(self._settings.fpath)
         except(IOError, OSError, csv.Error, NotImplementedError, Exception) as e:
             raise e
 
@@ -555,20 +576,23 @@ class PlotPreview(Plot):
         :return results: Plot import file contents
         :rtype results: List
         """
-        self._num_errors = 0
+        self._plot_layer = None
+        self._error_counter = 0
         try:
             with open(fpath, 'r') as csv_file:
-                clean_line = self._filter_whitespace(csv_file, self._header_row)
+                clean_line = self._filter_whitespace(csv_file, self._settings.header_row)
                 csv_reader = csv.DictReader(
                     clean_line,
-                    fieldnames=self._file_fields,
-                    delimiter=self._delimiter
+                    fieldnames=self._settings.file_fields,
+                    delimiter=self._settings.delimiter
                 )
-                self._geom_type = self._geometry_type()
-                if self._import_as == "Plots":
+                self._settings.geom_type = self._geometry_type()
+                if self._settings.import_as == "Plots":
                     results = self._plot_file_contents(csv_reader)
-                else:
+                elif self._settings.import_as == "Servitudes":
                     results = self._servitude_file_contents(csv_reader)
+                else:
+                    results = self._beacon_file_contents(csv_reader)
                 if self._plot_layer:
                     self._plot_layer.update_extents()
                     self._plot_layer.add_map_layer()
@@ -576,8 +600,29 @@ class PlotPreview(Plot):
         except (csv.Error, Exception) as e:
             raise e
         if results:
-            PlotPreview.dirty[self._parent_id] = True
+            self._dirty[self._settings.fpath] = True
+            self._set_errors(fpath)
         return results
+
+    def _set_errors(self, fpath):
+        """
+        Sets counted errors in a previewed file
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        """
+        if self._error_counter == 0 and fpath in self._errors:
+            del self._errors[fpath]
+            return
+        self._errors[fpath] = self._error_counter
+
+    def remove_error(self, fpath):
+        """
+        Removes error
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        """
+        if fpath in self._errors:
+            del self._errors[fpath]
 
     def _plot_file_contents(self, csv_reader):
         """
@@ -631,7 +676,30 @@ class PlotPreview(Plot):
                 self._create_layer(contents[GEOMETRY], attributes)
                 results.append(contents)
         return results
-    # TODO: End trials
+
+    def _beacon_file_contents(self, csv_reader):
+        """
+        Returns beacon file contents
+        :param csv_reader: CSV dictionary reader
+        :param csv_reader: DictReader
+        :return results: File content list
+        :return results: List
+        """
+        results = []
+        for row, data in enumerate(csv_reader):
+            contents = {}
+            self._items = {}
+            value = self._get_wkt(data, GEOMETRY_PT)
+            if value:
+                contents[GEOMETRY_PT] = unicode(value)
+                lat, long_ = self._beacon_coordinates(value)
+                contents[X_PT] = self._to_float(lat, X_PT)
+                contents[Y_PT] = self._to_float(long_, Y_PT)
+                contents["items"] = self._items
+                attributes = self._layer_attributes(contents)
+                self._create_layer(contents[GEOMETRY_PT], attributes)
+                results.append(contents)
+        return results
 
     @staticmethod
     def _filter_whitespace(in_file, hrow):
@@ -654,16 +722,18 @@ class PlotPreview(Plot):
         """
         Returns dominant geometry type of
         loaded plot import file
-        :return _geom_type: Dominant geometry type
-        :rtype _geom_type: String
+        :return: Dominant geometry type
+        :rtype: String
         """
-        if self._geom_type not in self._geometry_types.values():
-            self._geom_type = self.geometry_type(
-                self._fpath, self._header_row, self._delimiter
+        if self._settings.geom_type not in self._geometry_types.values():
+            self._settings.geom_type = self.geometry_type(
+                self._settings.fpath,
+                self._settings.header_row,
+                self._settings.delimiter
             )
-            type_ = self._geometry_types.get(self._geom_type)
-            self._geom_type = type_ if type_ else self._geom_type
-        return self._geom_type
+            type_ = self._geometry_types.get(self._settings.geom_type)
+            self._settings.geom_type = type_ if type_ else self._settings.geom_type
+        return self._settings.geom_type
 
     def _get_wkt(self, data, column):
         """
@@ -676,13 +746,13 @@ class PlotPreview(Plot):
         :return value: Object
         """
         invalid_tip = self._display_tooltip("Invalid WKT", WARNING)
-        value = data.get(self._geom_field)
+        value = data.get(self._settings.geom_field)
         if value is None:
             return
         elif isinstance(value, list):
             self._items[column] = invalid_tip
             return value
-        geom_type, geom = self._geometry(value)
+        geom_type, coordinates, geom = self._geometry(value)
         if not geom:
             self._items[column] = invalid_tip
             return value
@@ -692,16 +762,19 @@ class PlotPreview(Plot):
                 self._items[column] = self._display_tooltip(
                     "Geometry type not allowed", WARNING
                 )
-            elif geom_type != self._geom_type:
+                self._error_counter += 1
+            elif geom_type != self._settings.geom_type:
                 self._items[column] = self._display_tooltip(
-                    "Does not match set geometry type ({})".format(self._geom_type),
+                    "Does not match set geometry type ({})".format(self._settings.geom_type),
                     WARNING
                 )
-            elif self._import_type.get(self._geom_type) != self._import_as:
+                self._error_counter += 1
+            elif self._import_type.get(self._settings.geom_type) != self._settings.import_as:
                 self._items[column] = self._display_tooltip(
-                    "Does not match set import type ({})".format(self._import_as),
+                    "Does not match set import type ({})".format(self._settings.import_as),
                     WARNING
                 )
+                self._error_counter += 1
             return value
 
     def _get_value(self, data, field_names, column):
@@ -717,12 +790,9 @@ class PlotPreview(Plot):
         :return value: Object
         """
         value = self._field_value(data, field_names)
-
-        if value is None or not str(value).strip():
-            value = WARNING
-            self._items[column] = \
-                self._decoration_tooltip("Missing value")
-            self._num_errors += 1
+        warning_flag = self._empty_value(column, value)
+        if warning_flag:
+            value = warning_flag
         return value
 
     @staticmethod
@@ -742,6 +812,53 @@ class PlotPreview(Plot):
             if name in fields:
                 return data.get(fields[name])
 
+    def _beacon_coordinates(self, wkt):
+        """
+        Returns plot beacon coordinates
+        :param wkt: WKT data
+        :type wkt: String
+        :return lat: Beacon coordinates
+        :rtype lat: Float
+        """
+        beacon = {X_PT: "", Y_PT: ""}
+        if GEOMETRY_PT not in self._items:
+            geom_type, coordinates, geom = self._geometry(wkt)
+            lat, long_ = coordinates.split()
+            beacon = dict([(X_PT, lat), (Y_PT, long_)])
+        beacon = {k: self._coordinate(k, v) for k, v in beacon.items()}
+        return beacon[X_PT], beacon[Y_PT]
+
+    def _coordinate(self, column, coordinate):
+        """
+        Returns coordinate value
+        :param column: Table view column position
+        :type column: Integer
+        :param coordinate: Coordinate value
+        :type coordinate: String
+        :return coordinate: Coordinate value
+        :rtype coordinate: String
+        """
+        warning_flag = self._empty_value(column, coordinate)
+        if warning_flag:
+            coordinate = warning_flag
+        return coordinate
+
+    def _empty_value(self, column, value):
+        """
+        Returns flag for empty value
+        :param column: Table view column position
+        :type column: Integer
+        :param value: Plot import file value
+        :type value: Object
+        :return value: Empty value flag
+        :return value: String
+        """
+        if value is None or not str(value).strip():
+            value = WARNING
+            self._items[column] = self._decoration_tooltip("Missing value")
+            self._error_counter += 1
+            return value
+
     def _to_float(self, value, column):
         """
         Casts value to float
@@ -758,7 +875,7 @@ class PlotPreview(Plot):
             if value != WARNING:
                 self._items[column] = \
                     self._display_tooltip("Value is not a number", WARNING)
-                self._num_errors += 1
+                self._error_counter += 1
         return value
 
     @staticmethod
@@ -857,16 +974,16 @@ class PlotPreview(Plot):
             self._remove_previewed_layers()
             return
         if not self._plot_layer:
-            geom_type, geom = self._geometry(wkt)
-            uri = "{0}?crs={1}".format(geom_type, self._crs_id)
+            geom_type, coordinates, geom = self._geometry(wkt)
+            uri = "{0}?crs={1}&index=yes".format(geom_type, self._settings.crs_id)
             fields = [(field, type_) for field, type_, value in attributes]
             name = self._generate_layer_name()
             self._plot_layer = PlotLayer(uri, name, fields=fields)
-            self.remove_layer_by_id(self._parent_id)
+            self.remove_layer_by_id(self._settings.fpath)
             self._plot_layer.create_layer()
             self.layer.setReadOnly()
-            PlotPreview.layers[self._parent_id] = self.layer
-            self.type_count[self._geom_type] += 1
+            self._layers[self._settings.fpath] = self.layer
+            self.type_count[self._settings.geom_type] += 1
         value = {field: value for field, type_, value in attributes}
         self._plot_layer.wkt_geometry(wkt, value)
 
@@ -879,12 +996,12 @@ class PlotPreview(Plot):
         :return: True if valid. Otherwise False
         :rtype: Boolean
         """
-        geom_type, geom = self._geometry(wkt)
+        geom_type, coordinates, geom = self._geometry(wkt)
         type_name = self._geometry_types.get(geom_type)
-        import_type = self._import_type.get(self._geom_type)
+        import_type = self._import_type.get(self._settings.geom_type)
         if not type_name or \
-                type_name != self._geom_type or \
-                import_type != self._import_as:
+                type_name != self._settings.geom_type or \
+                import_type != self._settings.import_as:
             return False
         return True
 
@@ -892,8 +1009,8 @@ class PlotPreview(Plot):
         """
         Removes previewed layers
         """
-        PlotPreview.remove_layer_by_id(self._parent_id)
-        layer = PlotPreview.layers.get(self._parent_id)
+        self.remove_layer_by_id(self._settings.fpath)
+        layer = self._layers.get(self._settings.fpath)
         if layer:
             self._remove_stored_layer(layer.id())
 
@@ -905,50 +1022,47 @@ class PlotPreview(Plot):
         """
         layer_name = "{0}_{1}_{2}".format(
             self._scheme_number,
-            self._import_type.get(self._geom_type),
-            self.type_count[self._geom_type]
+            self._import_type.get(self._settings.geom_type),
+            self.type_count[self._settings.geom_type]
         )
         return layer_name
 
-    @classmethod
-    def remove_layer_by_id(cls, parent_id):
+    def remove_layer_by_id(self, parent_id):
         """
         Removes layer from the registry/map canvas
         :param parent_id: Parent record/item identifier
         :type parent_id: String
         """
-        if not cls.layers:
+        if not self._layers:
             return
         try:
-            layer = cls.layers.get(parent_id)
+            layer = self._layers.get(parent_id)
             if layer:
                 PlotLayer.remove_layer_by_id(layer.id())
         except (RuntimeError, OSError, Exception) as e:
             raise e
 
-    @classmethod
-    def remove_layers(cls):
+    def remove_layers(self):
         """
         Removes all layers from the registry/map canvas
         given layer IDs
         """
-        if not cls.layers:
+        if not self._layers:
             return
         try:
-            layer_ids = cls.layer_ids()
+            layer_ids = self.layer_ids()
             if layer_ids:
                 PlotLayer.remove_layers(layer_ids)
         except (RuntimeError, OSError, Exception) as e:
             raise e
 
-    @classmethod
-    def layer_ids(cls):
+    def layer_ids(self):
         """
         Returns all layers from the registry/map canvas
         :return layer_ids: Layer IDs
         :rtype layer_ids: List
         """
-        layer_ids = [layer.id() for layer in cls.layers.values()]
+        layer_ids = [layer.id() for layer in self._layers.values()]
         return layer_ids
 
     @property
@@ -966,21 +1080,36 @@ class PlotPreview(Plot):
         Emits layersWillBeRemoved signal
         """
         project = self._plot_layer.project_instance()
-        project.layersWillBeRemoved.connect(PlotPreview._remove_stored_layer)
+        project.layersWillBeRemoved.connect(self._remove_stored_layer)
+        project.layersWillBeRemoved.connect(self._reset_layer)
 
-    @classmethod
-    def _remove_stored_layer(cls, layer_ids):
+    def _remove_stored_layer(self, layer_ids):
         """
         Removes stored layer
         :param layer_ids: Layer IDs
         :param layer_ids: List
         """
         try:
-            cls.layers = {
+            self._layers = {
                 key: layer
-                for key, layer in cls.layers.items()
+                for key, layer in self._layers.items()
                 if layer.id() not in layer_ids
             }
+        except (RuntimeError, OSError, Exception) as e:
+            raise e
+
+    def _reset_layer(self, layer_ids):
+        """
+        Resets the current layer
+        :param layer_ids: Layer IDs
+        :param layer_ids: List
+        """
+        try:
+            if not self._plot_layer:
+                return
+            if self._plot_layer.layer and \
+                    self._plot_layer.layer.id() in layer_ids:
+                self._plot_layer.layer = None
         except (RuntimeError, OSError, Exception) as e:
             raise e
 
@@ -990,38 +1119,30 @@ class PlotPreview(Plot):
         :param row: Preview table view row index
         :type row: Integer
         """
-        layer = PlotPreview.layers.get(self._parent_id)
+        layer = self._layers.get(self._settings.fpath)
         if not self._plot_layer:
             return
         self._plot_layer.select_feature(layer, [row])
 
-    def clear_feature(self, layer=None):
+    @staticmethod
+    def clear_feature(layer):
         """
         Clears selected features in a layer
         :param layer: Input layer
         :type layer: QgsVectorLayer
         """
-        if not layer:
-            layer = PlotPreview.layers.get(self._parent_id)
-        if not self._plot_layer:
-            return
-        self._plot_layer.clear_feature(layer)
+        PlotLayer.clear_feature(layer)
 
-    @classmethod
-    def layer_in_store(cls, parent_id):
+    @property
+    def dirty(self):
         """
-        Checks if the layer exists
-        in the layer store
-        param parent_id: Parent record/item identifier
-        :type parent_id: String
-        :return: True
-        :rtype: Boolean
+        Returns dirty object
+        :return _dirty: Dirty object
+        :return _dirty: Dictionary
         """
-        if parent_id in cls.layers:
-            return True
+        return self._dirty
 
-    @classmethod
-    def is_dirty(cls, fpath):
+    def is_dirty(self, fpath):
         """
         Checks if the file is valid for import
         :param fpath: Plot import file absolute path
@@ -1029,38 +1150,52 @@ class PlotPreview(Plot):
         :return: True
         :rtype: Boolean
         """
-        return cls.dirty.get(fpath)
+        return self._dirty.get(fpath)
 
-    @classmethod
-    def dirty_file_names(cls):
+    def dirty_file_names(self):
         """
         Returns names of files which are valid for import
         :return file_names: Valid import file names
         :rtype file_names: List
         """
         file_names = [
-            QFileInfo(fpath).fileName() for fpath in cls.dirty.keys()
+            QFileInfo(fpath).fileName() for fpath in self._dirty.keys()
         ]
         return file_names
 
-    @classmethod
-    def remove_dirty(cls, fpath):
+    def remove_dirty(self, fpath):
         """
         Removes file name from dirty class variable
         :param fpath: Plot import file absolute path
         :type fpath: String
         """
         try:
-            del cls.dirty[fpath]
+            del self._dirty[fpath]
         except KeyError:
             pass
 
-    @classmethod
-    def reset_dirty(cls):
+    def reset_dirty(self):
         """
         Resets the dirty class variable
         """
-        cls.dirty = {}
+        self._dirty = {}
+
+    def import_error(self, fpath):
+        """
+        Returns number of errors encountered on preview
+        :return errors: Number of errors on preview
+        :return errors: Integer
+        """
+        errors = self._errors.get(fpath)
+        if not errors:
+            errors = 0
+        return errors
+
+    def reset_errors(self):
+        """
+        Resets errors
+        """
+        self._errors = {}
 
     def get_headers(self):
         """
@@ -1283,7 +1418,7 @@ class PlotFile(Plot):
                     for value in data:
                         if value is None or isinstance(value, list):
                             continue
-                        geom_type, geom = self._geometry(value)
+                        geom_type, coordinates, geom = self._geometry(value)
                         if geom:
                             count += 1
                 total_rows = self.row_count(fpath)
