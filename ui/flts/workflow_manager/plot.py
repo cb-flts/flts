@@ -41,7 +41,7 @@ from stdm.ui.flts.workflow_manager.data import Save
 NAME, IMPORT_AS, DELIMITER, HEADER_ROW, CRS_ID, \
 GEOM_FIELD, GEOM_TYPE = range(7)
 GEOMETRY, PARCEL_NUM, UPI_NUM, AREA, SCHEME_ID, PLOT_STATUS = range(6)
-GEOMETRY_POINT, X, Y = range(3)
+GEOMETRY_PT, X_PT, Y_PT = range(3)
 WARNING = "Warning"
 
 
@@ -354,7 +354,7 @@ class Plot(object):
                     for value in data:
                         if value is None or isinstance(value, list):
                             continue
-                        geom_type, geom = self._geometry(value)
+                        geom_type, coordinates, geom = self._geometry(value)
                         if geom_type:
                             if geom_type not in match_count:
                                 match_count[geom_type] = 0
@@ -388,7 +388,7 @@ class Plot(object):
         :return geom: Geometry
         :rtype geom: QgsGeometry
         """
-        geom_type = geom = None
+        geom_type = geom = coordinates = None
         matches = self._reg_exes["type_str"].match(wkt)
         if matches:
             geom_type, coordinates = matches.groups()
@@ -396,7 +396,7 @@ class Plot(object):
             if geom_type:
                 geom_type = geom_type.strip()
                 geom_type = geom_type.lower().capitalize()
-        return geom_type, geom
+        return geom_type, coordinates, geom
 
     @staticmethod
     def _default_geometry_type(type_count):
@@ -689,14 +689,15 @@ class PlotPreview(Plot):
         for row, data in enumerate(csv_reader):
             contents = {}
             self._items = {}
-            value = self._get_wkt(data, GEOMETRY)
+            value = self._get_wkt(data, GEOMETRY_PT)
             if value:
-                contents[GEOMETRY_POINT] = unicode(value)
-                contents[X] = unicode("")
-                contents[Y] = unicode("")
+                contents[GEOMETRY_PT] = unicode(value)
+                lat, long_ = self._beacon_coordinates(value)
+                contents[X_PT] = self._to_float(lat, X_PT)
+                contents[Y_PT] = self._to_float(long_, Y_PT)
                 contents["items"] = self._items
                 attributes = self._layer_attributes(contents)
-                self._create_layer(contents[GEOMETRY], attributes)
+                self._create_layer(contents[GEOMETRY_PT], attributes)
                 results.append(contents)
         return results
 
@@ -751,7 +752,7 @@ class PlotPreview(Plot):
         elif isinstance(value, list):
             self._items[column] = invalid_tip
             return value
-        geom_type, geom = self._geometry(value)
+        geom_type, coordinates, geom = self._geometry(value)
         if not geom:
             self._items[column] = invalid_tip
             return value
@@ -789,12 +790,9 @@ class PlotPreview(Plot):
         :return value: Object
         """
         value = self._field_value(data, field_names)
-
-        if value is None or not str(value).strip():
-            value = WARNING
-            self._items[column] = \
-                self._decoration_tooltip("Missing value")
-            self._error_counter += 1
+        warning_flag = self._empty_value(column, value)
+        if warning_flag:
+            value = warning_flag
         return value
 
     @staticmethod
@@ -813,6 +811,53 @@ class PlotPreview(Plot):
             name = name.lower()
             if name in fields:
                 return data.get(fields[name])
+
+    def _beacon_coordinates(self, wkt):
+        """
+        Returns plot beacon coordinates
+        :param wkt: WKT data
+        :type wkt: String
+        :return lat: Beacon coordinates
+        :rtype lat: Float
+        """
+        beacon = {X_PT: "", Y_PT: ""}
+        if GEOMETRY_PT not in self._items:
+            geom_type, coordinates, geom = self._geometry(wkt)
+            lat, long_ = coordinates.split()
+            beacon = dict([(X_PT, lat), (Y_PT, long_)])
+        beacon = {k: self._coordinate(k, v) for k, v in beacon.items()}
+        return beacon[X_PT], beacon[Y_PT]
+
+    def _coordinate(self, column, coordinate):
+        """
+        Returns coordinate value
+        :param column: Table view column position
+        :type column: Integer
+        :param coordinate: Coordinate value
+        :type coordinate: String
+        :return coordinate: Coordinate value
+        :rtype coordinate: String
+        """
+        warning_flag = self._empty_value(column, coordinate)
+        if warning_flag:
+            coordinate = warning_flag
+        return coordinate
+
+    def _empty_value(self, column, value):
+        """
+        Returns flag for empty value
+        :param column: Table view column position
+        :type column: Integer
+        :param value: Plot import file value
+        :type value: Object
+        :return value: Empty value flag
+        :return value: String
+        """
+        if value is None or not str(value).strip():
+            value = WARNING
+            self._items[column] = self._decoration_tooltip("Missing value")
+            self._error_counter += 1
+            return value
 
     def _to_float(self, value, column):
         """
@@ -929,7 +974,7 @@ class PlotPreview(Plot):
             self._remove_previewed_layers()
             return
         if not self._plot_layer:
-            geom_type, geom = self._geometry(wkt)
+            geom_type, coordinates, geom = self._geometry(wkt)
             uri = "{0}?crs={1}&index=yes".format(geom_type, self._settings.crs_id)
             fields = [(field, type_) for field, type_, value in attributes]
             name = self._generate_layer_name()
@@ -951,7 +996,7 @@ class PlotPreview(Plot):
         :return: True if valid. Otherwise False
         :rtype: Boolean
         """
-        geom_type, geom = self._geometry(wkt)
+        geom_type, coordinates, geom = self._geometry(wkt)
         type_name = self._geometry_types.get(geom_type)
         import_type = self._import_type.get(self._settings.geom_type)
         if not type_name or \
@@ -1373,7 +1418,7 @@ class PlotFile(Plot):
                     for value in data:
                         if value is None or isinstance(value, list):
                             continue
-                        geom_type, geom = self._geometry(value)
+                        geom_type, coordinates, geom = self._geometry(value)
                         if geom:
                             count += 1
                 total_rows = self.row_count(fpath)
