@@ -172,9 +172,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         # Last int value used for generating the scheme number
         self._abs_last_scheme_value = None
 
-        # Last int value used for generating the sg and constitution numbers
-        self._abs_last_sg_value = None
-
         # Validator for holders data
         self._holders_validator = None
 
@@ -225,10 +222,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         # Current date
         self._current_date = QDate.currentDate().getDate()
         self._current_year = self._current_date[0]
-
-        self.cbx_reg_div.currentIndexChanged.connect(
-            self._gen_sg_number
-        )
 
         # Set date limits
         self._configure_date_controls()
@@ -451,38 +444,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
                                             self._current_year)
 
         return scheme_code
-
-    def _gen_sg_number(self):
-        """
-        Generate the sg/general plan number
-        :return:
-        """
-        # Set sg_number prefix which is constant
-        sg_prefix = self.tr('A')
-        sg_default_value = 1
-        # Get the scheme object
-        scheme_object = self.schm_model()
-
-        # Get scheme object as list
-        scheme_res = scheme_object.queryObject().all()
-
-        # Check if length of list is empty i.e. if a scheme exist
-        if len(scheme_res) == 0:
-            sg_code = u'{0}/{1}/{2}'.format(sg_prefix,
-                                            str(sg_default_value).zfill(4),
-                                            self._current_year)
-            self.lnedit_sg_num.setText(sg_code)
-        # If record exists, increment the last value
-        elif len(scheme_res) > 0:
-            sch_res = scheme_object.queryObject().order_by(
-                self.schm_model.id.desc()).first()
-            sg_number = sch_res.general_plan_number.strip('][').split('/')
-            sg_count = int(sg_number[1])
-            sg_count += 1
-            sg_code = u'{0}/{1}/{2}'.format(sg_prefix,
-                                            str(sg_count).zfill(4),
-                                            self._current_year)
-            self.lnedit_sg_num.setText(sg_code)
 
     def _on_area_check(self):
         """
