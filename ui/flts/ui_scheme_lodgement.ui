@@ -52,26 +52,6 @@
   </property>
   <widget class="QWizardPage" name="wizardPage1">
    <layout class="QGridLayout" name="gridLayout_4">
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_region">
-      <property name="text">
-       <string>Region</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1">
-     <widget class="QComboBox" name="cbx_relv_auth"/>
-    </item>
-    <item row="4" column="1">
-     <widget class="QComboBox" name="cbx_relv_auth_name"/>
-    </item>
-    <item row="5" column="0">
-     <widget class="QLabel" name="label_reg_div">
-      <property name="text">
-       <string>Registration Division</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="0" colspan="2">
      <layout class="QVBoxLayout" name="vlNotification">
       <property name="bottomMargin">
@@ -92,112 +72,110 @@
       </property>
      </widget>
     </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_region">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Region &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
     <item row="2" column="1">
      <widget class="QComboBox" name="cbx_region"/>
     </item>
     <item row="3" column="0">
      <widget class="QLabel" name="label_rel_auth_type">
       <property name="text">
-       <string>Type of Relevant Authority</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Type of Relevant Authority &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QComboBox" name="cbx_relv_auth"/>
     </item>
     <item row="4" column="0">
      <widget class="QLabel" name="label_rel_auth_name">
       <property name="text">
-       <string>Name of Relevant Authority</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Name of Relevant Authority &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
-    <item row="8" column="1">
-     <widget class="QLineEdit" name="lnedit_schm_nam"/>
+    <item row="4" column="1">
+     <widget class="QComboBox" name="cbx_relv_auth_name"/>
     </item>
-    <item row="10" column="1">
-     <widget class="QDateEdit" name="date_establish">
-      <property name="minimumDateTime">
-       <datetime>
-        <hour>0</hour>
-        <minute>0</minute>
-        <second>0</second>
-        <year>2010</year>
-        <month>1</month>
-        <day>1</day>
-       </datetime>
+    <item row="5" column="0">
+     <widget class="QLabel" name="label_reg_div">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Registration Division &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
-      <property name="minimumDate">
-       <date>
-        <year>2010</year>
-        <month>1</month>
-        <day>1</day>
-       </date>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QComboBox" name="cbx_reg_div"/>
+    </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="label_schm_num">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scheme Number &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
-      <property name="calendarPopup">
+     </widget>
+    </item>
+    <item row="6" column="1">
+     <widget class="QLineEdit" name="lnedit_schm_num">
+      <property name="inputMask">
+       <string/>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
        <bool>true</bool>
       </property>
      </widget>
     </item>
-    <item row="12" column="1">
-     <widget class="QLineEdit" name="lnedit_twnshp"/>
+    <item row="7" column="0">
+     <widget class="QLabel" name="label_sg_num">
+      <property name="text">
+       <string>Surveyor General Number</string>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="1">
+     <widget class="QLineEdit" name="lnedit_sg_num">
+      <property name="inputMask">
+       <string/>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
+       <bool>false</bool>
+      </property>
+      <property name="placeholderText">
+       <string>Enter Surveyor General Number</string>
+      </property>
+     </widget>
     </item>
     <item row="8" column="0">
      <widget class="QLabel" name="label_schm_name">
       <property name="text">
-       <string>Scheme Name</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scheme Name &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="1">
+     <widget class="QLineEdit" name="lnedit_schm_nam">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string>Enter name of the Scheme</string>
       </property>
      </widget>
     </item>
     <item row="9" column="0">
      <widget class="QLabel" name="label_date_apprv">
       <property name="text">
-       <string>Date of Approval (RA)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="13" column="1">
-     <widget class="QDoubleSpinBox" name="dbl_spinbx_num_plots">
-      <property name="decimals">
-       <number>0</number>
-      </property>
-      <property name="maximum">
-       <double>200.000000000000000</double>
-      </property>
-     </widget>
-    </item>
-    <item row="11" column="1">
-     <widget class="QComboBox" name="cbx_lro"/>
-    </item>
-    <item row="11" column="0">
-     <widget class="QLabel" name="label_lro">
-      <property name="text">
-       <string>Land Rights Office</string>
-      </property>
-     </widget>
-    </item>
-    <item row="10" column="0">
-     <widget class="QLabel" name="label_date_establish">
-      <property name="text">
-       <string>Date of Establishment (RoD)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="1">
-     <widget class="QLineEdit" name="lnedit_schm_num">
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="12" column="0">
-     <widget class="QLabel" name="label_twn_name">
-      <property name="text">
-       <string>Township Name</string>
-      </property>
-     </widget>
-    </item>
-    <item row="7" column="1">
-     <widget class="QLineEdit" name="lnedit_sg_num">
-      <property name="readOnly">
-       <bool>true</bool>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Date of Approval (RA) &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
@@ -225,31 +203,113 @@
       </property>
      </widget>
     </item>
-    <item row="7" column="0">
-     <widget class="QLabel" name="label_sg_num">
+    <item row="10" column="0">
+     <widget class="QLabel" name="label_date_establish">
       <property name="text">
-       <string>SG/General Plan Number</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Date of Establishment (RoD) &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="1">
+     <widget class="QDateEdit" name="date_establish">
+      <property name="minimumDateTime">
+       <datetime>
+        <hour>0</hour>
+        <minute>0</minute>
+        <second>0</second>
+        <year>2010</year>
+        <month>1</month>
+        <day>1</day>
+       </datetime>
+      </property>
+      <property name="minimumDate">
+       <date>
+        <year>2010</year>
+        <month>1</month>
+        <day>1</day>
+       </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="11" column="0">
+     <widget class="QLabel" name="label_lro">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Land Rights Office &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
+    <item row="11" column="1">
+     <widget class="QComboBox" name="cbx_lro"/>
+    </item>
+    <item row="12" column="0">
+     <widget class="QLabel" name="label_title_deed_num">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Title Deed Number &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
+    <item row="12" column="1">
+     <widget class="QLineEdit" name="lnedit_title_deed_num">
+      <property name="placeholderText">
+       <string>Enter Title Deed Number</string>
       </property>
      </widget>
     </item>
     <item row="13" column="0">
+     <widget class="QLabel" name="label_constitution_ref_num">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Constitution Ref. Number &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
+    <item row="13" column="1">
+     <widget class="QLineEdit" name="lnedit_constitution_ref_num">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string>Enter Consitution Reference Number</string>
+      </property>
+     </widget>
+    </item>
+    <item row="14" column="0">
+     <widget class="QLabel" name="label_scheme_description">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scheme Description &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
+    <item row="14" column="1">
+     <widget class="QLineEdit" name="lnedit_scheme_description">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string>Erf Number, Township Name</string>
+      </property>
+     </widget>
+    </item>
+    <item row="15" column="0">
      <widget class="QLabel" name="label_num_plots">
       <property name="text">
-       <string>Number of Plots</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of Plots &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
-    <item row="5" column="1">
-     <widget class="QComboBox" name="cbx_reg_div"/>
-    </item>
-    <item row="6" column="0">
-     <widget class="QLabel" name="label_schm_num">
-      <property name="text">
-       <string>Scheme Number</string>
+    <item row="15" column="1">
+     <widget class="QDoubleSpinBox" name="dbl_spinbx_num_plots">
+      <property name="decimals">
+       <number>0</number>
+      </property>
+      <property name="maximum">
+       <double>200.000000000000000</double>
       </property>
      </widget>
     </item>
-    <item row="14" column="0" colspan="2">
+    <item row="16" column="0" colspan="2">
      <widget class="QGroupBox" name="gbx_block_area">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -264,7 +324,7 @@
        <item row="0" column="0">
         <widget class="QLabel" name="label_blck_area_units">
          <property name="text">
-          <string>Units</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Units &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
@@ -293,6 +353,13 @@
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item row="17" column="0">
+     <widget class="QLabel" name="label_mandatory">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot; font-style:italic; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;) Mandatory field&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
      </widget>
     </item>
    </layout>
