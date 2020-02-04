@@ -988,9 +988,9 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             pseudoname='Scheme Number'
         )
         self.addMapping(
-            'general_plan_number',
+            'sg_number',
             self.lnedit_sg_num,
-            pseudoname='General Plan Number'
+            pseudoname='Surveyor General Number'
         )
         self.addMapping(
             'scheme_name',
@@ -1013,11 +1013,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             pseudoname='Land Rights Office'
         )
         self.addMapping(
-            'township',
-            self.lnedit_twnshp,
-            pseudoname='Township'
-        )
-        self.addMapping(
             'area',
             self.dbl_spinbx_block_area,
             pseudoname='Area'
@@ -1026,6 +1021,21 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             'no_of_plots',
             self.dbl_spinbx_num_plots,
             pseudoname='Number of Plots'
+        )
+        self.addMapping(
+            'title_deed_number',
+            self.lnedit_title_deed_num,
+            pseudoname='Title Deed Number'
+        )
+        self.addMapping(
+            'constitution_ref_number',
+            self.lnedit_constitution_ref_num,
+            pseudoname='Constitution Reference Number'
+        )
+        self.addMapping(
+            'scheme_description',
+            self.lnedit_scheme_description,
+            pseudoname='Scheme Description'
         )
 
     def create_notification(self):
@@ -1237,10 +1247,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         self.tr_summary.scm_lro.setText(
             1,
             self.cbx_lro.currentText()
-        )
-        self.tr_summary.scm_township.setText(
-            1,
-            self.lnedit_twnshp.text()
         )
         self.tr_summary.scm_reg_div.setText(
             1,
