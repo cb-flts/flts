@@ -172,9 +172,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         # Last int value used for generating the scheme number
         self._abs_last_scheme_value = None
 
-        # Last int value used for generating the sg and constitution numbers
-        self._abs_last_sg_value = None
-
         # Validator for holders data
         self._holders_validator = None
 
@@ -226,46 +223,11 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         self._current_date = QDate.currentDate().getDate()
         self._current_year = self._current_date[0]
 
-        self.cbx_reg_div.currentIndexChanged.connect(
-            self._gen_sg_number
-        )
-
         # Set date limits
         self._configure_date_controls()
 
         # Specify MapperMixin widgets
         self.register_col_widgets()
-
-        # Temporary tooltips for demo
-        self.cbx_region.setToolTip(
-            self.tr('Select region')
-        )
-        self.cbx_relv_auth.setToolTip(
-            self.tr('Select type of relevant authority')
-        )
-        self.cbx_reg_div.setToolTip(
-            self.tr('Select registration division')
-        )
-        self.cbx_relv_auth_name.setToolTip(
-            self.tr('Select name of relevant authority')
-        )
-        self.lnedit_sg_num.setToolTip(
-            self.tr('This is the SG/General Plan number'
-                    'that is automatically generated')
-        )
-        self.lnedit_schm_num.setToolTip(
-            self.tr('This is the Scheme Number that is '
-                    'automatically generated')
-        )
-        self.dbl_spinbx_block_area.setToolTip(
-            self.tr('Insert block area')
-        )
-        self.radio_hectares.setToolTip(
-            self.tr('Click to show area in hectares')
-        )
-        self.radio_sq_meters.setToolTip(
-            self.tr('Click to show area in hectares')
-        )
 
     def _tooltips(self, widget, tip):
         """
@@ -482,38 +444,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
                                             self._current_year)
 
         return scheme_code
-
-    def _gen_sg_number(self):
-        """
-        Generate the sg/general plan number
-        :return:
-        """
-        # Set sg_number prefix which is constant
-        sg_prefix = self.tr('A')
-        sg_default_value = 1
-        # Get the scheme object
-        scheme_object = self.schm_model()
-
-        # Get scheme object as list
-        scheme_res = scheme_object.queryObject().all()
-
-        # Check if length of list is empty i.e. if a scheme exist
-        if len(scheme_res) == 0:
-            sg_code = u'{0}/{1}/{2}'.format(sg_prefix,
-                                            str(sg_default_value).zfill(4),
-                                            self._current_year)
-            self.lnedit_sg_num.setText(sg_code)
-        # If record exists, increment the last value
-        elif len(scheme_res) > 0:
-            sch_res = scheme_object.queryObject().order_by(
-                self.schm_model.id.desc()).first()
-            sg_number = sch_res.general_plan_number.strip('][').split('/')
-            sg_count = int(sg_number[1])
-            sg_count += 1
-            sg_code = u'{0}/{1}/{2}'.format(sg_prefix,
-                                            str(sg_count).zfill(4),
-                                            self._current_year)
-            self.lnedit_sg_num.setText(sg_code)
 
     def _on_area_check(self):
         """
@@ -1058,9 +988,9 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             pseudoname='Scheme Number'
         )
         self.addMapping(
-            'general_plan_number',
+            'sg_number',
             self.lnedit_sg_num,
-            pseudoname='General Plan Number'
+            pseudoname='Surveyor General Number'
         )
         self.addMapping(
             'scheme_name',
@@ -1083,11 +1013,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             pseudoname='Land Rights Office'
         )
         self.addMapping(
-            'township',
-            self.lnedit_twnshp,
-            pseudoname='Township'
-        )
-        self.addMapping(
             'area',
             self.dbl_spinbx_block_area,
             pseudoname='Area'
@@ -1096,6 +1021,21 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             'no_of_plots',
             self.dbl_spinbx_num_plots,
             pseudoname='Number of Plots'
+        )
+        self.addMapping(
+            'title_deed_number',
+            self.lnedit_title_deed_num,
+            pseudoname='Title Deed Number'
+        )
+        self.addMapping(
+            'constitution_ref_number',
+            self.lnedit_constitution_ref_num,
+            pseudoname='Constitution Reference Number'
+        )
+        self.addMapping(
+            'scheme_description',
+            self.lnedit_scheme_description,
+            pseudoname='Scheme Description'
         )
 
     def create_notification(self):
@@ -1307,10 +1247,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         self.tr_summary.scm_lro.setText(
             1,
             self.cbx_lro.currentText()
-        )
-        self.tr_summary.scm_township.setText(
-            1,
-            self.lnedit_twnshp.text()
         )
         self.tr_summary.scm_reg_div.setText(
             1,

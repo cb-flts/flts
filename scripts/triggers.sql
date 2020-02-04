@@ -15,15 +15,15 @@ CREATE TABLE "public"."cb_scheme_log" (
   "land_rights_office" int4,
   "region" int4,
   "title_deed_number" varchar(30),
-  "township_name" varchar(100),
   "registration_division" int4,
   "area" numeric(15,4),
-  "doc_imposing_conditions" varchar(30),
+  "doc_imposing_conditions_number" varchar(30),
   "constitution_ref_number" varchar(32),
   "no_of_plots" int4,
   "scheme_number" varchar(32),
-  "general_plan_number" varchar (32),
-  "scheme_id" int4
+  "sg_number" varchar (32),
+  "plot_status" int4,
+  "scheme_description" varchar(200)
 )
 ;
 
@@ -36,25 +36,26 @@ CREATE TABLE "public"."cb_holder_log" (
   "stamp" timestamp(6),
   "user_id" text,
   "id" int4,
-  "first_name" varchar(50),
-  "surname" varchar(50),
-  "gender" int4,
+  "holder_first_name" varchar(50),
+  "holder_surname" varchar(50),
+  "holder_gender" int4,
   "holder_identifier" varchar(20),
-  "date_of_birth" date,
-  "name_of_juristic_person" varchar(50),
-  "reg_no_of_juristic_person" varchar(50),
+  "holder_date_of_birth" date,
+  "juristic_person_name" varchar(50),
+  "juristic_person_number" varchar(50),
   "marital_status" int4,
   "spouse_surname" varchar(50),
   "spouse_first_name" varchar(50),
   "spouse_gender" int4,
   "spouse_identifier" varchar(20),
   "spouse_date_of_birth" date,
-  "disability_status" int4,
-  "income_level" int4,
-  "occupation" int4,
+  "holder_disability_status" int4,
+  "holder_income_level" int4,
+  "holder_occupation" int4,
   "other_dependants" int4,
-  "spouse_occupation" int4,
-  "spouse_income_level" int4
+  "plot_number" int4,
+  "transfer_contract_date" date,
+  "plot_use" int4
 )
 ;
 
