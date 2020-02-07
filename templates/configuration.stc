@@ -131,88 +131,12 @@
     <CodeValue value="In Community of Property" code=""/>
     <CodeValue value="Out of Community of Property" code=""/>
    </ValueList>
+   <ValueList name="check_holder_document_type">
+    <CodeValue value="Marriage Certificate" code=""/>
+    <CodeValue value="Holder ID" code=""/>
+    <CodeValue value="Transfer Contract" code=""/>
+   </ValueList>
   </ValueLists>
-  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to log entity of LIS_Plot" proxy="False" createId="True" supportsDocuments="False" shortName="LIS_Plot_log" name="cb_lis_plot_log" label="">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-   </Columns>
-  </Entity>
-  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to log entity of Relevant_authority" proxy="False" createId="True" supportsDocuments="False" shortName="Relevant_authority_log" name="cb_relevant_authority_log" label="Relevant Authority Log">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-   </Columns>
-  </Entity>
-  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to log entity of Holder" proxy="False" createId="True" supportsDocuments="False" shortName="Holder_log" name="cb_holder_log" label="Holder Log">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-   </Columns>
-  </Entity>
-  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to log entity of Notification" proxy="False" createId="True" supportsDocuments="False" shortName="Notification Log" name="cb_notification_log" label="Notification Log">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-   </Columns>
-  </Entity>
-  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to log entity of Report" proxy="False" createId="True" supportsDocuments="False" shortName="Report Log" name="cb_report_log" label="">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-   </Columns>
-  </Entity>
-  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to log entity of Scheme" proxy="False" createId="True" supportsDocuments="False" shortName="Scheme_log" name="cb_scheme_log" label="Scheme Log">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="0" minimum="0" maximum="1" description="operation on row" index="False" name="operation" searchable="True" TYPE_INFO="VARCHAR" label="operation" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="1" minimum="1752-09-14 00:00:00" maximum="9999-12-31 23:59:59.999999" description="timestamp of action on row" index="False" name="stamp" searchable="False" TYPE_INFO="DATETIME" label="timestamp" mandatory="False">
-     <currentDateTime minimum="True" maximum="True"/>
-    </Column>
-    <Column unique="False" tip="" rowindex="2" minimum="0" maximum="1073741823" description="user who performed action" index="False" name="user_id" searchable="False" TYPE_INFO="TEXT" label="user id" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="3" minimum="0" maximum="50" description="Name of Scheme" index="False" name="scheme_name" searchable="True" TYPE_INFO="VARCHAR" label="scheme name" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="4" minimum="1752-09-14" maximum="7999-12-31" description="Date of approval" index="False" name="date_of_approval" searchable="False" TYPE_INFO="DATE" label="date of approval" mandatory="False">
-     <currentDate minimum="False" maximum="True"/>
-    </Column>
-    <Column unique="False" tip="" rowindex="5" minimum="1752-09-14" maximum="7999-12-31" description="Date of Establishment" index="False" name="date_of_establishment" searchable="False" TYPE_INFO="DATE" label="date of establishment" mandatory="False">
-     <currentDate minimum="False" maximum="True"/>
-    </Column>
-    <Column unique="False" tip="" rowindex="6" minimum="0" maximum="2147483647" description="Relevant authority" index="False" name="relevant_authority" searchable="True" TYPE_INFO="INT" label="relevant authority" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="7" minimum="0" maximum="2147483647" description="Land Rights Office" index="False" name="land_rights_office" searchable="True" TYPE_INFO="INT" label="land rights office" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="8" minimum="0" maximum="2147483647" description="Region" index="False" name="region" searchable="True" TYPE_INFO="INT" label="region" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="9" minimum="0" maximum="30" description="The number/code of the title deed" index="False" name="title_deed_number" searchable="True" TYPE_INFO="VARCHAR" label="title deed number" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="10" minimum="0" maximum="100" description="Name of Township" index="False" name="township_name" searchable="True" TYPE_INFO="VARCHAR" label="township name" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="11" minimum="0" maximum="2147483647" description="registration division" index="False" name="registration_division" searchable="True" TYPE_INFO="INT" label="registration division" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="12" minimum="-0" maximum="179769313485999993463412110191957867872176903147024190229169150664616720223488549064776002732213849498804348433116986060126989671666306060788674238031081950882294921586851551818012975619342999042256679071052330673321513805402276774228700884740900574397999799640549171929913383207407537025048827210712192385024" description="Area of Scheme" index="False" name="area" searchable="True" TYPE_INFO="DOUBLE" label="area" mandatory="False">
-     <Numeric scale="4" precision="15"/>
-    </Column>
-    <Column unique="False" tip="" rowindex="13" minimum="0" maximum="30" description="Registration number of document imposing conditions" index="False" name="doc_imposing_conditions" searchable="True" TYPE_INFO="VARCHAR" label="doc imposing conditions" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="14" minimum="0" maximum="30" description="Reference number of the constitution" index="False" name="constitution_ref_no" searchable="True" TYPE_INFO="VARCHAR" label="consitution ref number" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="15" minimum="0" maximum="2147483647" description="Number of plots in the Scheme" index="False" name="no_of_plots" searchable="True" TYPE_INFO="INT" label="no of plots" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="16" minimum="0" maximum="32" description="The number representing the Scheme" index="False" name="scheme_number" searchable="True" TYPE_INFO="VARCHAR" label="scheme number" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="17" minimum="-2147483648" maximum="2147483647" description="scheme id" index="False" name="scheme_id" searchable="True" TYPE_INFO="INT" label="scheme id" mandatory="False"/>
-   </Columns>
-  </Entity>
-  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to log entity of Approval" proxy="False" createId="True" supportsDocuments="False" shortName="Approval_log" name="cb_approval_log" label="Approval Log">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-   </Columns>
-  </Entity>
-  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to log entity of Holder_plot" proxy="False" createId="True" supportsDocuments="False" shortName="Holder_plot_log" name="cb_holder_plot_log" label="Holder plot Log">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-   </Columns>
-  </Entity>
-  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to log entity of Lis_erf" proxy="False" createId="True" supportsDocuments="False" shortName="Lis_erf_log" name="cb_lis_erf_log" label="">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-   </Columns>
-  </Entity>
-  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to log entity of Plot" proxy="False" createId="True" supportsDocuments="False" shortName="Plot_log" name="cb_plot_log" label="Plot Log">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-   </Columns>
-  </Entity>
-  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to log entity of Cdrs_title_deed" proxy="False" createId="True" supportsDocuments="False" shortName="Cdrs_title_deed_log" name="cb_cdrs_title_deed_log" label="Cdrs_title_deed Log">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-   </Columns>
-  </Entity>
   <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to users" proxy="False" createId="True" supportsDocuments="False" shortName="User" name="cb_user" label="User">
    <Columns>
     <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
@@ -338,7 +262,7 @@
     <Column unique="False" tip="" rowindex="4" minimum="0" maximum="1000000000" description="last value" index="False" name="last_val" searchable="True" TYPE_INFO="INT" label="last value" mandatory="False"/>
    </Columns>
   </Entity>
-  <Entity editable="True" global="False" rowindex="10" associative="False" description="Refers to the holder of Land Hold Title" proxy="False" createId="True" supportsDocuments="False" shortName="Holder" name="cb_holder" label="lht_holder">
+  <Entity editable="True" global="False" rowindex="10" associative="False" description="Refers to the holder of Land Hold Title" documentTypeLookup="check_holder_document_type" proxy="False" createId="True" supportsDocuments="True" shortName="Holder" name="cb_holder" label="lht_holder">
    <Columns>
     <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
     <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="50" description="First name of the holder" index="False" name="holder_first_name" searchable="True" TYPE_INFO="VARCHAR" label="holder first name" mandatory="False"/>
@@ -436,24 +360,22 @@
     <Column unique="False" tip="" rowindex="5" minimum="0" maximum="2147483647" description="Region in which the scheme exists" index="False" name="region" searchable="True" TYPE_INFO="LOOKUP" label="region" mandatory="True">
      <Relation name="fk_cb_check_lht_region_id_cb_scheme_region"/>
     </Column>
-    <Column unique="False" tip="" rowindex="6" minimum="0" maximum="2147483647" description="The number/code of the title deed" index="False" name="title_deed_number" searchable="False" TYPE_INFO="FOREIGN_KEY" label="title deed no" mandatory="False">
-     <Relation name="fk_cb_cdrs_title_deed_id_cb_scheme_title_deed_number"/>
-    </Column>
-    <Column unique="False" tip="" rowindex="8" minimum="0" maximum="2147483647" description="The registration division" index="False" name="registration_division" searchable="True" TYPE_INFO="LOOKUP" label="registration division" mandatory="True">
+    <Column unique="False" tip="" rowindex="6" minimum="0" maximum="30" description="The number/code of the title deed" index="False" name="title_deed_number" searchable="True" TYPE_INFO="VARCHAR" label="title deed no" mandatory="True"/>
+    <Column unique="False" tip="" rowindex="7" minimum="0" maximum="2147483647" description="The registration division" index="False" name="registration_division" searchable="True" TYPE_INFO="LOOKUP" label="registration division" mandatory="True">
      <Relation name="fk_cb_check_lht_reg_division_id_cb_scheme_registration_division"/>
     </Column>
-    <Column unique="False" tip="" rowindex="9" minimum="-0" maximum="179769313485999993463412110191957867872176903147024190229169150664616720223488549064776002732213849498804348433116986060126989671666306060788674238031081950882294921586851551818012975619342999042256679071052330673321513805402276774228700884740900574397999799640549171929913383207407537025048827210712192385024" description="The geometric area of the scheme" index="False" name="area" searchable="True" TYPE_INFO="DOUBLE" label="scheme area" mandatory="True">
+    <Column unique="False" tip="" rowindex="8" minimum="-0" maximum="179769313485999993463412110191957867872176903147024190229169150664616720223488549064776002732213849498804348433116986060126989671666306060788674238031081950882294921586851551818012975619342999042256679071052330673321513805402276774228700884740900574397999799640549171929913383207407537025048827210712192385024" description="The geometric area of the scheme" index="False" name="area" searchable="True" TYPE_INFO="DOUBLE" label="scheme area" mandatory="True">
      <Numeric scale="4" precision="15"/>
     </Column>
-    <Column unique="False" tip="" rowindex="10" minimum="0" maximum="30" description="Registration number of document imposing conditions" index="False" name="doc_imposing_conditions_number" searchable="True" TYPE_INFO="VARCHAR" label="doc imposing conditions" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="11" minimum="0" maximum="32" description="Reference number of the constitution" index="False" name="constitution_ref_number" searchable="True" TYPE_INFO="VARCHAR" label="constitution reference number" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="12" minimum="0" maximum="2147483647" description="Number of polts in the scheme" index="False" name="no_of_plots" searchable="True" TYPE_INFO="INT" label="number of plots" mandatory="True"/>
-    <Column unique="False" tip="" rowindex="13" minimum="0" maximum="32" description="The number representing the scheme" index="False" name="scheme_number" searchable="True" TYPE_INFO="VARCHAR" label="scheme_number" mandatory="True"/>
-    <Column unique="False" tip="General Plan Number" rowindex="14" minimum="0" maximum="32" description="The number representing general plan" index="False" name="general_plan_number" searchable="True" TYPE_INFO="VARCHAR" label="general plan number" mandatory="True"/>
-    <Column unique="False" tip="Plot upload status" rowindex="-1" minimum="0" maximum="2147483647" description="Plot upload status" index="False" name="plot_status" searchable="True" TYPE_INFO="LOOKUP" label="" mandatory="False">
+    <Column unique="False" tip="" rowindex="9" minimum="0" maximum="30" description="Registration number of document imposing conditions" index="False" name="doc_imposing_conditions_number" searchable="True" TYPE_INFO="VARCHAR" label="doc imposing conditions" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="10" minimum="0" maximum="32" description="Reference number of the constitution" index="False" name="constitution_ref_number" searchable="True" TYPE_INFO="VARCHAR" label="constitution reference number" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="11" minimum="0" maximum="2147483647" description="Number of polts in the scheme" index="False" name="no_of_plots" searchable="True" TYPE_INFO="INT" label="number of plots" mandatory="True"/>
+    <Column unique="False" tip="" rowindex="12" minimum="0" maximum="32" description="The number representing the scheme" index="False" name="scheme_number" searchable="True" TYPE_INFO="VARCHAR" label="scheme_number" mandatory="True"/>
+    <Column unique="False" tip="General Plan Number" rowindex="13" minimum="0" maximum="32" description="The number representing general plan" index="False" name="general_plan_number" searchable="True" TYPE_INFO="VARCHAR" label="general plan number" mandatory="True"/>
+    <Column unique="False" tip="Plot upload status" rowindex="14" minimum="0" maximum="2147483647" description="Plot upload status" index="False" name="plot_status" searchable="True" TYPE_INFO="LOOKUP" label="" mandatory="False">
      <Relation name="fk_cb_check_plot_status_id_cb_scheme_plot_status"/>
     </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="200" description="Refers to the description of the scheme" index="False" name="scheme_description" searchable="True" TYPE_INFO="VARCHAR" label="scheme description" mandatory="True"/>
+    <Column unique="False" tip="" rowindex="15" minimum="0" maximum="200" description="Refers to the description of the scheme" index="False" name="scheme_description" searchable="True" TYPE_INFO="VARCHAR" label="scheme description" mandatory="True"/>
    </Columns>
   </Entity>
   <Entity editable="True" global="False" rowindex="4" associative="False" description="Refers to the relation between holder and plot" proxy="False" createId="True" supportsDocuments="False" shortName="Holder_plot" name="cb_holder_plot" label="lht_holder_plot">
@@ -492,22 +414,12 @@
     <Column unique="False" tip="" rowindex="2" minimum="0" maximum="2147483647" description="Use of the plot of land" index="False" name="use" searchable="True" TYPE_INFO="LOOKUP" label="plot use" mandatory="False">
      <Relation name="fk_cb_check_lht_plot_use_id_cb_plot_use"/>
     </Column>
-    <Column unique="True" tip="Plot number" rowindex="-1" minimum="0" maximum="6" description="" index="True" name="plot_number" searchable="True" TYPE_INFO="VARCHAR" label="" mandatory="True"/>
-    <Column unique="False" tip="Plot area" rowindex="-1" minimum="-2.225073858507201383090232717332404064219215980462331830553327416887204434813918195854283159012511020564067339731035811005152434161553460108856012385377718821130777993532002330479610147442583636071921565046942503734208375250806650616658158948720491179968591639648500635908770118304874799780887753749949451580451605050915399856582470818645113537935804992115981085766051992433352114352390148795699609591288891602992641511063466313393663477586513029371762047325631781485664350872122828637642044846811407613911477062801689853244110024161447421618567166150540154285084716752901903161322778896729707373123334086988983175067838846926092773977972858659654941091369095406136467568702398678315290680984617210924625396728515625E-308" maximum="179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368" description="Area of the plot" index="False" name="area" searchable="False" TYPE_INFO="DOUBLE" label="" mandatory="False">
+    <Column unique="True" tip="Plot number" rowindex="3" minimum="0" maximum="6" description="" index="True" name="plot_number" searchable="True" TYPE_INFO="VARCHAR" label="" mandatory="True"/>
+    <Column unique="False" tip="Plot area" rowindex="4" minimum="-2.225073858507201383090232717332404064219215980462331830553327416887204434813918195854283159012511020564067339731035811005152434161553460108856012385377718821130777993532002330479610147442583636071921565046942503734208375250806650616658158948720491179968591639648500635908770118304874799780887753749949451580451605050915399856582470818645113537935804992115981085766051992433352114352390148795699609591288891602992641511063466313393663477586513029371762047325631781485664350872122828637642044846811407613911477062801689853244110024161447421618567166150540154285084716752901903161322778896729707373123334086988983175067838846926092773977972858659654941091369095406136467568702398678315290680984617210924625396728515625E-308" maximum="179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368" description="Area of the plot" index="False" name="area" searchable="False" TYPE_INFO="DOUBLE" label="" mandatory="False">
      <Numeric scale="6" precision="18"/>
     </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="2147483647" description="Identifier of the scheme" index="False" name="scheme_id" searchable="False" TYPE_INFO="FOREIGN_KEY" label="" mandatory="True">
+    <Column unique="False" tip="" rowindex="5" minimum="0" maximum="2147483647" description="Identifier of the scheme" index="False" name="scheme_id" searchable="False" TYPE_INFO="FOREIGN_KEY" label="" mandatory="True">
      <Relation name="fk_cb_scheme_id_cb_plot_scheme_id"/>
-    </Column>
-   </Columns>
-  </Entity>
-  <Entity editable="True" global="False" rowindex="9" associative="False" description="Refers to the cadastral system title deed" proxy="False" createId="True" supportsDocuments="False" shortName="Cdrs_title_deed" name="cb_cdrs_title_deed" label="lht_cdrs_title_deed">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="0" minimum="0" maximum="30" description="number of title deed" index="False" name="title_deed_number" searchable="True" TYPE_INFO="VARCHAR" label="title deed number" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="1" minimum="-2147483648" maximum="2147483647" description="identifier of the big plot(erf)" index="False" name="erf_id" searchable="True" TYPE_INFO="INT" label="erf identifier" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="2" minimum="-2.225073858507201383090232717332404064219215980462331830553327416887204434813918195854283159012511020564067339731035811005152434161553460108856012385377718821130777993532002330479610147442583636071921565046942503734208375250806650616658158948720491179968591639648500635908770118304874799780887753749949451580451605050915399856582470818645113537935804992115981085766051992433352114352390148795699609591288891602992641511063466313393663477586513029371762047325631781485664350872122828637642044846811407613911477062801689853244110024161447421618567166150540154285084716752901903161322778896729707373123334086988983175067838846926092773977972858659654941091369095406136467568702398678315290680984617210924625396728515625E-308" maximum="179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368" description="size of the big plot" index="False" name="erf_size" searchable="True" TYPE_INFO="DOUBLE" label="erf area" mandatory="False">
-     <Numeric scale="6" precision="18"/>
     </Column>
    </Columns>
   </Entity>
@@ -527,18 +439,17 @@
    <EntityRelation displayColumns="name,code" child="Holder" showInParent="True" parent="check_lht_occupation" name="fk_cb_check_lht_occupation_id_cb_holder_holder_occupation" parentColumn="id" showInChild="True" childColumn="holder_occupation"/>
    <EntityRelation displayColumns="name,code" child="Holder" showInParent="True" parent="check_lht_plot_use" name="fk_cb_check_lht_plot_use_id_cb_holder_plot_use" parentColumn="id" showInChild="True" childColumn="plot_use"/>
    <EntityRelation displayColumns="name,code" child="Notification" showInParent="True" parent="check_lht_notification" name="fk_cb_check_lht_notification_id_cb_notification_status" parentColumn="id" showInChild="True" childColumn="status"/>
-   <EntityRelation displayColumns="" child="check_tenure_type_str_attrs" showInParent="True" parent="social_tenure_relationship" name="fk_cb_social_tenure_relationship_id_cb_check_tenure_type_str_attrs_social_tenure_relationship_id" parentColumn="id" showInChild="True" childColumn="social_tenure_relationship_id"/>
-   <EntityRelation displayColumns="" child="Relevant_auth_reg_division" showInParent="True" parent="Relevant_authority" name="fk_cb_relevant_authority_id_cb_relevant_auth_reg_division_relv_auth_id" parentColumn="id" showInChild="True" childColumn="relv_auth_id"/>
-   <EntityRelation displayColumns="name,code" child="Relevant_auth_reg_division" showInParent="True" parent="check_lht_reg_division" name="fk_cb_check_lht_reg_division_id_cb_relevant_auth_reg_division_reg_division_id" parentColumn="id" showInChild="True" childColumn="reg_division_id"/>
    <EntityRelation displayColumns="name,code" child="Scheme_supporting_document" showInParent="True" parent="check_scheme_document_type" name="fk_cb_check_scheme_document_type_id_cb_scheme_supporting_document_document_type" parentColumn="id" showInChild="True" childColumn="document_type"/>
    <EntityRelation displayColumns="" child="Scheme_supporting_document" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_scheme_supporting_document_scheme_id" parentColumn="id" showInChild="True" childColumn="scheme_id"/>
    <EntityRelation displayColumns="" child="Scheme_supporting_document" showInParent="True" parent="supporting_document" name="fk_cb_supporting_document_id_cb_scheme_supporting_document_supporting_doc_id" parentColumn="id" showInChild="True" childColumn="supporting_doc_id"/>
    <EntityRelation displayColumns="name,code" child="Scheme" showInParent="True" parent="check_lht_relevant_authority" name="fk_cb_check_lht_relevant_authority_id_cb_scheme_relevant_authority" parentColumn="id" showInChild="True" childColumn="relevant_authority"/>
    <EntityRelation displayColumns="name,code" child="Scheme" showInParent="True" parent="check_lht_land_rights_office" name="fk_cb_check_lht_land_rights_office_id_cb_scheme_land_rights_office" parentColumn="id" showInChild="True" childColumn="land_rights_office"/>
    <EntityRelation displayColumns="name,code" child="Scheme" showInParent="True" parent="check_lht_region" name="fk_cb_check_lht_region_id_cb_scheme_region" parentColumn="id" showInChild="True" childColumn="region"/>
-   <EntityRelation displayColumns="" child="Scheme" showInParent="True" parent="Cdrs_title_deed" name="fk_cb_cdrs_title_deed_id_cb_scheme_title_deed_number" parentColumn="id" showInChild="True" childColumn="title_deed_number"/>
    <EntityRelation displayColumns="name,code" child="Scheme" showInParent="True" parent="check_lht_reg_division" name="fk_cb_check_lht_reg_division_id_cb_scheme_registration_division" parentColumn="id" showInChild="True" childColumn="registration_division"/>
    <EntityRelation displayColumns="name,code" child="Scheme" showInParent="True" parent="check_plot_status" name="fk_cb_check_plot_status_id_cb_scheme_plot_status" parentColumn="id" showInChild="True" childColumn="plot_status"/>
+   <EntityRelation displayColumns="" child="check_tenure_type_str_attrs" showInParent="True" parent="social_tenure_relationship" name="fk_cb_social_tenure_relationship_id_cb_check_tenure_type_str_attrs_social_tenure_relationship_id" parentColumn="id" showInChild="True" childColumn="social_tenure_relationship_id"/>
+   <EntityRelation displayColumns="" child="Relevant_auth_reg_division" showInParent="True" parent="Relevant_authority" name="fk_cb_relevant_authority_id_cb_relevant_auth_reg_division_relv_auth_id" parentColumn="id" showInChild="True" childColumn="relv_auth_id"/>
+   <EntityRelation displayColumns="name,code" child="Relevant_auth_reg_division" showInParent="True" parent="check_lht_reg_division" name="fk_cb_check_lht_reg_division_id_cb_relevant_auth_reg_division_reg_division_id" parentColumn="id" showInChild="True" childColumn="reg_division_id"/>
    <EntityRelation displayColumns="" child="Scheme_workflow" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_scheme_workflow_scheme_id" parentColumn="id" showInChild="True" childColumn="scheme_id"/>
    <EntityRelation displayColumns="name,code" child="Scheme_workflow" showInParent="True" parent="check_lht_workflow" name="fk_cb_check_lht_workflow_id_cb_scheme_workflow_workflow_id" parentColumn="id" showInChild="True" childColumn="workflow_id"/>
    <EntityRelation displayColumns="name,code" child="Scheme_workflow" showInParent="True" parent="check_lht_approval_status" name="fk_cb_check_lht_approval_status_id_cb_scheme_workflow_approval_id" parentColumn="id" showInChild="True" childColumn="approval_id"/>
@@ -556,6 +467,9 @@
    <EntityRelation displayColumns="" child="Lis_erf" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_lis_erf_scheme_identifier" parentColumn="id" showInChild="True" childColumn="scheme_identifier"/>
    <EntityRelation displayColumns="" child="social_tenure_relationship" showInParent="True" parent="Holder" name="fk_cb_holder_id_cb_social_tenure_relationship_holder_id" parentColumn="id" showInChild="True" childColumn="holder_id"/>
    <EntityRelation displayColumns="" child="social_tenure_relationship" showInParent="True" parent="Plot" name="fk_cb_plot_id_cb_social_tenure_relationship_plot_id" parentColumn="id" showInChild="True" childColumn="plot_id"/>
+   <EntityRelation displayColumns="name,code" child="Holder_supporting_document" showInParent="True" parent="check_holder_document_type" name="fk_cb_check_holder_document_type_id_cb_holder_supporting_document_document_type" parentColumn="id" showInChild="True" childColumn="document_type"/>
+   <EntityRelation displayColumns="" child="Holder_supporting_document" showInParent="True" parent="Holder" name="fk_cb_holder_id_cb_holder_supporting_document_holder_id" parentColumn="id" showInChild="True" childColumn="holder_id"/>
+   <EntityRelation displayColumns="" child="Holder_supporting_document" showInParent="True" parent="supporting_document" name="fk_cb_supporting_document_id_cb_holder_supporting_document_supporting_doc_id" parentColumn="id" showInChild="True" childColumn="supporting_doc_id"/>
   </Relations>
   <SocialTenure layerDisplay="" tenureTypeList="check_tenure_type" spatialUnit="Plot" supportsMultipleParties="True" party="Holder">
    <SpatialUnitTenureMappings>
