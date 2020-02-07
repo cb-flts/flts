@@ -204,7 +204,6 @@ class SchemeDataService(DataService):
                 options(joinedload(model.cb_check_lht_land_rights_office)). \
                 options(joinedload(model.cb_check_lht_region)). \
                 options(joinedload(model.cb_check_lht_relevant_authority)). \
-                options(joinedload(model.cb_cdrs_title_deed)).\
                 filter(
                     scheme_workflow_model.scheme_id == model.id,
                     scheme_workflow_model.workflow_id == workflow_id
