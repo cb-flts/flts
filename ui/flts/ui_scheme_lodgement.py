@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'ui_scheme_lodgement.ui'
 #
-# Created: Mon Feb 03 18:01:15 2020
-#      by: PyQt4 UI code generator 4.10.2
+# Created: Fri Feb  7 17:16:36 2020
+#      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -324,7 +324,7 @@ class Ui_ldg_wzd(object):
         self.label_lro.setText(_translate("ldg_wzd", "<html><head/><body><p>Land Rights Office <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
         self.label_title_deed_num.setText(_translate("ldg_wzd", "<html><head/><body><p>Title Deed Number <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
         self.lnedit_title_deed_num.setPlaceholderText(_translate("ldg_wzd", "Enter Title Deed Number", None))
-        self.label_constitution_ref_num.setText(_translate("ldg_wzd", "<html><head/><body><p>Constitution Ref. Number <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
+        self.label_constitution_ref_num.setText(_translate("ldg_wzd", "<html><head/><body><p>Constitution Ref. Number</p></body></html>", None))
         self.lnedit_constitution_ref_num.setPlaceholderText(_translate("ldg_wzd", "Enter Consitution Reference Number", None))
         self.label_scheme_description.setText(_translate("ldg_wzd", "<html><head/><body><p>Scheme Description <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
         self.lnedit_scheme_description.setPlaceholderText(_translate("ldg_wzd", "Erf Number, Township Name", None))
