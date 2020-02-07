@@ -32,7 +32,8 @@ from qgis.core import (
     QgsGeometry,
     QgsMapLayerRegistry,
     QgsProject,
-    QgsVectorLayer
+    QgsVectorLayer,
+    QgsWKBTypes
 )
 from qgis.utils import iface
 from sqlalchemy import exc
@@ -57,7 +58,7 @@ class PlotLayer:
         self._provider_lib = provider_lib
         self._fields = fields
         self._data_provider = None
-        self._layer = None
+        self._layer = self._feature = None
         self.project_instance().legendLayersAdded.connect(self._move_layer_top)
 
     @property
@@ -68,6 +69,15 @@ class PlotLayer:
         :rtype _layer: QgsVectorLayer
         """
         return self._layer
+
+    @property
+    def feature(self):
+        """
+        Returns created feature
+        :return _feature: Feature
+        :rtype _feature: QgsFeature
+        """
+        return self._feature
 
     @layer.setter
     def layer(self, value):
@@ -107,6 +117,25 @@ class PlotLayer:
         fields = [QgsField(name, type_)for name, type_ in self._fields]
         return fields
 
+    # def wkt_geometry(self, wkt, attributes):
+    #     """
+    #     Creates geometry from WKT and
+    #     displays it in the map canvas
+    #     :param wkt: Well-Known Text(WKT)
+    #     :type wkt: String
+    #     :param attributes: Attribute values
+    #     :type attributes: Dictionary
+    #     """
+    #     geom = QgsGeometry.fromWkt(wkt)
+    #     if not geom:
+    #         return
+    #     feature = QgsFeature()
+    #     feature.setGeometry(geom)
+    #     values = self._attribute_values(attributes)
+    #     if values:
+    #         feature.setAttributes(values)
+    #     self._data_provider.addFeatures([feature])
+
     def wkt_geometry(self, wkt, attributes):
         """
         Creates geometry from WKT and
@@ -116,6 +145,7 @@ class PlotLayer:
         :param attributes: Attribute values
         :type attributes: Dictionary
         """
+        self._feature = None
         geom = QgsGeometry.fromWkt(wkt)
         if not geom:
             return
@@ -125,6 +155,7 @@ class PlotLayer:
         if values:
             feature.setAttributes(values)
         self._data_provider.addFeatures([feature])
+        self._feature = feature
 
     def _attribute_values(self, attributes):
         """
@@ -161,6 +192,19 @@ class PlotLayer:
         if len(fields) > 0:
             fields = [(field.name(), field.type()) for field in fields]
             return fields
+
+    @staticmethod
+    def _feature_area(feature):
+        """
+        Returns feature geometry area
+        :param feature: Feature
+        :type feature: QgsFeature
+        :return: Feature area
+        :rtype: Float
+        """
+        if feature.wkbType() == QgsWKBTypes.Polygon:
+            geom = feature.geometry()
+            return geom.area()
 
     @staticmethod
     def _move_layer_top(layers):
