@@ -46,7 +46,6 @@ CREATE TABLE "public"."cb_holder_log" (
   "holder_date_of_birth" date,
   "marital_status" int4,
   "nature_of_marriage" int4,
-  "marriage_certificate" varchar(30),
   "holder_disability_status" int4,
   "holder_income_level" int4,
   "holder_occupation" int4,
