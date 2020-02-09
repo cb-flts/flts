@@ -856,7 +856,6 @@ configurations = {
                 name='Region', type="text", flag=(Qt.DisplayRole,)
             ): {'cb_check_lht_region': 'value'}
         },
-        {Column(name='Township', type="text", flag=(Qt.DisplayRole,)): 'township_name'},
         {
             Column(
                 name='Registration Division', type="integer", flag=(Qt.DisplayRole,)

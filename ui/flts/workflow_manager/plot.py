@@ -16,6 +16,7 @@ copyright            : (C) 2019
  ***************************************************************************/
 """
 import re
+import decimal
 import itertools
 from collections import OrderedDict
 import csv
@@ -32,6 +33,7 @@ from qgis.core import (
     QgsGeometry,
     QgsMapLayerRegistry,
     QgsProject,
+    QgsVectorDataProvider,
     QgsVectorLayer,
     QgsWKBTypes
 )
@@ -57,8 +59,10 @@ class PlotLayer:
         self._name = name
         self._provider_lib = provider_lib
         self._fields = fields
+        self._attribute_names = []
         self._data_provider = None
-        self._layer = self._feature = None
+        self._layer = None
+        self._features = []
         self.project_instance().legendLayersAdded.connect(self._move_layer_top)
 
     @property
@@ -70,15 +74,6 @@ class PlotLayer:
         """
         return self._layer
 
-    @property
-    def feature(self):
-        """
-        Returns created feature
-        :return _feature: Feature
-        :rtype _feature: QgsFeature
-        """
-        return self._feature
-
     @layer.setter
     def layer(self, value):
         """
@@ -88,12 +83,31 @@ class PlotLayer:
         """
         self._layer = value
 
+    @property
+    def features(self):
+        """
+        Returns list of added features
+        :return _feature: Added features
+        :rtype _feature: List
+        """
+        return self._features
+
+    @property
+    def attribute_names(self):
+        """
+        Returns attribute names
+        :return _attribute_names: Attribute names
+        :rtype _attribute_names: List
+        """
+        return self._attribute_names
+
     def create_layer(self):
         """
         Creates a vector layer
         """
         self._layer = QgsVectorLayer(self._uri, self._name, self._provider_lib)
         self._set_data_provider()
+        self.add_attributes(self._attribute_fields)
         self._layer.updateFields()
 
     def _set_data_provider(self):
@@ -101,9 +115,27 @@ class PlotLayer:
         Sets the data provider
         """
         self._data_provider = self._layer.dataProvider()
-        fields = self._attribute_fields
-        if fields:
-            self._data_provider.addAttributes(fields)
+
+    def add_attributes(self, attributes):
+        """
+        Adds attributes to the layer
+        :param attributes: Layer attributes
+        :type attributes: List
+        """
+        if attributes:
+            self._data_provider.addAttributes(attributes)
+            self._set_attribute_name(attributes)
+
+    def _set_attribute_name(self, attributes):
+        """
+        Sets attribute names
+        :param attributes: Layer attributes
+        :type attributes: List
+        """
+        for attribute in attributes:
+            name = attribute.name()
+            if name not in self._attribute_names:
+                self._attribute_names.append(name)
 
     @property
     def _attribute_fields(self):
@@ -114,27 +146,8 @@ class PlotLayer:
         """
         if not self._fields:
             return
-        fields = [QgsField(name, type_)for name, type_ in self._fields]
+        fields = [QgsField(name, type_) for name, type_ in self._fields]
         return fields
-
-    # def wkt_geometry(self, wkt, attributes):
-    #     """
-    #     Creates geometry from WKT and
-    #     displays it in the map canvas
-    #     :param wkt: Well-Known Text(WKT)
-    #     :type wkt: String
-    #     :param attributes: Attribute values
-    #     :type attributes: Dictionary
-    #     """
-    #     geom = QgsGeometry.fromWkt(wkt)
-    #     if not geom:
-    #         return
-    #     feature = QgsFeature()
-    #     feature.setGeometry(geom)
-    #     values = self._attribute_values(attributes)
-    #     if values:
-    #         feature.setAttributes(values)
-    #     self._data_provider.addFeatures([feature])
 
     def wkt_geometry(self, wkt, attributes):
         """
@@ -145,7 +158,6 @@ class PlotLayer:
         :param attributes: Attribute values
         :type attributes: Dictionary
         """
-        self._feature = None
         geom = QgsGeometry.fromWkt(wkt)
         if not geom:
             return
@@ -154,8 +166,8 @@ class PlotLayer:
         values = self._attribute_values(attributes)
         if values:
             feature.setAttributes(values)
-        self._data_provider.addFeatures([feature])
-        self._feature = feature
+        result, feature = self._data_provider.addFeatures([feature])
+        self._features.extend(feature)
 
     def _attribute_values(self, attributes):
         """
@@ -174,9 +186,11 @@ class PlotLayer:
 
     def get_fields(self, layer=None):
         """
-        Returns a list of layer fields
+        Returns the fields associated with this layer
         :param layer: Geometry layer
         :type layer: QgsVectorLayer
+        :return layer: QgsFields
+        :rtype layer: QgsFields
         """
         if not layer:
             layer = self._layer
@@ -187,14 +201,16 @@ class PlotLayer:
         """
         Returns a list of layer fields and types
         :param fields: Layer fields
-        :type fields: QgsField
+        :type fields: QgsFields
+        :return fields: Layer fields name and type
+        :rtype fields: List
         """
         if len(fields) > 0:
             fields = [(field.name(), field.type()) for field in fields]
             return fields
 
     @staticmethod
-    def _feature_area(feature):
+    def feature_area(feature):
         """
         Returns feature geometry area
         :param feature: Feature
@@ -202,8 +218,8 @@ class PlotLayer:
         :return: Feature area
         :rtype: Float
         """
-        if feature.wkbType() == QgsWKBTypes.Polygon:
-            geom = feature.geometry()
+        geom = feature.geometry()
+        if geom.wkbType() == QgsWKBTypes.Polygon:
             return geom.area()
 
     @staticmethod
@@ -677,6 +693,7 @@ class PlotPreview(Plot):
         :return results: List
         """
         results = []
+        area_attribute = False
         upi = UniqueParcelIdentifier(self._data_service, "W")
         aucode = upi.aucode()
         for row, data in enumerate(csv_reader):
@@ -692,13 +709,49 @@ class PlotPreview(Plot):
                 value = upi.plot_number()
                 contents[PARCEL_NUM] = unicode(value)
                 contents[UPI_NUM] = unicode(upi.upi(aucode, value))
-                value = self._get_value(data, ("area",), AREA)
-                contents[AREA] = self._to_float(value, AREA)
-                contents["items"] = self._items
+                contents[AREA] = ""
                 attributes = self._layer_attributes(contents)
                 self._create_layer(contents[GEOMETRY], attributes)
+                if not area_attribute:
+                    self._add_attributes([QgsField("Area", QVariant.Double)])
+                    area_attribute = True
+                value = self._plot_area()
+                self._update_plot_attribute("Area", value)
+                contents[AREA] = self._to_float(value, AREA)
+                contents["items"] = self._items
                 results.append(contents)
         return results
+
+    def _plot_area(self):
+        """
+        Returns area value
+        :return area: Area value
+        :rtype area: Object
+        """
+        if self._plot_layer and self._plot_layer.features:
+            feature = self._plot_layer.features[-1]
+            area = self._feature_area(feature)
+            warning_flag = self._empty_value(AREA, area)
+            if warning_flag:
+                area = warning_flag
+            return area
+        else:
+            return self._empty_value(AREA)
+
+    def _update_plot_attribute(self, field_name, value):
+        """
+        Updates plot attribute
+        :param field_name: Field name
+        :type field_name: String
+        :param value: Update value
+        :type value: Object
+        """
+        if self._plot_layer and self._plot_layer.features:
+            layer = self._plot_layer.layer
+            feature = self._plot_layer.features[-1]
+            value = self._replace_warning(value)
+            attribute = {layer.fieldNameIndex(field_name): value}
+            self._update_feature_attribute(layer, feature, attribute)
 
     def _servitude_file_contents(self, csv_reader):
         """
@@ -887,7 +940,7 @@ class PlotPreview(Plot):
             coordinate = warning_flag
         return coordinate
 
-    def _empty_value(self, column, value):
+    def _empty_value(self, column, value=None):
         """
         Returns flag for empty value
         :param column: Table view column position
@@ -914,7 +967,7 @@ class PlotPreview(Plot):
         :return value: Object
         """
         if self._is_number(value):
-            value = float(value)
+            value = '{:.4f}'.format(round(decimal.Decimal(value), 4))
         else:
             if value != WARNING:
                 self._items[column] = \
@@ -1240,6 +1293,44 @@ class PlotPreview(Plot):
         Resets errors
         """
         self._errors = {}
+
+    def _add_attributes(self, attributes):
+        """
+        Adds attributes to the layer
+        :param attributes: Layer attributes
+        :type attributes: List
+        """
+        if not self._plot_layer:
+            return
+        self._plot_layer.add_attributes(attributes)
+        self.layer.updateFields()
+
+    def _feature_area(self, feature):
+        """
+        :param feature: Feature
+        :type feature: QgsFeature
+        :return: Feature area
+        :rtype: Float
+        """
+        if not self._plot_layer:
+            return
+        return self._plot_layer.feature_area(feature)
+
+    @staticmethod
+    def _update_feature_attribute(layer, feature, attribute):
+        """
+        Updates feature attribute value
+        :param feature: Feature
+        :type feature: QgsFeature
+        :param attribute: Attribute to be set (field index, value)
+        :type attribute: Tuple
+        """
+        if not layer or not feature:
+            return
+        caps = layer.dataProvider().capabilities()
+        attribute = {feature.id(): attribute}
+        if caps and QgsVectorDataProvider.ChangeAttributeValues:
+            layer.dataProvider().changeAttributeValues(attribute)
 
     def get_headers(self):
         """
