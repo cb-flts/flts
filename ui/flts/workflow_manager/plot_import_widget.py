@@ -42,6 +42,12 @@ from stdm.ui.flts.workflow_manager.components.plot_import_component import PlotI
 
 NAME, IMPORT_AS, DELIMITER, HEADER_ROW, CRS_ID, \
 GEOM_FIELD, GEOM_TYPE = range(7)
+NAM_CRS = [
+    "EPSG:29373", "EPSG:29375",
+    "EPSG:29377", "EPSG:29379",
+    "EPSG:29381", "EPSG:29383",
+    "EPSG:29385", "EPSG:4006"
+]
 
 
 class PlotImportWidget(QWidget):
@@ -670,6 +676,7 @@ class PlotImportWidget(QWidget):
         :return auth_id: String
         """
         proj_selector = QgsGenericProjectionSelector()
+        proj_selector.setOgcWmsCrsFilter(NAM_CRS)
         proj_selector.exec_()
         auth_id = proj_selector.selectedAuthId()
         return auth_id
