@@ -133,9 +133,9 @@
     <CodeValue value="Out of Community of Property" code=""/>
    </ValueList>
    <ValueList name="check_holder_document_type">
-    <CodeValue value="Marriage Certificate" code=""/>
-    <CodeValue value="Holder ID" code=""/>
     <CodeValue value="Transfer Contract" code=""/>
+    <CodeValue value="Marriage Certificate" code=""/>
+    <CodeValue value="Holder Identifier" code=""/>
    </ValueList>
   </ValueLists>
   <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to users" proxy="False" createId="True" supportsDocuments="False" shortName="User" name="cb_user" label="User">
@@ -266,46 +266,49 @@
   <Entity editable="True" global="False" rowindex="10" associative="False" description="Refers to the holder of Land Hold Title" documentTypeLookup="check_holder_document_type" proxy="False" createId="True" supportsDocuments="True" shortName="Holder" name="cb_holder" label="lht_holder">
    <Columns>
     <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="50" description="First name of the holder" index="False" name="holder_first_name" searchable="True" TYPE_INFO="VARCHAR" label="holder first name" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="50" description="Surname of the holder" index="False" name="holder_surname" searchable="True" TYPE_INFO="VARCHAR" label="holder surname" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="2147483647" description="Sex of the holder" index="False" name="holder_gender" searchable="True" TYPE_INFO="LOOKUP" label="holder gender" mandatory="False">
-     <Relation name="fk_cb_check_lht_gender_id_cb_holder_holder_gender"/>
-    </Column>
-    <Column unique="False" tip="" rowindex="3" minimum="0" maximum="20" description="Identity number of the holder" index="False" name="holder_identifier" searchable="True" TYPE_INFO="VARCHAR" label="holder Id number" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="-1" minimum="1900-01-01" maximum="2099-12-31" description="Holder's date of birth" index="False" name="holder_date_of_birth" searchable="False" TYPE_INFO="DATE" label="holder dob" mandatory="False">
+    <Column unique="True" tip="" rowindex="0" minimum="0" maximum="999999999" description="Refers to number of the plot" index="False" name="plot_number" searchable="True" TYPE_INFO="INT" label="plot number" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="1" minimum="1752-09-14" maximum="7999-12-31" description="Refers to date of the transfer contract" index="False" name="transfer_contract_date" searchable="False" TYPE_INFO="DATE" label="transfer contract date" mandatory="False">
      <currentDate minimum="False" maximum="False"/>
     </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="50" description="The name of juristic/legal person" index="False" name="juristic_person_name" searchable="True" TYPE_INFO="VARCHAR" label="name of jusristic person" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="50" description="Registation number of juristic/legal person" index="False" name="juristic_person_number" searchable="True" TYPE_INFO="VARCHAR" label="reg number fo juristic person" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="7" minimum="0" maximum="2147483647" description="Marital status of the holder" index="False" name="marital_status" searchable="True" TYPE_INFO="LOOKUP" label="marital status" mandatory="False">
-     <Relation name="fk_cb_check_lht_marital_status_id_cb_holder_marital_status"/>
-    </Column>
-    <Column unique="False" tip="" rowindex="8" minimum="0" maximum="50" description="Surname of the holder's spouse" index="False" name="spouse_surname" searchable="True" TYPE_INFO="VARCHAR" label="spouse surname" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="9" minimum="0" maximum="50" description="First name of the holder's spouse" index="False" name="spouse_first_name" searchable="True" TYPE_INFO="VARCHAR" label="spouse first name" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="10" minimum="0" maximum="2147483647" description="Sex of the holder's spouse" index="False" name="spouse_gender" searchable="True" TYPE_INFO="LOOKUP" label="spouse gender" mandatory="False">
-     <Relation name="fk_cb_check_lht_gender_id_cb_holder_spouse_gender"/>
-    </Column>
-    <Column unique="False" tip="" rowindex="11" minimum="0" maximum="20" description="Identity number of the spouse" index="False" name="spouse_identifier" searchable="True" TYPE_INFO="VARCHAR" label="spouse id number" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="12" minimum="1900-01-01" maximum="2099-12-31" description="Date of birth of spouse" index="False" name="spouse_date_of_birth" searchable="False" TYPE_INFO="DATE" label="spouse dob" mandatory="False">
-     <currentDate minimum="False" maximum="False"/>
-    </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="2147483647" description="Disability status of the holder" index="False" name="holder_disability_status" searchable="True" TYPE_INFO="LOOKUP" label="disabled" mandatory="False">
-     <Relation name="fk_cb_check_lht_disability_id_cb_holder_holder_disability_status"/>
-    </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="2147483647" description="Level of income of holder" index="False" name="holder_income_level" searchable="True" TYPE_INFO="LOOKUP" label="income level" mandatory="False">
-     <Relation name="fk_cb_check_lht_income_level_id_cb_holder_holder_income_level"/>
-    </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="2147483647" description="Occupation of the holder" index="False" name="holder_occupation" searchable="True" TYPE_INFO="LOOKUP" label="occupation" mandatory="False">
-     <Relation name="fk_cb_check_lht_occupation_id_cb_holder_holder_occupation"/>
-    </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="Number of dependants of the holder" index="False" name="other_dependants" searchable="True" TYPE_INFO="INT" label="dependants" mandatory="False"/>
-    <Column unique="True" tip="" rowindex="-1" minimum="0" maximum="999999999" description="Refers to number of the plot" index="False" name="plot_number" searchable="True" TYPE_INFO="INT" label="plot number" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="-1" minimum="1752-09-14" maximum="7999-12-31" description="Refers to date of the transfer contract" index="False" name="transfer_contract_date" searchable="False" TYPE_INFO="DATE" label="transfer contract date" mandatory="False">
-     <currentDate minimum="False" maximum="False"/>
-    </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="2147483647" description="Refers to the use of the plot" index="False" name="plot_use" searchable="True" TYPE_INFO="LOOKUP" label="plot use" mandatory="False">
+    <Column unique="False" tip="" rowindex="2" minimum="0" maximum="2147483647" description="Refers to the use of the plot" index="False" name="plot_use" searchable="True" TYPE_INFO="LOOKUP" label="plot use" mandatory="False">
      <Relation name="fk_cb_check_lht_plot_use_id_cb_holder_plot_use"/>
     </Column>
+    <Column unique="False" tip="" rowindex="3" minimum="0" maximum="50" description="First name of the holder" index="False" name="holder_first_name" searchable="True" TYPE_INFO="VARCHAR" label="holder first name" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="4" minimum="0" maximum="50" description="Surname of the holder" index="False" name="holder_surname" searchable="True" TYPE_INFO="VARCHAR" label="holder surname" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="5" minimum="0" maximum="2147483647" description="Sex of the holder" index="False" name="holder_gender" searchable="True" TYPE_INFO="LOOKUP" label="holder gender" mandatory="False">
+     <Relation name="fk_cb_check_lht_gender_id_cb_holder_holder_gender"/>
+    </Column>
+    <Column unique="False" tip="" rowindex="6" minimum="0" maximum="20" description="Identity number of the holder" index="False" name="holder_identifier" searchable="True" TYPE_INFO="VARCHAR" label="holder Id number" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="7" minimum="1900-01-01" maximum="2099-12-31" description="Holder's date of birth" index="False" name="holder_date_of_birth" searchable="False" TYPE_INFO="DATE" label="holder dob" mandatory="False">
+     <currentDate minimum="False" maximum="False"/>
+    </Column>
+    <Column unique="False" tip="" rowindex="8" minimum="0" maximum="2147483647" description="Marital status of the holder" index="False" name="marital_status" searchable="True" TYPE_INFO="LOOKUP" label="marital status" mandatory="False">
+     <Relation name="fk_cb_check_lht_marital_status_id_cb_holder_marital_status"/>
+    </Column>
+    <Column unique="False" tip="" rowindex="9" minimum="0" maximum="2147483647" description="Refers rto the nature of marriage" index="False" name="nature_of_marriage" searchable="True" TYPE_INFO="LOOKUP" label="nature of marriage" mandatory="False">
+     <Relation name="fk_cb_check_lht_nature_of_marriage_id_cb_holder_nature_of_marriage"/>
+    </Column>
+    <Column unique="False" tip="" rowindex="10" minimum="0" maximum="2147483647" description="Disability status of the holder" index="False" name="holder_disability_status" searchable="True" TYPE_INFO="LOOKUP" label="disabled" mandatory="False">
+     <Relation name="fk_cb_check_lht_disability_id_cb_holder_holder_disability_status"/>
+    </Column>
+    <Column unique="False" tip="" rowindex="11" minimum="0" maximum="2147483647" description="Level of income of holder" index="False" name="holder_income_level" searchable="True" TYPE_INFO="LOOKUP" label="income level" mandatory="False">
+     <Relation name="fk_cb_check_lht_income_level_id_cb_holder_holder_income_level"/>
+    </Column>
+    <Column unique="False" tip="" rowindex="12" minimum="0" maximum="2147483647" description="Occupation of the holder" index="False" name="holder_occupation" searchable="True" TYPE_INFO="LOOKUP" label="occupation" mandatory="False">
+     <Relation name="fk_cb_check_lht_occupation_id_cb_holder_holder_occupation"/>
+    </Column>
+    <Column unique="False" tip="" rowindex="13" minimum="0" maximum="50" description="Surname of the holder's spouse" index="False" name="spouse_surname" searchable="True" TYPE_INFO="VARCHAR" label="spouse surname" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="14" minimum="0" maximum="50" description="First name of the holder's spouse" index="False" name="spouse_first_name" searchable="True" TYPE_INFO="VARCHAR" label="spouse first name" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="15" minimum="0" maximum="2147483647" description="Sex of the holder's spouse" index="False" name="spouse_gender" searchable="True" TYPE_INFO="LOOKUP" label="spouse gender" mandatory="False">
+     <Relation name="fk_cb_check_lht_gender_id_cb_holder_spouse_gender"/>
+    </Column>
+    <Column unique="False" tip="" rowindex="16" minimum="0" maximum="20" description="Identity number of the spouse" index="False" name="spouse_identifier" searchable="True" TYPE_INFO="VARCHAR" label="spouse id number" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="17" minimum="1900-01-01" maximum="2099-12-31" description="Date of birth of spouse" index="False" name="spouse_date_of_birth" searchable="False" TYPE_INFO="DATE" label="spouse dob" mandatory="False">
+     <currentDate minimum="False" maximum="False"/>
+    </Column>
+    <Column unique="False" tip="" rowindex="18" minimum="-2147483648" maximum="2147483647" description="Number of dependants of the holder" index="False" name="other_dependants" searchable="True" TYPE_INFO="INT" label="dependants" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="19" minimum="0" maximum="50" description="The name of juristic/legal person" index="False" name="juristic_person_name" searchable="True" TYPE_INFO="VARCHAR" label="name of jusristic person" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="20" minimum="0" maximum="50" description="Registation number of juristic/legal person" index="False" name="juristic_person_number" searchable="True" TYPE_INFO="VARCHAR" label="reg number fo juristic person" mandatory="False"/>
    </Columns>
   </Entity>
   <Entity editable="True" global="False" rowindex="14" associative="False" description="Refers to the search details" proxy="False" createId="True" supportsDocuments="False" shortName="Search" name="cb_search" label="lht_search">
@@ -345,38 +348,38 @@
   <Entity editable="True" global="False" rowindex="2" associative="False" description="Refers to the land hold title scheme" documentTypeLookup="check_scheme_document_type" proxy="False" createId="True" supportsDocuments="True" shortName="Scheme" name="cb_scheme" label="lht_scheme">
    <Columns>
     <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="50" description="Name of the scheme" index="False" name="scheme_name" searchable="True" TYPE_INFO="VARCHAR" label="name of scheme" mandatory="True"/>
-    <Column unique="False" tip="" rowindex="-1" minimum="1752-09-14" maximum="7999-12-31" description="Date of the approval of the scheme" index="False" name="date_of_approval" searchable="False" TYPE_INFO="DATE" label="" mandatory="True">
+    <Column unique="False" tip="" rowindex="0" minimum="0" maximum="50" description="Name of the scheme" index="False" name="scheme_name" searchable="True" TYPE_INFO="VARCHAR" label="name of scheme" mandatory="True"/>
+    <Column unique="False" tip="" rowindex="1" minimum="1752-09-14" maximum="7999-12-31" description="Date of the approval of the scheme" index="False" name="date_of_approval" searchable="False" TYPE_INFO="DATE" label="" mandatory="True">
      <currentDate minimum="False" maximum="True"/>
     </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="1752-09-14" maximum="7999-12-31" description="Date of the establishment of the scheme" index="False" name="date_of_establishment" searchable="False" TYPE_INFO="DATE" label="" mandatory="True">
+    <Column unique="False" tip="" rowindex="2" minimum="1752-09-14" maximum="7999-12-31" description="Date of the establishment of the scheme" index="False" name="date_of_establishment" searchable="False" TYPE_INFO="DATE" label="" mandatory="True">
      <currentDate minimum="False" maximum="True"/>
     </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="2147483647" description="The relevant authority" index="False" name="relevant_authority" searchable="True" TYPE_INFO="LOOKUP" label="relevant authority" mandatory="True">
+    <Column unique="False" tip="" rowindex="3" minimum="0" maximum="2147483647" description="The relevant authority" index="False" name="relevant_authority" searchable="True" TYPE_INFO="LOOKUP" label="relevant authority" mandatory="True">
      <Relation name="fk_cb_check_lht_relevant_authority_id_cb_scheme_relevant_authority"/>
     </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="2147483647" description="Land rights office" index="False" name="land_rights_office" searchable="True" TYPE_INFO="LOOKUP" label="land rights office" mandatory="True">
+    <Column unique="False" tip="" rowindex="4" minimum="0" maximum="2147483647" description="Land rights office" index="False" name="land_rights_office" searchable="True" TYPE_INFO="LOOKUP" label="land rights office" mandatory="True">
      <Relation name="fk_cb_check_lht_land_rights_office_id_cb_scheme_land_rights_office"/>
     </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="2147483647" description="Region in which the scheme exists" index="False" name="region" searchable="True" TYPE_INFO="LOOKUP" label="region" mandatory="True">
+    <Column unique="False" tip="" rowindex="5" minimum="0" maximum="2147483647" description="Region in which the scheme exists" index="False" name="region" searchable="True" TYPE_INFO="LOOKUP" label="region" mandatory="True">
      <Relation name="fk_cb_check_lht_region_id_cb_scheme_region"/>
     </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="30" description="The number/code of the title deed" index="False" name="title_deed_number" searchable="True" TYPE_INFO="VARCHAR" label="title deed no" mandatory="True"/>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="2147483647" description="The registration division" index="False" name="registration_division" searchable="True" TYPE_INFO="LOOKUP" label="registration division" mandatory="True">
+    <Column unique="False" tip="" rowindex="6" minimum="0" maximum="30" description="The number/code of the title deed" index="False" name="title_deed_number" searchable="True" TYPE_INFO="VARCHAR" label="title deed no" mandatory="True"/>
+    <Column unique="False" tip="" rowindex="7" minimum="0" maximum="2147483647" description="The registration division" index="False" name="registration_division" searchable="True" TYPE_INFO="LOOKUP" label="registration division" mandatory="True">
      <Relation name="fk_cb_check_lht_reg_division_id_cb_scheme_registration_division"/>
     </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="-0" maximum="179769313485999993463412110191957867872176903147024190229169150664616720223488549064776002732213849498804348433116986060126989671666306060788674238031081950882294921586851551818012975619342999042256679071052330673321513805402276774228700884740900574397999799640549171929913383207407537025048827210712192385024" description="The geometric area of the scheme" index="False" name="area" searchable="True" TYPE_INFO="DOUBLE" label="scheme area" mandatory="True">
+    <Column unique="False" tip="" rowindex="8" minimum="-0" maximum="179769313485999993463412110191957867872176903147024190229169150664616720223488549064776002732213849498804348433116986060126989671666306060788674238031081950882294921586851551818012975619342999042256679071052330673321513805402276774228700884740900574397999799640549171929913383207407537025048827210712192385024" description="The geometric area of the scheme" index="False" name="area" searchable="True" TYPE_INFO="DOUBLE" label="scheme area" mandatory="True">
      <Numeric scale="4" precision="15"/>
     </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="30" description="Registration number of document imposing conditions" index="False" name="doc_imposing_conditions_number" searchable="True" TYPE_INFO="VARCHAR" label="doc imposing conditions" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="32" description="Reference number of the constitution" index="False" name="constitution_ref_number" searchable="True" TYPE_INFO="VARCHAR" label="constitution reference number" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="2147483647" description="Number of polts in the scheme" index="False" name="no_of_plots" searchable="True" TYPE_INFO="INT" label="number of plots" mandatory="True"/>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="32" description="The number representing the scheme" index="False" name="scheme_number" searchable="True" TYPE_INFO="VARCHAR" label="scheme_number" mandatory="True"/>
-    <Column unique="False" tip="Surveyor General Number" rowindex="-1" minimum="0" maximum="32" description="The number representing surveyor general" index="False" name="sg_number" searchable="True" TYPE_INFO="VARCHAR" label="surveyor general number" mandatory="True"/>
-    <Column unique="False" tip="Plot upload status" rowindex="-1" minimum="0" maximum="2147483647" description="Plot upload status" index="False" name="plot_status" searchable="True" TYPE_INFO="LOOKUP" label="" mandatory="False">
+    <Column unique="False" tip="" rowindex="9" minimum="0" maximum="30" description="Registration number of document imposing conditions" index="False" name="doc_imposing_conditions_number" searchable="True" TYPE_INFO="VARCHAR" label="doc imposing conditions" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="10" minimum="0" maximum="32" description="Reference number of the constitution" index="False" name="constitution_ref_number" searchable="True" TYPE_INFO="VARCHAR" label="constitution reference number" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="11" minimum="0" maximum="2147483647" description="Number of polts in the scheme" index="False" name="no_of_plots" searchable="True" TYPE_INFO="INT" label="number of plots" mandatory="True"/>
+    <Column unique="False" tip="" rowindex="12" minimum="0" maximum="32" description="The number representing the scheme" index="False" name="scheme_number" searchable="True" TYPE_INFO="VARCHAR" label="scheme_number" mandatory="True"/>
+    <Column unique="False" tip="Surveyor General Number" rowindex="13" minimum="0" maximum="32" description="The number representing surveyor general" index="False" name="sg_number" searchable="True" TYPE_INFO="VARCHAR" label="surveyor general number" mandatory="True"/>
+    <Column unique="False" tip="Plot upload status" rowindex="14" minimum="0" maximum="2147483647" description="Plot upload status" index="False" name="plot_status" searchable="True" TYPE_INFO="LOOKUP" label="" mandatory="False">
      <Relation name="fk_cb_check_plot_status_id_cb_scheme_plot_status"/>
     </Column>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="200" description="Refers to the description of the scheme" index="False" name="scheme_description" searchable="True" TYPE_INFO="VARCHAR" label="scheme description" mandatory="True"/>
+    <Column unique="False" tip="" rowindex="15" minimum="0" maximum="200" description="Refers to the description of the scheme" index="False" name="scheme_description" searchable="True" TYPE_INFO="VARCHAR" label="scheme description" mandatory="True"/>
    </Columns>
   </Entity>
   <Entity editable="True" global="False" rowindex="4" associative="False" description="Refers to the relation between holder and plot" proxy="False" createId="True" supportsDocuments="False" shortName="Holder_plot" name="cb_holder_plot" label="lht_holder_plot">
@@ -471,6 +474,7 @@
    <EntityRelation displayColumns="" child="Lis_erf" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_lis_erf_scheme_identifier" parentColumn="id" showInChild="True" childColumn="scheme_identifier"/>
    <EntityRelation displayColumns="" child="social_tenure_relationship" showInParent="True" parent="Holder" name="fk_cb_holder_id_cb_social_tenure_relationship_holder_id" parentColumn="id" showInChild="True" childColumn="holder_id"/>
    <EntityRelation displayColumns="" child="social_tenure_relationship" showInParent="True" parent="Plot" name="fk_cb_plot_id_cb_social_tenure_relationship_plot_id" parentColumn="id" showInChild="True" childColumn="plot_id"/>
+   <EntityRelation displayColumns="name,code" child="Holder" showInParent="True" parent="check_lht_nature_of_marriage" name="fk_cb_check_lht_nature_of_marriage_id_cb_holder_nature_of_marriage" parentColumn="id" showInChild="True" childColumn="nature_of_marriage"/>
   </Relations>
   <SocialTenure layerDisplay="" tenureTypeList="check_tenure_type" spatialUnit="Plot" supportsMultipleParties="True" party="Holder">
    <SpatialUnitTenureMappings>
