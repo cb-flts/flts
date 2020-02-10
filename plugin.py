@@ -989,22 +989,22 @@ class STDMQGISLoader(object):
         fltsReportMenu.setTitle(QApplication.translate("ToolbarReportSettings", "Report Settings"))
 
         # Notification
-        notifBtn = QToolButton()
-        notifObjName = QApplication.translate("ToolbarNotificationSettings", "Notification")
-        # Required by module loader for those widgets that need to be inserted into the container
-        notifBtn.setObjectName(notifObjName)
-        notifBtn.setToolTip(notifObjName)
-        notifBtn.setIcon(QIcon(":/plugins/stdm/images/icons/flts_notification.png"))
-        notifBtn.setPopupMode(QToolButton.InstantPopup)
-
-        notifMenu = QMenu(notifBtn)
-        notifBtn.setMenu(notifMenu)
+        # notifBtn = QToolButton()
+        # notifObjName = QApplication.translate("ToolbarNotificationSettings", "Notification")
+        # # Required by module loader for those widgets that need to be inserted into the container
+        # notifBtn.setObjectName(notifObjName)
+        # notifBtn.setToolTip(notifObjName)
+        # notifBtn.setIcon(QIcon(":/plugins/stdm/images/icons/flts_notification.png"))
+        # notifBtn.setPopupMode(QToolButton.InstantPopup)
+        #
+        # notifMenu = QMenu(notifBtn)
+        # notifBtn.setMenu(notifMenu)
 
         # Settings menu container in STDM's QGIS menu
-        fltsNotifMenu = QMenu(self.stdmMenu)
-        fltsNotifMenu.setIcon(QIcon(":/plugins/stdm/images/icons/flts_notification.png"))
-        fltsNotifMenu.setObjectName("FLTSReportSettings")
-        fltsNotifMenu.setTitle(QApplication.translate("ToolbarNotificationSettings", "Notification"))
+        # fltsNotifMenu = QMenu(self.stdmMenu)
+        # fltsNotifMenu.setIcon(QIcon(":/plugins/stdm/images/icons/flts_notification.png"))
+        # fltsNotifMenu.setObjectName("FLTSReportSettings")
+        # fltsNotifMenu.setTitle(QApplication.translate("ToolbarNotificationSettings", "Notification"))
 
         # Define actions
 
@@ -1038,15 +1038,16 @@ class STDMQGISLoader(object):
         #                          QApplication.translate("ImportAction", "Import Data"), self.iface.mainWindow())
         #
         # self.exportAct = QAction(QIcon(":/plugins/stdm/images/icons/export.png"), \
-        #                          QApplication.translate("ReportBuilderAction", "Export Data"), self.iface.mainWindow())
+        #                          QApplication.translate("ReportBuilderAction", "Export Data"),
+        #                          self.iface.mainWindow())
         #
-        # self.docDesignerAct = QAction(QIcon(":/plugins/stdm/images/icons/cert_designer.png"), \
-        #                               QApplication.translate("DocumentDesignerAction", "Document Designer"),
-        #                               self.iface.mainWindow())
-        #
-        # self.docGeneratorAct = QAction(QIcon(":/plugins/stdm/images/icons/generate_document.png"), \
-        #                                QApplication.translate("DocumentGeneratorAction", "Document Generator"),
-        #                                self.iface.mainWindow())
+        self.docDesignerAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_certificate.png"), \
+                                      QApplication.translate("DocumentDesignerAction", "Document Designer"),
+                                      self.iface.mainWindow())
+
+        self.docGeneratorAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_certificate_print.png"), \
+                                       QApplication.translate("DocumentGeneratorAction", "Document Generator"),
+                                       self.iface.mainWindow())
         #
         # # Spatial Layer Manager
         # self.spatialLayerManager = QAction(QIcon(":/plugins/stdm/images/icons/spatial_unit_manager.png"), \
@@ -1060,9 +1061,9 @@ class STDMQGISLoader(object):
         #                                    self.iface.mainWindow())
         # self.feature_details_act.setCheckable(True)
         #
-        # self.viewSTRAct = QAction(QIcon(":/plugins/stdm/images/icons/view_str.png"), \
-        #                           QApplication.translate("ViewSTRToolbarAction", "View Social Tenure Relationship"),
-        #                           self.iface.mainWindow())
+        self.viewSTRAct = QAction(QIcon(":/plugins/stdm/images/icons/view_str.png"), \
+                                  QApplication.translate("ViewSTRToolbarAction", "View Social Tenure Relationship"),
+                                  self.iface.mainWindow())
         #
         self.wzdAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_database_designer.png"), \
                               QApplication.translate("ConfigWizard", "Configuration Wizard"), self.iface.mainWindow())
@@ -1126,10 +1127,10 @@ class STDMQGISLoader(object):
         )
 
         self.printCertificateAct = QAction(
-            QIcon(":/plugins/stdm/images/icons/flts_import_plot_cropped.png"),
+            QIcon(":/plugins/stdm/images/icons/flts_print.png"),
             QApplication.translate(
                 "PrintCertificateToolbarAction",
-                "Plots"
+                "Print Certificate"
             ),
             self.iface.mainWindow()
         )
@@ -1179,24 +1180,39 @@ class STDMQGISLoader(object):
             self.iface.mainWindow()
         )
 
-        self.notificationAct = QAction(
-            QIcon(":/plugins/stdm/images/icons/flts_notification.png"),
-            QApplication.translate(
-                "NotificationToolbarAction",
-                "Notification"
-            ),
-            self.iface.mainWindow()
-        )
+        # self.notificationAct = QAction(
+        #     QIcon(":/plugins/stdm/images/icons/flts_notification.png"),
+        #     QApplication.translate(
+        #         "NotificationToolbarAction",
+        #         "Notification"
+        #     ),
+        #     self.iface.mainWindow()
+        # )
 
         # Connect the slots for the actions above
         self.contentAuthAct.triggered.connect(self.contentAuthorization)
         self.usersAct.triggered.connect(self.manageAccounts)
         self.options_act.triggered.connect(self.on_sys_options)
+        self.docDesignerAct.triggered.connect(self.onDocumentDesigner)
+        self.docGeneratorAct.triggered.connect(self.onDocumentGenerator)
+        self.wzdAct.triggered.connect(self.load_config_wizard)
+        self.viewSTRAct.triggered.connect(self.onViewSTR)
+        # flts
+        self.schemeLodgementAct.triggered.connect(self.lodge_scheme)
+        self.schemeEstablishmentAct.triggered.connect(self.establish_scheme)
+        self.firstExaminationAct.triggered.connect(self.first_examination)
+        self.secondExaminationAct.triggered.connect(self.second_examination)
+        self.thirdExaminationAct.triggered.connect(self.third_examination)
+        self.importPlotsAct.triggered.connect(self.import_plots)
+        self.schemeRevisionAct.triggered.connect(self.revise_scheme)
+        self.printCertificateAct.triggered.connect(self.print_certificate)
+        self.scanCertificateAct.triggered.connect(self.scan_certificate)
+        self.searchAct.triggered.connect(self.flts_search)
+        self.reportAct.triggered.connect(self.flts_report)
+
         # self.manageAdminUnitsAct.triggered.connect(self.onManageAdminUnits)
         # self.exportAct.triggered.connect(self.onExportData)
         # self.importAct.triggered.connect(self.onImportData)
-        # self.docDesignerAct.triggered.connect(self.onDocumentDesigner)
-        # self.docGeneratorAct.triggered.connect(self.onDocumentGenerator)
         # self.spatialLayerManager.triggered.connect(self.spatialLayerMangerActivate)
 
         # self.feature_details_act.triggered.connect(self.details_tree_view.activate_feature_details)
@@ -1208,24 +1224,10 @@ class STDMQGISLoader(object):
         #     lambda: self.details_tree_view.activate_feature_details(False)
         # )
         # contentMenu.triggered.connect(self.widgetLoader)
-        self.wzdAct.triggered.connect(self.load_config_wizard)
-        # self.viewSTRAct.triggered.connect(self.onViewSTR)
-
-        # flts
-        self.schemeLodgementAct.triggered.connect(self.lodge_scheme)
-        self.schemeEstablishmentAct.triggered.connect(self.establish_scheme)
-        self.firstExaminationAct.triggered.connect(self.first_examination)
-        self.secondExaminationAct.triggered.connect(self.second_examination)
-        self.thirdExaminationAct.triggered.connect(self.third_examination)
-        self.schemeRevisionAct.triggered.connect(self.revise_scheme)
-        self.printCertificateAct.triggered.connect(self.print_certificate)
-        self.scanCertificateAct.triggered.connect(self.scan_certificate)
-        self.searchAct.triggered.connect(self.flts_search)
-        self.reportAct.triggered.connect(self.flts_report)
-        self.notificationAct.triggered.connect(self.flts_notification)
+        # self.notificationAct.triggered.connect(self.flts_notification)
 
         # Create content items
-
+        # STDM
         contentAuthCnt = ContentGroup.contentItemFromQAction(self.contentAuthAct)
         contentAuthCnt.code = "E59F7CC1-0D0E-4EA2-9996-89DACBD07A83"
 
@@ -1235,40 +1237,20 @@ class STDMQGISLoader(object):
         options_cnt = ContentGroup.contentItemFromQAction(self.options_act)
         options_cnt.code = "1520B989-03BA-4B05-BC50-A4C3EC7D79B6"
 
-        # adminUnitsCnt = ContentGroup.contentItemFromQAction(self.manageAdminUnitsAct)
-        # adminUnitsCnt.code = "770EAC75-2BEC-492E-8703-34674054C246"
-        #
-        # importCnt = ContentGroup.contentItemFromQAction(self.importAct)
-        # importCnt.code = "3BBD6347-4A37-45D0-9B41-36D68D2CA4DB"
-        #
-        # exportCnt = ContentGroup.contentItemFromQAction(self.exportAct)
-        # exportCnt.code = "D0C34436-619D-434E-928C-2CBBDA79C060"
-        #
-        # documentDesignerCnt = ContentGroup.contentItemFromQAction(self.docDesignerAct)
-        # documentDesignerCnt.code = "C4826C19-2AE3-486E-9FF0-32C00A0A517F"
-        #
-        # documentGeneratorCnt = ContentGroup.contentItemFromQAction(self.docGeneratorAct)
-        # documentGeneratorCnt.code = "4C0C7EF2-5914-4FDE-96CB-089D44EDDA5A"
-        #
-        # spatialLayerManagerCnt = ContentGroup.contentItemFromQAction(self.spatialLayerManager)
-        # spatialLayerManagerCnt.code = "4E945EE7-D6F9-4E1C-X4AA-0C7F1BC67224"
-        #
-        # feature_details_cnt = ContentGroup.contentItemFromQAction(self.feature_details_act)
-        # feature_details_cnt.code = '2adff3f8-bda9-49f9-b37d-caeed9889ab6'
-        #
+        documentDesignerCnt = ContentGroup.contentItemFromQAction(self.docDesignerAct)
+        documentDesignerCnt.code = "C4826C19-2AE3-486E-9FF0-32C00A0A517F"
+
+        documentGeneratorCnt = ContentGroup.contentItemFromQAction(self.docGeneratorAct)
+        documentGeneratorCnt.code = "4C0C7EF2-5914-4FDE-96CB-089D44EDDA5A"
+
         wzdConfigCnt = ContentGroup.contentItemFromQAction(self.wzdAct)
         wzdConfigCnt.code = "F16CA4AC-3E8C-49C8-BD3C-96111EA74206"
         #
-        # strViewCnt = ContentGroup.contentItemFromQAction(self.viewSTRAct)
-        # strViewCnt.code = "D13B0415-30B4-4497-B471-D98CA98CD841"
-        #
-        # mobileFormgeneratorCnt = ContentGroup.contentItemFromQAction(self.mobile_form_act)
-        # mobileFormgeneratorCnt.code = "d93981ef-dec4-4597-8495-2941ec2e9a52"
-        #
-        # mobileFormImportCnt = ContentGroup.contentItemFromQAction(self.mobile_form_import)
-        # mobileFormImportCnt.code = "1394547d-fb6c-4f6e-80d2-53407cf7b7d4"
+        strViewCnt = ContentGroup.contentItemFromQAction(self.viewSTRAct)
+        strViewCnt.code = "D13B0415-30B4-4497-B471-D98CA98CD841"
 
-        # flts
+        # FLTS
+
         schemeLodgementCnt = ContentGroup.contentItemFromQAction(self.schemeLodgementAct)
         schemeLodgementCnt.code = "97EB2313-AA9C-4478-83F8-896E30E8FA78"
 
@@ -1287,20 +1269,44 @@ class STDMQGISLoader(object):
         thirdExaminationCnt = ContentGroup.contentItemFromQAction(self.thirdExaminationAct)
         thirdExaminationCnt.code = "E9116F3F-EF17-4D84-9FDF-5E65455503D2"
 
-        printCertificateCnt = ContentGroup.contentItemFromQAction(self.printCertificateAct)
-        printCertificateCnt.code = "E59F7CC1-0D0E-4EA2-9996-89DACBD07A83"
+        importPlotsCnt = ContentGroup.contentItemFromQAction(self.importPlotsAct)
+        importPlotsCnt.code = "FEC81DCE-FF7E-4253-B6CE-30D0504D4G16"
 
-        scanCertificateCnt = ContentGroup.contentItemFromQAction(self.scanCertificateAct)
-        scanCertificateCnt.code = "0CC4FB8F-70BA-4DE8-8599-FD344A564EB5"
+        # printCertificateCnt = ContentGroup.contentItemFromQAction(self.printCertificateAct)
+        # printCertificateCnt.code = "E59F7CC1-0D0E-4EA2-9996-89DACBD07A83"
 
-        fltsSearchCnt = ContentGroup.contentItemFromQAction(self.searchAct)
-        fltsSearchCnt.code = "1520B989-03BA-4B05-BC50-A4C3EC7D79B6"
+        # scanCertificateCnt = ContentGroup.contentItemFromQAction(self.scanCertificateAct)
+        # scanCertificateCnt.code = "0CC4FB8F-70BA-4DE8-8599-FD344A564EB5"
+        #
+        # fltsSearchCnt = ContentGroup.contentItemFromQAction(self.searchAct)
+        # fltsSearchCnt.code = "1520B989-03BA-4B05-BC50-A4C3EC7D79B6"
+        #
+        # fltsReportCnt = ContentGroup.contentItemFromQAction(self.reportAct)
+        # fltsReportCnt.code = "DABD3A8A-3A8B-4215-90B0-27F40DAFF2F1"
 
-        fltsReportCnt = ContentGroup.contentItemFromQAction(self.reportAct)
-        fltsReportCnt.code = "dabd3a8a-3a8b-4215-90b0-27f40daff2f1"
+        # fltsNotificationCnt = ContentGroup.contentItemFromQAction(self.notificationAct)
+        # fltsNotificationCnt.code = "fab81cce-ff7e-4443-a5be-30c9493d3f05"
 
-        fltsNotificationCnt = ContentGroup.contentItemFromQAction(self.notificationAct)
-        fltsNotificationCnt.code = "fab81cce-ff7e-4443-a5be-30c9493d3f05"
+        # adminUnitsCnt = ContentGroup.contentItemFromQAction(self.manageAdminUnitsAct)
+        # adminUnitsCnt.code = "770EAC75-2BEC-492E-8703-34674054C246"
+        #
+        # importCnt = ContentGroup.contentItemFromQAction(self.importAct)
+        # importCnt.code = "3BBD6347-4A37-45D0-9B41-36D68D2CA4DB"
+        #
+        # exportCnt = ContentGroup.contentItemFromQAction(self.exportAct)
+        # exportCnt.code = "D0C34436-619D-434E-928C-2CBBDA79C060"
+        #
+        # spatialLayerManagerCnt = ContentGroup.contentItemFromQAction(self.spatialLayerManager)
+        # spatialLayerManagerCnt.code = "4E945EE7-D6F9-4E1C-X4AA-0C7F1BC67224"
+        #
+        # feature_details_cnt = ContentGroup.contentItemFromQAction(self.feature_details_act)
+        # feature_details_cnt.code = '2adff3f8-bda9-49f9-b37d-caeed9889ab6'
+        #
+        # mobileFormgeneratorCnt = ContentGroup.contentItemFromQAction(self.mobile_form_act)
+        # mobileFormgeneratorCnt.code = "d93981ef-dec4-4597-8495-2941ec2e9a52"
+        #
+        # mobileFormImportCnt = ContentGroup.contentItemFromQAction(self.mobile_form_import)
+        # mobileFormImportCnt.code = "1394547d-fb6c-4f6e-80d2-53407cf7b7d4"
 
         username = data.app_dbconn.User.UserName
 
@@ -1363,6 +1369,23 @@ class STDMQGISLoader(object):
         self.wzdConfigCntGroup.addContentItem(wzdConfigCnt)
         self.wzdConfigCntGroup.register()
 
+        self.STRCntGroup = TableContentGroup(username,
+                                             self.viewSTRAct.text(),
+                                             self.viewSTRAct)
+        self.STRCntGroup.createContentItem().code = "71EC2ED8-5D7F-4A27-8514-CFFE94E1294F"
+        self.STRCntGroup.readContentItem().code = "ED607F24-11A2-427C-B395-2E2A3EBA4EBD"
+        self.STRCntGroup.updateContentItem().code = "5D45A49D-F640-4A48-94D9-A10F502655F5"
+        self.STRCntGroup.deleteContentItem().code = "15E27A59-28F7-42B4-858F-C070E2C3AE10"
+        self.STRCntGroup.register()
+
+        self.docDesignerCntGroup = ContentGroup(username, self.docDesignerAct)
+        self.docDesignerCntGroup.addContentItem(documentDesignerCnt)
+        self.docDesignerCntGroup.register()
+
+        self.docGeneratorCntGroup = ContentGroup(username, self.docGeneratorAct)
+        self.docGeneratorCntGroup.addContentItem(documentGeneratorCnt)
+        self.docGeneratorCntGroup.register()
+
         adminSettingsCntGroups = []
         adminSettingsCntGroups.append(self.contentAuthCntGroup)
         adminSettingsCntGroups.append(self.userRoleCntGroup)
@@ -1397,6 +1420,11 @@ class STDMQGISLoader(object):
         self.secondExaminationCntGroup.setContainerItem(self.secondExaminationAct)
         self.secondExaminationCntGroup.register()
 
+        self.importPlotsCntGroup = ContentGroup(username)
+        self.importPlotsCntGroup.addContentItem(importPlotsCnt)
+        self.importPlotsCntGroup.setContainerItem(self.importPlotsAct)
+        self.importPlotsCntGroup.register()
+
         self.thirdExaminationCntGroup = ContentGroup(username)
         self.thirdExaminationCntGroup.addContentItem(thirdExaminationCnt)
         self.thirdExaminationCntGroup.setContainerItem(self.thirdExaminationAct)
@@ -1410,36 +1438,44 @@ class STDMQGISLoader(object):
         schemeSettingsCntGroups.append(self.firstExaminationCntGroup)
         schemeSettingsCntGroups.append(self.secondExaminationCntGroup)
         schemeSettingsCntGroups.append(self.thirdExaminationCntGroup)
+        schemeSettingsCntGroups.append(self.importPlotsCntGroup)
         schemeSettingsCntGroups.append(self.schemeRevisionCntGroup)
 
-        self.printCertCntGroup = ContentGroup(username)
-        self.printCertCntGroup.addContentItem(printCertificateCnt)
-        self.printCertCntGroup.setContainerItem(self.printCertificateAct)
-        self.printCertCntGroup.register()
+        # self.printCertCntGroup = ContentGroup(username)
+        # self.printCertCntGroup.addContentItem(printCertificateCnt)
+        # self.printCertCntGroup.setContainerItem(self.printCertificateAct)
+        # self.printCertCntGroup.register()
 
-        self.scanCertCntGroup = ContentGroup(username)
-        self.scanCertCntGroup.addContentItem(scanCertificateCnt)
-        self.scanCertCntGroup.setContainerItem(self.scanCertificateAct)
-        self.scanCertCntGroup.register()
+        # self.scanCertCntGroup = ContentGroup(username)
+        # self.scanCertCntGroup.addContentItem(scanCertificateCnt)
+        # self.scanCertCntGroup.setContainerItem(self.scanCertificateAct)
+        # self.scanCertCntGroup.register()
 
         certSettingsCntGroups = []
-        certSettingsCntGroups.append(self.printCertCntGroup)
-        certSettingsCntGroups.append(self.scanCertCntGroup)
+        # certSettingsCntGroups.append(self.printCertCntGroup)
+        # certSettingsCntGroups.append(self.scanCertCntGroup)
+        certSettingsCntGroups.append(self.docGeneratorCntGroup)
+        certSettingsCntGroups.append(self.docDesignerCntGroup)
+        certSettingsCntGroups.append(self.STRCntGroup)
 
-        self.fltsSearchCntGroup = ContentGroup(username, self.searchAct)
-        self.fltsSearchCntGroup.addContentItem(fltsSearchCnt)
-        self.fltsSearchCntGroup.setContainerItem(self.searchAct)
-        self.fltsSearchCntGroup.register()
+        # self.fltsSearchCntGroup = ContentGroup(username, self.searchAct)
+        # self.fltsSearchCntGroup.addContentItem(fltsSearchCnt)
+        # self.fltsSearchCntGroup.setContainerItem(self.searchAct)
+        # self.fltsSearchCntGroup.register()
 
-        self.fltsReportCntGroup = ContentGroup(username, self.reportAct)
-        self.fltsReportCntGroup.addContentItem(fltsReportCnt)
-        self.fltsReportCntGroup.setContainerItem(self.reportAct)
-        self.fltsReportCntGroup.register()
+        # self.fltsReportCntGroup = ContentGroup(username, self.reportAct)
+        # self.fltsReportCntGroup.addContentItem(fltsReportCnt)
+        # self.fltsReportCntGroup.setContainerItem(self.reportAct)
+        # self.fltsReportCntGroup.register()
 
-        self.fltsNotificationCntGroup = ContentGroup(username, self.notificationAct)
-        self.fltsNotificationCntGroup.addContentItem(fltsNotificationCnt)
-        self.fltsNotificationCntGroup.setContainerItem(self.notificationAct)
-        self.fltsNotificationCntGroup.register()
+        searchReportCntgroups = []
+        # searchReportCntgroups.append(self.fltsSearchCntGroup)
+        # searchReportCntgroups.append(self.fltsReportCntGroup)
+
+        # self.fltsNotificationCntGroup = ContentGroup(username, self.notificationAct)
+        # self.fltsNotificationCntGroup.addContentItem(fltsNotificationCnt)
+        # self.fltsNotificationCntGroup.setContainerItem(self.notificationAct)
+        # self.fltsNotificationCntGroup.register()
 
         # flts toolbar items
 
@@ -1464,51 +1500,46 @@ class STDMQGISLoader(object):
         self.toolbarLoader.addContent(self.firstExaminationCntGroup)
         self.toolbarLoader.addContent(self.secondExaminationCntGroup)
         self.toolbarLoader.addContent(self.thirdExaminationCntGroup)
+        self.toolbarLoader.addContent(self.importPlotsCntGroup)
         self.toolbarLoader.addContent(self.schemeRevisionCntGroup)
 
         self.toolbarLoader.addContent(self._action_separator())
 
-        self.toolbarLoader.addContent(self.printCertCntGroup)
-        self.toolbarLoader.addContent(self.scanCertCntGroup)
+        # self.toolbarLoader.addContent(self.printCertCntGroup)
+        # self.toolbarLoader.addContent(self.scanCertCntGroup)
 
         self.toolbarLoader.addContent(self._action_separator())
 
-        self.toolbarLoader.addContent(self.fltsSearchCntGroup)
+        # self.toolbarLoader.addContent(self.fltsSearchCntGroup)
 
         self.toolbarLoader.addContent(self._action_separator())
 
-        self.toolbarLoader.addContent(self.fltsReportCntGroup)
+        # self.toolbarLoader.addContent(self.fltsReportCntGroup)
 
         self.toolbarLoader.addContent(self._action_separator())
 
-        self.toolbarLoader.addContent(self.fltsNotificationCntGroup)
+        self.toolbarLoader.addContent(self.docDesignerCntGroup)
+        self.toolbarLoader.addContent(self.docGeneratorCntGroup)
+        self.toolbarLoader.addContent(self.STRCntGroup)
+
+        # self.toolbarLoader.addContent(self.fltsNotificationCntGroup)
 
         # menubar items
         self.menubarLoader.addContents(schemeSettingsCntGroups,
                                        [lhtAdminMenu, lhtAdminMenu]
                                        )
 
-        self.toolbarLoader.addContent(self._action_separator())
-
         self.menubarLoader.addContents(certSettingsCntGroups,
                                        [lhtAdminMenu, lhtAdminMenu]
                                        )
 
-        self.toolbarLoader.addContent(self._action_separator())
-
-        self.menubarLoader.addContent(self.printCertCntGroup,
-                                      [lhtAdminMenu, lhtAdminMenu]
-                                      )
-        self.menubarLoader.addContent(self.scanCertCntGroup,
-                                      [lhtAdminMenu, lhtAdminMenu]
-                                      )
-        self.menubarLoader.addContent(self.fltsNotificationCntGroup,
-                                      [lhtAdminMenu, lhtAdminMenu]
-                                      )
-
-        self.menubarLoader.addContents(adminSettingsCntGroups,
-                                       [fltsAdminMenu, fltsAdminMenu]
+        self.menubarLoader.addContents(searchReportCntgroups,
+                                       [lhtAdminMenu, lhtAdminMenu]
                                        )
+
+        # self.menubarLoader.addContent(self.fltsNotificationCntGroup,
+        #                               [lhtAdminMenu, lhtAdminMenu]
+        #                               )
 
         # Load all the content in the container
         self.toolbarLoader.loadContent()
@@ -2134,15 +2165,15 @@ class STDMQGISLoader(object):
             # self.stdmInitToolbar.removeAction(self.spatialLayerManager)
             # self.feature_details_act.setChecked(False)
             # self.stdmInitToolbar.removeAction(self.feature_details_act)
-            # self.stdmInitToolbar.removeAction(self.contentAuthAct)
+            self.stdmInitToolbar.removeAction(self.contentAuthAct)
             # self.stdmInitToolbar.removeAction(self.usersAct)
             self.stdmInitToolbar.removeAction(self.options_act)
             # self.stdmInitToolbar.removeAction(self.manageAdminUnitsAct)
             # self.stdmInitToolbar.removeAction(self.importAct)
             # self.stdmInitToolbar.removeAction(self.exportAct)
-            # self.stdmInitToolbar.removeAction(self.docDesignerAct)
-            # self.stdmInitToolbar.removeAction(self.docGeneratorAct)
-            # self.stdmInitToolbar.removeAction(self.viewSTRAct)
+            self.stdmInitToolbar.removeAction(self.docDesignerAct)
+            self.stdmInitToolbar.removeAction(self.docGeneratorAct)
+            self.stdmInitToolbar.removeAction(self.viewSTRAct)
 
             # flts
             self.stdmInitToolbar.removeAction(self.schemeLodgementAct)
@@ -2151,7 +2182,7 @@ class STDMQGISLoader(object):
             self.stdmInitToolbar.removeAction(self.firstExaminationAct)
             self.stdmInitToolbar.removeAction(self.secondExaminationAct)
             self.stdmInitToolbar.removeAction(self.thirdExaminationAct)
-            self.stdmInitToolbar.removeAction(self.notificationAct)
+            # self.stdmInitToolbar.removeAction(self.notificationAct)
             self.stdmInitToolbar.removeAction(self.printCertificateAct)
             self.stdmInitToolbar.removeAction(self.scanCertificateAct)
             self.stdmInitToolbar.removeAction(self.searchAct)
@@ -2454,20 +2485,6 @@ class STDMQGISLoader(object):
         dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         dock_widget.show_dock_widget()
 
-    def import_plots(self):
-        """
-        Load the wizard to import plots
-        """
-        import_plot_dialog = ImportPlotWizard(self.iface.mainWindow())
-        import_plot_dialog.exec_()
-
-    # def revise_scheme(self):
-    #     """
-    #     Load the wizard for revision of scheme.
-    #     """
-    #     scheme_revision = SchemeRevisionWizard(self.iface.mainWindow())
-    #     scheme_revision.exec_()
-
     def scan_certificate(self):
         """
         Load the dialog for scanning of certificate.
@@ -2475,7 +2492,7 @@ class STDMQGISLoader(object):
         scan_cert = ScanCertificateDialog(self.iface.mainWindow())
         scan_cert.exec_()
 
-    def print_certificate(self):
+    def import_plots(self):
         """
         Docks Import Plot workflow manager widget
         """
@@ -2486,10 +2503,10 @@ class STDMQGISLoader(object):
         dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         dock_widget.show_dock_widget()
 
-    # def print_certificate(self):
-    #     """Load the dialog for printing of certificate."""
-    #     print_cert = PrintCertificateDialog(self.iface.mainWindow())
-    #     print_cert.exec_()
+    def print_certificate(self):
+        """Load the dialog for printing of certificate."""
+        print_cert = PrintCertificateDialog(self.iface.mainWindow())
+        print_cert.exec_()
 
     def flts_search(self):
         """
@@ -2505,9 +2522,9 @@ class STDMQGISLoader(object):
         report_dialog = ReportDialog(self.iface.mainWindow())
         report_dialog.exec_()
 
-    def flts_notification(self):
-        """
-        Load the dialog for notifications in flts
-        """
-        notification_dialog = NotificationDialog(self.iface.mainWindow())
-        notification_dialog.exec_()
+    # def flts_notification(self):
+    #     """
+    #     Load the dialog for notifications in flts
+    #     """
+    #     notification_dialog = NotificationDialog(self.iface.mainWindow())
+    #     notification_dialog.exec_()
