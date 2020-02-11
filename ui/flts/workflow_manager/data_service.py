@@ -832,25 +832,30 @@ class PlotPreviewDataService:
             "type_of_relevant_authority": self._scheme.relevant_authority,
             "region": self._scheme.region
         }
+        model = self.entity_model_("Relevant_authority")
         relevant_authority = self.filter_query_by(
-            "Relevant_authority", filters
+            "Relevant_authority",
+            filters,
+            [getattr(model, "au_code")]
         ).first()
         return relevant_authority
 
     @staticmethod
-    def filter_query_by(entity_name, filters):
+    def filter_query_by(entity_name, filters, columns=None):
         """
         Filters query result by a column value
         :param entity_name: Entity name
         :type entity_name: String
         :param filters: Column filters - column name and value
         :type filters: Dictionary
+        :type columns: Fields to select from
+        :type columns: List
         :return: Filter entity query object
         :rtype: Entity object
         """
         try:
             filter_by = FilterQueryBy()
-            return filter_by(entity_name, filters)
+            return filter_by(entity_name, filters, columns)
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
 

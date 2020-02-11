@@ -489,20 +489,22 @@ class FilterQueryBy:
     def __init__(self):
         self._profile = None
 
-    def __call__(self, entity_name, filters):
+    def __call__(self, entity_name, filters, columns=None):
         """
         Return query object on filter by a column value
         :param entity_name: Entity name
         :type entity_name: String
         :param filters: Column filters - column name and value
         :type filters: Dictionary
+        :type columns: Fields to select from
+        :type columns: List
         :return: Filter entity query object
         :rtype: Entity object
         """
         try:
             if not self._profile:
                 self._profile = current_profile()
-            query_obj = self._entity_query_object(entity_name)
+            query_obj = self._entity_query_object(entity_name, columns)
             return self._filter_by(query_obj, filters)
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
@@ -523,18 +525,24 @@ class FilterQueryBy:
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
 
-    def _entity_query_object(self, entity_name):
+    def _entity_query_object(self, entity_name, columns=None):
         """
         Return query object of an entity
         :param entity_name: Entity name
         :type entity_name: String
+        :type columns: Fields to select from
+        :type columns: List
         :return:Entity query object
         :rtype List
         """
+        columns = columns if isinstance(columns, list) else []
         model = self._entity_model(entity_name)
         entity_object = model()
         try:
-            return entity_object.queryObject()
+            if len(columns) == 0:
+                return entity_object.queryObject()
+            else:
+                return entity_object.queryObject(columns)
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
 
