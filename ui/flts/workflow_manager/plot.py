@@ -552,7 +552,7 @@ class UniqueParcelIdentifier:
         :return upi: Unique Parcel Identifier
         :return upi: String
         """
-        upi = "{0}/{1}/{2}".format(self._prefix, aucode, plot_number)
+        upi = "{0}/{1}/{2}".format(self._prefix, plot_number, aucode)
         return upi
 
 
