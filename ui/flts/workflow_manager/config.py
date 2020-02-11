@@ -489,7 +489,7 @@ class FilterQueryBy:
     def __init__(self):
         self._profile = None
 
-    def __call__(self, entity_name, filters, columns=None):
+    def __call__(self, entity_name, filters=None, columns=None):
         """
         Return query object on filter by a column value
         :param entity_name: Entity name
@@ -505,6 +505,8 @@ class FilterQueryBy:
             if not self._profile:
                 self._profile = current_profile()
             query_obj = self._entity_query_object(entity_name, columns)
+            if not filters:
+                return query_obj
             return self._filter_by(query_obj, filters)
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e

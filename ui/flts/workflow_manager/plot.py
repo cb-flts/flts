@@ -502,10 +502,24 @@ class UniqueParcelIdentifier:
     """
     Unique Parcel Identifier (UPI) object
     """
+
+    rems = ["REM", "ACCESS", "POS"]
+
     def __init__(self, data_service, prefix):
         self._data_service = data_service
         self._prefix = prefix
         self._plot_counter = 0
+        self._wkt_plot_numbers = []
+
+    def scheme_plot_numbers(self):
+        """
+        Returns the Scheme plot numbers
+        :return plot_numbers: Scheme plot numbers
+        :rtype plot_numbers: List
+        """
+        plot_numbers = self._data_service.scheme_plot_numbers()
+        plot_numbers = [num for num, in plot_numbers]
+        return plot_numbers
 
     def aucode(self):
         """
@@ -516,19 +530,24 @@ class UniqueParcelIdentifier:
         relevant_authority = self._data_service.scheme_relevant_authority()
         return relevant_authority.au_code
 
-    def plot_number(self):
+    def plot_number(self, plot_id):
         """
         Returns Scheme Plot Number
+        :param plot_id: Plot identifier
+        :type: Object
         :return: Plot number
         :rtype: String
         """
-        if self._plot_counter == 0 and self._data_service.is_plot():
-            plot_number = self._data_service.max_plot_number()
-            if plot_number:
-                return self._generate_plot_number(int(plot_number) + 1)
-        return self._generate_plot_number(1)
+        plot_id = str(plot_id)
+        if self._is_id_remainder(plot_id):
+            return plot_id
+        plot_number = self._extract_plot_number(plot_id)
+        if plot_number:
+            plot_number = self._generate_plot_number(plot_number)
+        return plot_number
 
-    def _generate_plot_number(self, num):
+    @staticmethod
+    def _generate_plot_number(num):
         """
         Returns a new plot number
         :param num: New number
@@ -537,10 +556,69 @@ class UniqueParcelIdentifier:
         :rtype: String
         """
         prefix = "000000"
-        self._plot_counter += num
-        suffix = str(self._plot_counter)
+        suffix = str(num)
         prefix = prefix[:-len(suffix)]
         return prefix + suffix
+
+    def _is_id_remainder(self, plot_id):
+        """
+        Checks if the WKT plot ID is the remainder
+        :param plot_id: Plot ID
+        :param plot_id: String
+        :return: True or False
+        :return: Boolean
+        """
+        for rem in self.rems:
+            if plot_id.find(rem) != -1:
+                return True
+        return False
+
+    @staticmethod
+    def _extract_plot_number(plot_id):
+        """
+        Extracts plot number from the WKT plot ID
+        :param plot_id: Plot ID
+        :param plot_id: String
+        :return plot_id: Plot number
+        :param plot_id: Integer
+        """
+        try:
+            plot_id = [c for c in plot_id if c.isdigit()]
+            plot_id = int("".join(plot_id))
+            return plot_id
+        except ValueError:
+            return
+
+    def wkt_plot_numbers(self):
+        """
+        Returns plot numbers generated from the WKT file
+        :return _wkt_plot_numbers: Plot numbers
+        :rtype _wkt_plot_numbers: List
+        """
+        return self._wkt_plot_numbers
+
+    def store_wkt_plot_number(self, plot_number):
+        """
+        Stores plot numbers generated from the WKT file
+        :param plot_number: Plot number
+        :type plot_number: String
+        """
+        self._wkt_plot_numbers.append(plot_number)
+
+    @staticmethod
+    def _is_number(value):
+        """
+        Checks if value is a number
+        :param value: Input value
+        :type value: Object
+        :return: True if number otherwise return False
+        :rtype: Boolean
+        """
+        try:
+            float(value)
+            return True
+        except (ValueError, TypeError, Exception):
+            return False
 
     def upi(self, plot_number, aucode):
         """
@@ -603,6 +681,12 @@ class PlotPreview(Plot):
         self._layers = {}
         self._dirty = {}
         self._errors = {}
+        self.wkt_header_options = {
+            "parcel_number": (
+                "id", "parcel_number",
+                "parcel number", "parcel"
+            )
+        }
 
     def set_settings(self, settings):
         """
@@ -693,22 +777,23 @@ class PlotPreview(Plot):
         :return results: List
         """
         results = []
-        area_attribute = False
         upi = UniqueParcelIdentifier(self._data_service, "W")
+        scheme_plot_numbers = upi.scheme_plot_numbers()
         aucode = upi.aucode()
+        area_attribute = False
         for row, data in enumerate(csv_reader):
             contents = {}
             self._items = {}
             value = self._get_wkt(data, GEOMETRY)
             if value:
                 contents[GEOMETRY] = unicode(value)
-                # value = self._get_value(
-                #     data, ("parcel", "parcel number", "id"), PARCEL_NUM
-                # )
-                # contents[PARCEL_NUM] = unicode(value)
-                value = upi.plot_number()
-                contents[PARCEL_NUM] = unicode(value)
-                contents[UPI_NUM] = unicode(upi.upi(aucode, value))
+                field_options = self.wkt_header_options["parcel_number"]
+                value = self._get_value(data, field_options, PARCEL_NUM)
+                plot_number = self._plot_number(value, upi, scheme_plot_numbers)
+                contents[PARCEL_NUM] = unicode(plot_number)
+                if plot_number != WARNING:
+                    plot_number = unicode(upi.upi(aucode, plot_number))
+                contents[UPI_NUM] = self._on_empty_value(UPI_NUM, plot_number)
                 contents[AREA] = ""
                 attributes = self._layer_attributes(contents)
                 self._create_layer(contents[GEOMETRY], attributes)
@@ -722,6 +807,35 @@ class PlotPreview(Plot):
                 results.append(contents)
         return results
 
+    def _plot_number(self, value, upi, scheme_plot_numbers):
+        """
+        Returns plot number
+        :param value: WKT value
+        :param value: Object
+        :param upi: Unique Parcel Identifier
+        :param upi: UniqueParcelIdentifier
+        :param scheme_plot_numbers: Existing scheme plot numbers
+        :param scheme_plot_numbers: String
+        :return value: Plot number
+        :return value: String
+        """
+        if value == WARNING:
+            return value
+        plot_number = upi.plot_number(value)
+        wkt_plot_numbers = upi.wkt_plot_numbers()
+        if plot_number is None:
+            self._set_invalid_tip(PARCEL_NUM, "Invalid identifier")
+        elif plot_number in wkt_plot_numbers:
+            self._set_invalid_tip(PARCEL_NUM, "Duplicate WKT identifier")
+        elif plot_number in scheme_plot_numbers:
+            value = plot_number
+            tip = "Scheme plot number exist in the database"
+            self._set_invalid_tips({PARCEL_NUM: tip, UPI_NUM: tip})
+        else:
+            value = plot_number
+            upi.store_wkt_plot_number(plot_number)
+        return value
+
     def _plot_area(self):
         """
         Returns area value
@@ -731,12 +845,10 @@ class PlotPreview(Plot):
         if self._plot_layer and self._plot_layer.features:
             feature = self._plot_layer.features[-1]
             area = self._feature_area(feature)
-            warning_flag = self._empty_value(AREA, area)
-            if warning_flag:
-                area = warning_flag
+            area = self._on_empty_value(AREA, area)
             return area
         else:
-            return self._empty_value(AREA)
+            return self._on_empty_value(AREA)
 
     def _update_plot_attribute(self, field_name, value):
         """
@@ -842,36 +954,30 @@ class PlotPreview(Plot):
         :return value: Plot import file value
         :return value: Object
         """
-        invalid_tip = self._display_tooltip("Invalid WKT", WARNING)
+        invalid_tip = "Invalid WKT"
         value = data.get(self._settings.geom_field)
         if value is None:
             return
         elif isinstance(value, list):
-            self._items[column] = invalid_tip
+            self._set_invalid_tip(column, invalid_tip)
             return value
         geom_type, coordinates, geom = self._geometry(value)
         if not geom:
-            self._items[column] = invalid_tip
+            self._set_invalid_tip(column, invalid_tip)
             return value
         else:
             geom_type = self._geometry_types.get(geom_type)
             if not geom_type:
-                self._items[column] = self._display_tooltip(
-                    "Geometry type not allowed", WARNING
-                )
-                self._error_counter += 1
+                self._set_invalid_tip(column, "Geometry type not allowed")
             elif geom_type != self._settings.geom_type:
-                self._items[column] = self._display_tooltip(
-                    "Does not match set geometry type ({})".format(self._settings.geom_type),
-                    WARNING
-                )
-                self._error_counter += 1
-            elif self._import_type.get(self._settings.geom_type) != self._settings.import_as:
-                self._items[column] = self._display_tooltip(
-                    "Does not match set import type ({})".format(self._settings.import_as),
-                    WARNING
-                )
-                self._error_counter += 1
+                tip = "Mismatch with set geometry type ({})".\
+                    format(self._settings.geom_type)
+                self._set_invalid_tip(column, tip)
+            elif self._import_type.get(self._settings.geom_type) != \
+                    self._settings.import_as:
+                tip = "Mismatch with set import type ({})".\
+                    format(self._settings.import_as)
+                self._set_invalid_tip(column, tip)
             return value
 
     def _get_value(self, data, field_names, column):
@@ -887,9 +993,7 @@ class PlotPreview(Plot):
         :return value: Object
         """
         value = self._field_value(data, field_names)
-        warning_flag = self._empty_value(column, value)
-        if warning_flag:
-            value = warning_flag
+        value = self._on_empty_value(column, value)
         return value
 
     @staticmethod
@@ -935,14 +1039,12 @@ class PlotPreview(Plot):
         :return coordinate: Coordinate value
         :rtype coordinate: String
         """
-        warning_flag = self._empty_value(column, coordinate)
-        if warning_flag:
-            coordinate = warning_flag
+        coordinate = self._on_empty_value(column, coordinate)
         return coordinate
 
-    def _empty_value(self, column, value=None):
+    def _on_empty_value(self, column, value=None):
         """
-        Returns flag for empty value
+        Set empty value
         :param column: Table view column position
         :type column: Integer
         :param value: Plot import file value
@@ -950,11 +1052,11 @@ class PlotPreview(Plot):
         :return value: Empty value flag
         :return value: String
         """
-        if value is None or not str(value).strip():
+        if value == WARNING or value is None or not str(value).strip():
             value = WARNING
             self._items[column] = self._decoration_tooltip("Missing value")
             self._error_counter += 1
-            return value
+        return value
 
     def _to_float(self, value, column):
         """
@@ -970,9 +1072,7 @@ class PlotPreview(Plot):
             value = '{:.4f}'.format(round(decimal.Decimal(value), 4))
         else:
             if value != WARNING:
-                self._items[column] = \
-                    self._display_tooltip("Value is not a number", WARNING)
-                self._error_counter += 1
+                self._set_invalid_tip(column, "Value is not a number")
         return value
 
     @staticmethod
@@ -989,6 +1089,29 @@ class PlotPreview(Plot):
             return True
         except (ValueError, TypeError, Exception):
             return False
+
+    def _set_invalid_tips(self, tips):
+        """
+        Sets invalid tips to columns
+        :param tips: Table view column tips
+        :type tips: Dictionary
+        """
+        for column, tip in tips.items():
+            self._set_invalid_tip(column, tip)
+
+    def _set_invalid_tip(self, column, tip=None):
+        """
+        Sets invalid tip on a column
+        :param column: Table view column position
+        :type column: Integer
+        :param tip: Tooltip message
+        :type tip: String
+        """
+        invalid_tip = self._display_tooltip("Invalid value", WARNING)
+        if tip:
+            invalid_tip = self._display_tooltip(tip, WARNING)
+        self._items[column] = invalid_tip
+        self._error_counter += 1
 
     @staticmethod
     def _display_tooltip(tip, icon_id):

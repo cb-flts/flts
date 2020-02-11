@@ -813,14 +813,20 @@ class PlotPreviewDataService:
         """
         return self.filter_query_by("Scheme", {"id": self._scheme_id}).first()
 
-    def is_plot(self):
+    def scheme_plot_numbers(self):
         """
-        Checks if the scheme has a plot
-        :return: True
-        :return: Boolean
+        Returns Scheme plot numbers
+        :return plot_numbers: Scheme Relevant Authority record/row
+        :rtype plot_numbers: Entity
         """
-        if len(self._scheme.cb_plot_collection):
-            return True
+        filters = {"scheme_id": self._scheme_id}
+        model = self.entity_model_("Plot")
+        plot_numbers = self.filter_query_by(
+            "Plot",
+            filters,
+            [getattr(model, "plot_number")]
+        ).distinct()
+        return plot_numbers
 
     def scheme_relevant_authority(self):
         """
@@ -858,18 +864,6 @@ class PlotPreviewDataService:
             return filter_by(entity_name, filters, columns)
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
-
-    def max_plot_number(self):
-        """
-        Returns maximum Scheme Plot Number
-        :return plot_number: Max Plot Number
-        :rtype plot_number: Unicode
-        """
-        model = self.entity_model_("Plot")
-        entity_object = model()
-        plot_number = entity_object.queryObject([func.max(model.plot_number)]).\
-            filter(model.scheme_id == self._scheme_id).scalar()
-        return plot_number
 
     def entity_model_(self, name=None):
         """
