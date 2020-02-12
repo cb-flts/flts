@@ -795,6 +795,7 @@ class PlotPreviewDataService:
         """
         return False
 
+    @staticmethod
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
@@ -917,6 +918,35 @@ class ServitudePreviewDataService:
         """
         return self._table_model_icons.icons
 
+    @property
+    def save_columns(self):
+        """
+        Servitude import save column options
+        :return: Save column values
+        :rtype: List
+        """
+        return self._servitude_config.servitude_save_columns
+
+    @property
+    def collections(self):
+        """
+        Related entity collection names
+        :return: Related entity collection names
+        :rtype: List
+        """
+        return False
+
+    @staticmethod
+    def related_entities(self, entity_name=None):
+        """
+        Related entity name identified by foreign keys
+        :param entity_name:
+        :type entity_name: String
+        :return: Related entity names
+        :rtype: List
+        """
+        return False
+
 
 class BeaconPreviewDataService:
     """
@@ -953,6 +983,35 @@ class BeaconPreviewDataService:
         :rtype: Dictionary
         """
         return self._table_model_icons.icons
+
+    @property
+    def save_columns(self):
+        """
+        Beacon import save column options
+        :return: Save column values
+        :rtype: List
+        """
+        return self._beacon_config.beacon_save_columns
+
+    @property
+    def collections(self):
+        """
+        Related entity collection names
+        :return: Related entity collection names
+        :rtype: List
+        """
+        return False
+
+    @staticmethod
+    def related_entities(self, entity_name=None):
+        """
+        Related entity name identified by foreign keys
+        :param entity_name:
+        :type entity_name: String
+        :return: Related entity names
+        :rtype: List
+        """
+        return False
 
 
 def plot_data_service(import_type):
