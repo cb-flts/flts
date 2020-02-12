@@ -426,6 +426,9 @@ class PlotImportWidget(QWidget):
         srid = settings.get(CRS_ID)
         srid = srid.split(":")[1]
         data_service = self._preview_data_service[import_type]
+
+        # TODO: On importing different types, this is the only
+        #  part that changes
         column_keys = range(4)
         try:
             import_plot = ImportPlot(
