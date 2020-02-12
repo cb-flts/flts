@@ -428,8 +428,10 @@ class PlotImportWidget(QWidget):
             self._import_plot(import_type, srid, range(4))
             # TODO: On success update upload_status in the Scheme entity
             #  Update method to be coded in the ImportPlot Class
+        elif import_type == "Servitudes":
+            self._import_plot(import_type, srid, 0)
         else:
-            pass
+            self._import_plot(import_type, srid, range(3))
 
     def _import_plot(self, import_type, srid, columns):
         """
