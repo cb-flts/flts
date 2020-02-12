@@ -393,61 +393,6 @@ class PlotImportWidget(QWidget):
             self._preview_table_view.horizontalHeader(). \
                 setStretchLastSection(True)
 
-    # def _import(self):
-    #     """
-    #     Imports selected plot import file content
-    #     """
-    #     index = self._current_index(self._file_table_view)
-    #     if index is None:
-    #         return
-    #     row = index.row()
-    #     settings = self._file_settings(row)
-    #     import_type = settings.get(IMPORT_AS)
-    #     fpath = self.model.results[row].get("fpath")
-    #     if self._previewed_message(fpath) or \
-    #             self._import_error_message(fpath) or \
-    #             not self._ok_to_import(index, import_type):
-    #         return
-    #     if settings.get(IMPORT_AS) == "Plots":
-    #         self._import_plot()
-    #     else:
-    #         pass
-    #     self._remove_file()
-    #
-    # def _import_plot(self):
-    #     """
-    #     Imports plot values
-    #     """
-    #     index = self._current_index(self._file_table_view)
-    #     if index is None:
-    #         return
-    #     settings = self._file_settings(index.row())
-    #     import_type = settings.get(IMPORT_AS)
-    #     srid = settings.get(CRS_ID)
-    #     srid = srid.split(":")[1]
-    #     data_service = self._preview_data_service[import_type]
-    #
-    #     # TODO: On importing different types, this is the only
-    #     #  part that changes
-    #     column_keys = range(4)
-    #     try:
-    #         import_plot = ImportPlot(
-    #             self._preview_model,
-    #             self._scheme_id,
-    #             srid,
-    #             data_service,
-    #             column_keys
-    #         )
-    #         import_plot = import_plot.save()
-    #     except (AttributeError, exc.SQLAlchemyError, Exception) as e:
-    #         self._show_critical_message(
-    #             "Workflow Manager - Plot Import",
-    #             "Failed to update: {}".format(e)
-    #         )
-    #     else:
-    #         msg = "Successfully imported {0} plots".format(import_plot)
-    #         self.notif_bar.insertInformationNotification(msg)
-
     def _import(self):
         """
         Imports selected plot import file content
