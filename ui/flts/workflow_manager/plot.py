@@ -503,7 +503,7 @@ class UniqueParcelIdentifier:
     Unique Parcel Identifier (UPI) object
     """
 
-    rems = ["REM", "ACCESS", "POS"]
+    rems = ["REM", "ACCES", "POS"]
 
     def __init__(self, data_service, prefix):
         self._data_service = data_service

@@ -463,10 +463,8 @@ class PlotImportWidget(QWidget):
                 self._import_error_message(fpath) or \
                 not self._ok_to_import(index, import_type):
             return
-        if settings.get(IMPORT_AS) == "Plots":
-            self._import_as()
-        else:
-            pass
+        self._import_as()
+        self._remove_file()
 
     def _import_as(self):
         """
@@ -487,6 +485,12 @@ class PlotImportWidget(QWidget):
     def _import_plot(self, import_type, srid, columns):
         """
         Imports plot values
+        :param import_type: Import type
+        :param import_type: String
+        :param srid: Spatial reference identifier
+        :param srid: String
+        :param columns: Tableview columns - positions
+        :param columns: Integer
         """
         data_service = self._preview_data_service[import_type]
         try:
@@ -508,7 +512,6 @@ class PlotImportWidget(QWidget):
             msg = "Successfully imported {0} {1}".\
                 format(import_plot, import_type)
             self.notif_bar.insertInformationNotification(msg)
-            self._remove_file()
 
     def _file_settings(self, row):
         """
