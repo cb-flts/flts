@@ -504,7 +504,7 @@ class Save(DataRoutine):
                     entity_obj = model()
                     model = [model(**columns) for columns in items]
                     entity_obj.saveMany(model)
-                    count += 1
+                    count += len(items)
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
         else:
