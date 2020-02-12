@@ -281,6 +281,17 @@ class ServitudeImportPreviewConfig(Config):
         """
         return self.get_data('servitude_preview_columns')
 
+    @property
+    def servitude_save_columns(self):
+        """
+        Scheme servitude import preview
+        table view save column options
+        :return: Save column values
+        :rtype: List
+        """
+        return self.get_data('save_columns').\
+            get('servitude_import_save', None)
+
 
 class BeaconImportPreviewConfig(Config):
     """
@@ -296,6 +307,17 @@ class BeaconImportPreviewConfig(Config):
         :rtype: List
         """
         return self.get_data('beacon_preview_columns')
+
+    @property
+    def beacon_save_columns(self):
+        """
+        Scheme beacon import preview
+        table view save column options
+        :return: Save column values
+        :rtype: List
+        """
+        return self.get_data('save_columns').\
+            get('beacon_import_save', None)
 
 
 class PlotViewerConfig(Config):
@@ -619,6 +641,7 @@ class ColumnSettings:
 
 
 GEOMETRY, PARCEL_NUM, UPI_NUM, AREA = range(4)
+GEOMETRY_PT, X_PT, Y_PT = range(3)
 Column = namedtuple('Column', ['name', 'type', 'flag'])
 Icon = namedtuple('Icon', ['icon', 'size'])
 LookUp = namedtuple(
@@ -1223,6 +1246,28 @@ configurations = {
             ),
             "SCHEME_ID": SaveColumn(
                 column='scheme_id', value=None, entity='Plot'
+            )
+        },
+        'beacon_import_save': {
+            GEOMETRY_PT: SaveColumn(
+                column='geom', value=None, entity='Beacon'
+            ),
+            X_PT: SaveColumn(
+                column='x', value=None, entity='Beacon'
+            ),
+            Y_PT: SaveColumn(
+                column='y', value=None, entity='Beacon'
+            ),
+            "SCHEME_ID": SaveColumn(
+                column='scheme_id', value=None, entity='Beacon'
+            )
+        },
+        'servitude_import_save': {
+            GEOMETRY: SaveColumn(
+                column='geom', value=None, entity='Servitude'
+            ),
+            "SCHEME_ID": SaveColumn(
+                column='scheme_id', value=None, entity='Servitude'
             )
         }
     }
