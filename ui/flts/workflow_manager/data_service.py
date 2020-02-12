@@ -738,7 +738,7 @@ class PlotImportFileDataService:
         return self._table_model_icons.icons
 
 
-class PlotPreviewDataService:
+class PlotPreviewDataService(DataService):
     """
     Scheme plot import preview data model service
     """
@@ -795,16 +795,19 @@ class PlotPreviewDataService:
         """
         return False
 
-    @staticmethod
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
         :param entity_name:
         :type entity_name: String
-        :return: Related entity names
-        :rtype: List
         """
-        return False
+        pass
+
+    def run_query(self):
+        """
+        Run query on an entity
+        """
+        pass
 
     def _get_scheme(self):
         """
@@ -875,18 +878,15 @@ class PlotPreviewDataService:
         :rtype: DeclarativeMeta
         """
         entity = self._profile.entity(name)
-        try:
-            model = entity_model(entity)
-            return model
-        except AttributeError as e:
-            raise e
+        return super(PlotPreviewDataService, self).entity_model_(entity)
 
 
-class ServitudePreviewDataService:
+class ServitudePreviewDataService(DataService):
     """
     Scheme servitude import preview data model service
     """
     def __init__(self, current_profile, scheme_id):
+        self._profile = current_profile
         self._servitude_config = ServitudeImportPreviewConfig()
         self._table_model_icons = TableModelIcons()
 
@@ -936,23 +936,38 @@ class ServitudePreviewDataService:
         """
         return False
 
-    @staticmethod
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
         :param entity_name:
         :type entity_name: String
-        :return: Related entity names
-        :rtype: List
         """
-        return False
+        pass
+
+    def run_query(self):
+        """
+        Run query on an entity
+        """
+        pass
+
+    def entity_model_(self, name=None):
+        """
+        Gets entity model
+        :param name: Name of the entity
+        :type name: String
+        :return: Entity model
+        :rtype: DeclarativeMeta
+        """
+        entity = self._profile.entity(name)
+        return super(ServitudePreviewDataService, self).entity_model_(entity)
 
 
-class BeaconPreviewDataService:
+class BeaconPreviewDataService(DataService):
     """
     Scheme beacon import preview data model service
     """
     def __init__(self, current_profile, scheme_id):
+        self._profile = current_profile
         self._beacon_config = BeaconImportPreviewConfig()
         self._table_model_icons = TableModelIcons()
 
@@ -1002,16 +1017,30 @@ class BeaconPreviewDataService:
         """
         return False
 
-    @staticmethod
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
         :param entity_name:
         :type entity_name: String
-        :return: Related entity names
-        :rtype: List
         """
-        return False
+        pass
+
+    def run_query(self):
+        """
+        Run query on an entity
+        """
+        pass
+
+    def entity_model_(self, name=None):
+        """
+        Gets entity model
+        :param name: Name of the entity
+        :type name: String
+        :return: Entity model
+        :rtype: DeclarativeMeta
+        """
+        entity = self._profile.entity(name)
+        return super(BeaconPreviewDataService, self).entity_model_(entity)
 
 
 def plot_data_service(import_type):

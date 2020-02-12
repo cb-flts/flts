@@ -1483,7 +1483,7 @@ class ImportPlot:
         :return saved: Number of saved items
         :rtype saved: Integer
         """
-        imported = 0
+
         try:
             items = self._import_items()
             imported = Save(
@@ -1493,7 +1493,7 @@ class ImportPlot:
             ).save()
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
-        finally:
+        else:
             return imported
 
     def _import_items(self):
