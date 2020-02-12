@@ -289,7 +289,7 @@ class PlotImportWidget(QWidget):
             elif reply == QMessageBox.Yes:
                 if self._import_error_message(fpath):
                     return False
-                self._import_plot()
+                self._import_as()
             else:
                 self._remove_dirty(fpath)
         return True
@@ -393,6 +393,61 @@ class PlotImportWidget(QWidget):
             self._preview_table_view.horizontalHeader(). \
                 setStretchLastSection(True)
 
+    # def _import(self):
+    #     """
+    #     Imports selected plot import file content
+    #     """
+    #     index = self._current_index(self._file_table_view)
+    #     if index is None:
+    #         return
+    #     row = index.row()
+    #     settings = self._file_settings(row)
+    #     import_type = settings.get(IMPORT_AS)
+    #     fpath = self.model.results[row].get("fpath")
+    #     if self._previewed_message(fpath) or \
+    #             self._import_error_message(fpath) or \
+    #             not self._ok_to_import(index, import_type):
+    #         return
+    #     if settings.get(IMPORT_AS) == "Plots":
+    #         self._import_plot()
+    #     else:
+    #         pass
+    #     self._remove_file()
+    #
+    # def _import_plot(self):
+    #     """
+    #     Imports plot values
+    #     """
+    #     index = self._current_index(self._file_table_view)
+    #     if index is None:
+    #         return
+    #     settings = self._file_settings(index.row())
+    #     import_type = settings.get(IMPORT_AS)
+    #     srid = settings.get(CRS_ID)
+    #     srid = srid.split(":")[1]
+    #     data_service = self._preview_data_service[import_type]
+    #
+    #     # TODO: On importing different types, this is the only
+    #     #  part that changes
+    #     column_keys = range(4)
+    #     try:
+    #         import_plot = ImportPlot(
+    #             self._preview_model,
+    #             self._scheme_id,
+    #             srid,
+    #             data_service,
+    #             column_keys
+    #         )
+    #         import_plot = import_plot.save()
+    #     except (AttributeError, exc.SQLAlchemyError, Exception) as e:
+    #         self._show_critical_message(
+    #             "Workflow Manager - Plot Import",
+    #             "Failed to update: {}".format(e)
+    #         )
+    #     else:
+    #         msg = "Successfully imported {0} plots".format(import_plot)
+    #         self.notif_bar.insertInformationNotification(msg)
+
     def _import(self):
         """
         Imports selected plot import file content
@@ -409,14 +464,13 @@ class PlotImportWidget(QWidget):
                 not self._ok_to_import(index, import_type):
             return
         if settings.get(IMPORT_AS) == "Plots":
-            self._import_plot()
+            self._import_as()
         else:
             pass
-        self._remove_file()
 
-    def _import_plot(self):
+    def _import_as(self):
         """
-        Imports plot values
+        Imports plot values based on geometry type
         """
         index = self._current_index(self._file_table_view)
         if index is None:
@@ -425,18 +479,23 @@ class PlotImportWidget(QWidget):
         import_type = settings.get(IMPORT_AS)
         srid = settings.get(CRS_ID)
         srid = srid.split(":")[1]
-        data_service = self._preview_data_service[import_type]
+        if import_type == "Plots":
+            self._import_plot(import_type, srid, range(4))
+        else:
+            pass
 
-        # TODO: On importing different types, this is the only
-        #  part that changes
-        column_keys = range(4)
+    def _import_plot(self, import_type, srid, columns):
+        """
+        Imports plot values
+        """
+        data_service = self._preview_data_service[import_type]
         try:
             import_plot = ImportPlot(
                 self._preview_model,
                 self._scheme_id,
                 srid,
                 data_service,
-                column_keys
+                columns
             )
             import_plot = import_plot.save()
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
@@ -445,8 +504,11 @@ class PlotImportWidget(QWidget):
                 "Failed to update: {}".format(e)
             )
         else:
-            msg = "Successfully imported {0} plots".format(import_plot)
+            import_type = import_type.lower()
+            msg = "Successfully imported {0} {1}".\
+                format(import_plot, import_type)
             self.notif_bar.insertInformationNotification(msg)
+            self._remove_file()
 
     def _file_settings(self, row):
         """
