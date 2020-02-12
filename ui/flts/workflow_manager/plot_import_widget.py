@@ -410,6 +410,8 @@ class PlotImportWidget(QWidget):
             return
         self._import_as()
         self._remove_file()
+        # TODO: On zero(0) import show warning notification.
+        #  Do not remove the file.
 
     def _import_as(self):
         """
@@ -424,6 +426,8 @@ class PlotImportWidget(QWidget):
         srid = srid.split(":")[1]
         if import_type == "Plots":
             self._import_plot(import_type, srid, range(4))
+            # TODO: On success update upload_status in the Scheme entity
+            #  Update method to be coded in the ImportPlot Class
         else:
             pass
 

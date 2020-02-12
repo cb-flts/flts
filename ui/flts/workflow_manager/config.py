@@ -618,7 +618,7 @@ class ColumnSettings:
         return column
 
 
-GEOMETRY, PARCEL_NUM, UPI_NUM, AREA, SCHEME_ID, PLOT_STATUS = range(6)
+GEOMETRY, PARCEL_NUM, UPI_NUM, AREA = range(4)
 Column = namedtuple('Column', ['name', 'type', 'flag'])
 Icon = namedtuple('Icon', ['icon', 'size'])
 LookUp = namedtuple(
@@ -1221,7 +1221,7 @@ configurations = {
             AREA: SaveColumn(
                 column='area', value=None, entity='Plot'
             ),
-            SCHEME_ID: SaveColumn(
+            "SCHEME_ID": SaveColumn(
                 column='scheme_id', value=None, entity='Plot'
             )
         }

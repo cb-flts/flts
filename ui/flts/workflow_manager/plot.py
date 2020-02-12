@@ -43,7 +43,7 @@ from stdm.ui.flts.workflow_manager.data import Save
 
 NAME, IMPORT_AS, DELIMITER, HEADER_ROW, CRS_ID, \
 GEOM_FIELD, GEOM_TYPE = range(7)
-GEOMETRY, PARCEL_NUM, UPI_NUM, AREA, SCHEME_ID, PLOT_STATUS = range(6)
+GEOMETRY, PARCEL_NUM, UPI_NUM, AREA = range(4)
 GEOMETRY_PT, X_PT, Y_PT = range(3)
 WARNING = "Warning"
 
@@ -1466,7 +1466,7 @@ class PlotPreview(Plot):
 
 class ImportPlot:
     """
-    Imports plot values
+    Imports plot data
     """
     def __init__(self, model, scheme_id, srid, data_service, col_keys):
         self._model = model
@@ -1474,11 +1474,12 @@ class ImportPlot:
         self._srid = srid
         self._data_service = data_service
         self._options = data_service.save_columns
-        self.col_keys = col_keys
+        self._col_keys = col_keys
+        self._geom_column = 0
 
     def save(self):
         """
-        Imports plots into the database
+        Imports plots data into the database
         :return saved: Number of saved items
         :rtype saved: Integer
         """
@@ -1505,13 +1506,11 @@ class ImportPlot:
             import_items = {}
             for row, data in enumerate(self._model.results):
                 items = []
-                for key in self.col_keys:
+                for key in self._col_keys:
                     value = data[key]
                     option = self._options[key]
-                    if key == GEOMETRY:
+                    if key == self._geom_column:
                         value = "SRID={0};{1}".format(self._srid, value)
-                    elif key == SCHEME_ID:
-                        value = self._scheme_id
                     items.append([option.column, value, option.entity])
                 items.append(self._scheme_items())
                 import_items[row] = items
@@ -1525,9 +1524,8 @@ class ImportPlot:
         :return: Scheme items
         :rtype: List
         """
-        option = self._options[SCHEME_ID]
-        scheme_id = option.column
-        return list((scheme_id, self._scheme_id, option.entity))
+        option = self._options["SCHEME_ID"]
+        return list((option.column, self._scheme_id, option.entity))
 
 
 class PlotFile(Plot):
