@@ -71,8 +71,8 @@ class BeaconWidget(PlotViewerTableView):
     Beacon table view
     """
     def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
-        super(BeaconWidget, self).__init__(widget_properties, profile, scheme_id, "Beacons", parent)
-        super(BeaconWidget, self)._initial_load()
+        PlotViewerTableView.__init__(self, widget_properties, profile, scheme_id, "Beacons", parent)
+        PlotViewerTableView._initial_load(self)
 
 
 class PlotWidget(PlotViewerTableView):
@@ -80,8 +80,8 @@ class PlotWidget(PlotViewerTableView):
     Beacon table view
     """
     def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
-        super(PlotWidget, self).__init__(widget_properties, profile, scheme_id, "Plots", parent)
-        super(PlotWidget, self)._initial_load()
+        PlotViewerTableView.__init__(self, widget_properties, profile, scheme_id, "Plots", parent)
+        PlotViewerTableView._initial_load(self)
 
 
 class PlotViewerWidget(QWidget):
