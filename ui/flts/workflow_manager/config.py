@@ -334,6 +334,20 @@ class PlotViewerConfig(Config):
         return self.get_data('plot_viewer_columns')
 
 
+class BeaconViewerConfig(Config):
+    """
+    Scheme beacon viewer table view configuration interface
+    """
+    @property
+    def columns(self):
+        """
+        Scheme beacon viewer table view columns options
+        :return: Table view columns and query columns options
+        :rtype: List
+        """
+        return self.get_data('beacon_viewer_columns')
+
+
 class StyleSheet(Config):
     """
     Widget style sheet interface
@@ -964,6 +978,18 @@ configurations = {
             Column(
                 name='Area', type="float", flag=(Qt.DisplayRole,)
             ): 'area'
+        }
+    ],
+    'beacon_viewer_columns': [
+        {
+            Column(
+                name='X', type="float", flag=(Qt.DisplayRole,)
+            ): 'x'
+        },
+        {
+            Column(
+                name='Y', type="float", flag=(Qt.DisplayRole,)
+            ): 'y'
         }
     ],
     'tab_icons': {
