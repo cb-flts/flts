@@ -75,7 +75,7 @@ class PlotImportWidget(QWidget):
         self._remove_button = toolbar["removeFiles"]
         self._set_crs_button = toolbar["setCRS"]
         self._preview_button = toolbar["Preview"]
-        self._import_button = toolbar["Import"]
+        self._import_button = toolbar["plotsImportButton"]
         header_style = StyleSheet().header_style
         self._file_table_view = QTableView(self)
         self.model = WorkflowManagerModel(self._file_service)

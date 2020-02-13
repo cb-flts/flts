@@ -997,7 +997,9 @@ configurations = {
         'Documents': QIcon(":/plugins/stdm/images/icons/flts_scheme_documents.png"),
         'Comments': QIcon(":/plugins/stdm/images/icons/flts_scheme_comment.png"),
         'Hold': QIcon(":/plugins/stdm/images/icons/flts_scheme_withdraw.png"),
-        'Scheme': QIcon(":/plugins/stdm/images/icons/flts_scheme.png")
+        'Scheme': QIcon(":/plugins/stdm/images/icons/flts_scheme.png"),
+        'Plots': QIcon(":/plugins/stdm/images/icons/flts_plot_module_cropped.png"),
+        'Import': QIcon(":/plugins/stdm/images/icons/flts_import_plot_cropped.png")
     },
     'table_model_icons': {
         1: QIcon(":/plugins/stdm/images/icons/flts_approve.png"),
@@ -1084,7 +1086,7 @@ configurations = {
         ],
         'importPlot': [
             buttonConfig(
-                name="plotsImportButton",
+                name="Import",
                 label="Import",
                 icon=QIcon(":/plugins/stdm/images/icons/flts_import_plot_cropped.png"),
                 size=QSize(24, 24),
@@ -1164,7 +1166,7 @@ configurations = {
                 enable=False
             ),
             buttonConfig(
-                name="Import",
+                name="plotsImportButton",
                 label="Import",
                 icon=QIcon(":/plugins/stdm/images/icons/flts_import_plot_cropped.png"),
                 size=None,

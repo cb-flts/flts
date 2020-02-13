@@ -95,7 +95,7 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
         toolbar_widgets = toolbar.components
         layout = toolbar.layout
         self.toolbarFrame.setLayout(layout)
-        self.plotsImportButton = toolbar_widgets.get("plotsImportButton")
+        self.ImportButton = toolbar_widgets.get("Import")
         self.plotsButton = toolbar_widgets.get("Plots")
         self.approveButton = toolbar_widgets.get("approveButton")
         self.disapproveButton = toolbar_widgets.get("disapproveButton")
@@ -138,8 +138,8 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
             self.holdButton.clicked.connect(
                 lambda: self._on_disapprove(self._lookup.HELD(), "hold")
             )
-        if self.plotsImportButton:
-            self.plotsImportButton.clicked.connect(self._load_scheme_detail)
+        if self.ImportButton:
+            self.ImportButton.clicked.connect(self._load_scheme_detail)
         if self.plotsButton:
             self.plotsButton.clicked.connect(self._load_scheme_detail)
         self.documentsButton.clicked.connect(self._load_scheme_detail)
@@ -307,8 +307,8 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
                 self._enable_widget(self.disapproveButton)
         if self.holdButton and self._lookup.DISAPPROVED() in status:
             self._enable_widget(self.holdButton)
-        if self.plotsImportButton and self._lookup.PENDING() in status:
-            self._enable_widget(self.plotsImportButton)
+        if self.ImportButton and self._lookup.PENDING() in status:
+            self._enable_widget(self.ImportButton)
         if self.plotsButton and self._lookup.PENDING() in status:
             self._enable_widget(self.plotsButton)
         self._on_uncheck_disable_widgets()
@@ -421,7 +421,7 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
         """
         # TODO: Start Refactor by moving them to the configuration file
         # widget_prop = {
-        #     self.plotsImportButton.objectName(): {
+        #     self.ImportButton.objectName(): {
         #         'data_service': {
         #             "plot_file": PlotImportFileDataService,
         #             "plot_preview": plot_data_service
@@ -453,7 +453,7 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
         #     }
         # }
         widget_prop = {
-            'plotsImportButton': {
+            'Import': {
                 'data_service': {
                     "plot_file": PlotImportFileDataService,
                     "plot_preview": plot_data_service
@@ -1019,7 +1019,7 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
             self._disable_widget([
                 self.approveButton, self.holdersButton,
                 self.documentsButton, self.commentsButton,
-                self.plotsImportButton, self.plotsButton
+                self.ImportButton, self.plotsButton
             ])
 
         elif self._lookup.PENDING() not in status and \
@@ -1058,7 +1058,8 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
         """
         active_tab_label = self.tabWidget.tabText(index)
         active_tab_label = active_tab_label.split(" - ")[0]
-        tabs_label = (self.holdersButton.objectName())
+        # tabs_label = (self.holdersButton.objectName(), self.plotsButton.objectName())
+        tabs_label = ("Holders", "Import")
         if index == 0 or active_tab_label in tabs_label:
             self._show_widget(self.paginationFrame)
             self._enable_search() if self._model.results or \
