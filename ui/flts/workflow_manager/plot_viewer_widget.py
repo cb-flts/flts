@@ -24,15 +24,16 @@ from stdm.ui.flts.workflow_manager.model import WorkflowManagerModel
 from stdm.ui.flts.workflow_manager.plot import PlotLayer
 
 
-class BeaconWidget(QTableView):
+class PlotViewerTableView(QTableView):
     """
-    A widget to view beacons of a scheme.
+    Plot viewer base table view
     """
-    def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
+
+    def __init__(self, widget_properties, profile, scheme_id, geom_name, parent=None):
         super(QTableView, self).__init__(parent)
         self._load_collections = widget_properties["load_collections"]
         self._data_service = widget_properties["data_service"]
-        self._data_service = self._data_service("Beacons")
+        self._data_service = self._data_service(geom_name)
         self._data_service = self._data_service(profile, scheme_id)
         self._data_loader = Load(self._data_service)
         self.model = WorkflowManagerModel(self._data_service)
@@ -42,7 +43,6 @@ class BeaconWidget(QTableView):
         self.horizontalHeader().setStyleSheet(StyleSheet().header_style)
         self.setSelectionBehavior(QTableView.SelectRows)
         self.setSelectionMode(QAbstractItemView.SingleSelection)
-        self._initial_load()
 
     def _initial_load(self):
         """
@@ -53,7 +53,6 @@ class BeaconWidget(QTableView):
                 self.model.load_collection(self._data_loader)
             else:
                 self.model.load(self._data_loader)
-                pass
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             QMessageBox.critical(
                 self,
@@ -67,47 +66,22 @@ class BeaconWidget(QTableView):
             self.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
 
 
-class PlotWidget(QTableView):
+class BeaconWidget(PlotViewerTableView):
     """
-    A widget to view plots of a scheme.
+    Beacon table view
     """
     def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
-        super(QTableView, self).__init__(parent)
-        self._load_collections = widget_properties["load_collections"]
-        self._data_service = widget_properties["data_service"]
-        self._data_service = self._data_service("Plots")
-        self._data_service = self._data_service(profile, scheme_id)
-        self._data_loader = Load(self._data_service)
-        self.model = WorkflowManagerModel(self._data_service)
-        self.setModel(self.model)
-        self.setAlternatingRowColors(True)
-        self.setShowGrid(False)
-        self.horizontalHeader().setStyleSheet(StyleSheet().header_style)
-        self.setSelectionBehavior(QTableView.SelectRows)
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
-        self._initial_load()
+        super(BeaconWidget, self).__init__(widget_properties, profile, scheme_id, "Beacons", parent)
+        super(BeaconWidget, self)._initial_load()
 
-    def _initial_load(self):
-        """
-        Initial table view data load
-        """
-        try:
-            if self._load_collections:
-                self.model.load_collection(self._data_loader)
-            else:
-                self.model.load(self._data_loader)
-                pass
-        except (AttributeError, exc.SQLAlchemyError, Exception) as e:
-            QMessageBox.critical(
-                self,
-                self.tr('{} Entity Model'.format(self.model.entity_name)),
-                self.tr("{0} failed to load: {1}".format(
-                    self.model.entity_name, e
-                ))
-            )
-        else:
-            self.horizontalHeader().setStretchLastSection(True)
-            self.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
+
+class PlotWidget(PlotViewerTableView):
+    """
+    Beacon table view
+    """
+    def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
+        super(PlotWidget, self).__init__(widget_properties, profile, scheme_id, "Plots", parent)
+        super(PlotWidget, self)._initial_load()
 
 
 class PlotViewerWidget(QWidget):
