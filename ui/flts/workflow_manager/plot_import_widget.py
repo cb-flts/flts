@@ -15,6 +15,7 @@ copyright            : (C) 2019
  *                                                                         *
  ***************************************************************************/
 """
+import copy
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.gui import QgsGenericProjectionSelector
@@ -88,6 +89,7 @@ class PlotImportWidget(QWidget):
         self._file_table_view.setSelectionBehavior(QTableView.SelectRows)
         self._file_table_view.setSelectionMode(QAbstractItemView.SingleSelection)
         self._preview_table_view = QTableView(self)
+        self._preview_models = {}
         self._preview_data_service = self._preview_model = None
         self._plot_preview = PlotPreview(scheme_number, self._preview_data_service)
         self._preview_model = WorkflowManagerModel(self._preview_data_service)
@@ -289,7 +291,7 @@ class PlotImportWidget(QWidget):
             elif reply == QMessageBox.Yes:
                 if self._import_error_message(fpath):
                     return False
-                self._import_as()
+                self._import_plot()
             else:
                 self._remove_dirty(fpath)
         return True
@@ -315,6 +317,7 @@ class PlotImportWidget(QWidget):
             self._plot_preview.set_settings(settings)
             self._preview_load()
             self._set_preview_groupbox_title(settings[NAME])
+            self._set_preview_models(fpath)
             self._previewed[fpath] = fpath
 
     def _clear_feature(self):
@@ -337,6 +340,14 @@ class PlotImportWidget(QWidget):
         if import_type not in self._preview_data_service:
             service = self._preview_service(import_type)
             self._preview_data_service[import_type] = service
+
+    def _set_preview_models(self, fpath):
+        """
+        Sets plot preview models
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        """
+        self._preview_models[fpath] = copy.copy(self._preview_model)
 
     def _preview_service(self, import_type):
         """
@@ -408,45 +419,30 @@ class PlotImportWidget(QWidget):
                 self._import_error_message(fpath) or \
                 not self._ok_to_import(index, import_type):
             return
-        self._import_as()
+        self._import_plot()
         self._remove_file()
         # TODO: On zero(0) import show warning notification.
         #  Do not remove the file.
 
-    def _import_as(self):
+    def _import_plot(self):
         """
-        Imports plot values based on geometry type
+        Imports plot values
         """
         index = self._current_index(self._file_table_view)
         if index is None:
             return
-        settings = self._file_settings(index.row())
-        import_type = settings.get(IMPORT_AS)
+        row = index.row()
+        fpath = self.model.results[row].get("fpath")
+        model = self._preview_models[fpath]
+        settings = self._file_settings(row)
         srid = settings.get(CRS_ID)
         srid = srid.split(":")[1]
-        if import_type == "Plots":
-            self._import_plot(import_type, srid, range(4))
-            # TODO: On success update upload_status in the Scheme entity
-            #  Update method to be coded in the ImportPlot Class
-        elif import_type == "Servitudes":
-            self._import_plot(import_type, srid, 0)
-        else:
-            self._import_plot(import_type, srid, range(3))
-
-    def _import_plot(self, import_type, srid, columns):
-        """
-        Imports plot values
-        :param import_type: Import type
-        :param import_type: String
-        :param srid: Spatial reference identifier
-        :param srid: String
-        :param columns: Tableview columns - positions
-        :param columns: Integer
-        """
+        import_type = settings.get(IMPORT_AS)
         data_service = self._preview_data_service[import_type]
+        columns = self._import_type_columns(import_type)
         try:
             import_plot = ImportPlot(
-                self._preview_model,
+                model,
                 self._scheme_id,
                 srid,
                 data_service,
@@ -463,6 +459,25 @@ class PlotImportWidget(QWidget):
             msg = "Successfully imported {0} {1}".\
                 format(import_plot, import_type)
             self.notif_bar.insertInformationNotification(msg)
+
+    @staticmethod
+    def _import_type_columns(import_type):
+        """
+        Return preview table view column positions
+        based on import type (Plots, Beacons or Servitudes)
+        :param import_type: Import type
+        :param import_type: String
+        :return: Preview table view column positions
+        :rtype: Integer
+        """
+        if import_type == "Plots":
+            return range(4)
+            # TODO: On success update upload_status in the Scheme entity
+            #  Update method to be coded in the ImportPlot Class
+        elif import_type == "Servitudes":
+            return 0
+        else:
+            return range(3)
 
     def _file_settings(self, row):
         """
