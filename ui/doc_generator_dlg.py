@@ -629,7 +629,8 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
                     status,msg = self._doc_generator.run(self._docTemplatePath, entity_field_name,
                                                   record.id, outputMode,
                                                   filePath = self._outputFilePath)
-                    self._doc_generator.clear_temporary_layers()
+                    # self._doc_generator.clear_temporary_layers()
+
                 #Output folder location using custom naming
                 else:
 
