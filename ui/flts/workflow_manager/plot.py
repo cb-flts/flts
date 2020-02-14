@@ -802,7 +802,7 @@ class PlotPreview(Plot):
                     area_attribute = True
                 value = self._plot_area()
                 self._update_plot_attribute("Area", value)
-                contents[AREA] = self._to_float(value, AREA)
+                contents[AREA] = unicode(self._to_float(value, AREA))
                 contents["items"] = self._items
                 results.append(contents)
         return results
@@ -902,8 +902,8 @@ class PlotPreview(Plot):
             if value:
                 contents[GEOMETRY_PT] = unicode(value)
                 lat, long_ = self._beacon_coordinates(value)
-                contents[X_PT] = self._to_float(lat, X_PT)
-                contents[Y_PT] = self._to_float(long_, Y_PT)
+                contents[X_PT] = unicode(self._to_float(lat, X_PT))
+                contents[Y_PT] = unicode(self._to_float(long_, Y_PT))
                 contents["items"] = self._items
                 attributes = self._layer_attributes(contents)
                 self._create_layer(contents[GEOMETRY_PT], attributes)
@@ -1069,7 +1069,7 @@ class PlotPreview(Plot):
         :return value: Object
         """
         if self._is_number(value):
-            value = '{:.4f}'.format(round(decimal.Decimal(value), 4))
+            value = round(decimal.Decimal(value), 6)
         else:
             if value != WARNING:
                 self._set_invalid_tip(column, "Value is not a number")

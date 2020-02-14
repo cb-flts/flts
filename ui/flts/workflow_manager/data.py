@@ -52,17 +52,21 @@ class DataRoutine(object):
             return getattr(fk_entity_object, column.get(attr), None)
         return getattr(query_obj, column, None)
 
-    def to_pyqt(self, obj):
+    @staticmethod
+    def to_pyqt(obj, type_=None):
         """
         Converts data from python object type to PyQt equivalent
         :param obj: Python object
         :type obj: Multiple types
+        :param type_: Cast type
+        :type type_: Object
         :return: Converted value
         :rtype: Multiple types
         """
-        obj = float(obj) if self._is_number(obj) else obj
-        if isinstance(obj, (Decimal, int, float)):
-            return float(obj)
+        if isinstance(obj, int):
+            return obj
+        if isinstance(obj, (Decimal, float)):
+            obj = Decimal(obj).normalize()
         elif type(obj) is datetime.date:
             return QDate(obj)
         elif type(obj) is datetime.datetime:
@@ -270,7 +274,7 @@ class Load(DataRoutine):
                 store[n] = self._get_collection_value(query_obj, column)
                 self.append_(header, self._headers)
                 continue
-            elif hasattr(query_obj, column):
+            elif hasattr(query_obj, str(column)):
                 store[n] = self._cast_value(query_obj, column)
                 self.append_(header, self._headers)
                 continue

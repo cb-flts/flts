@@ -889,7 +889,7 @@ configurations = {
         COMMENT_COLUMN='comment', VIEW_PDF=5
     ),
     'scheme_columns': [
-        {Column(name='', type="integer", flag=(Qt.ItemIsUserCheckable,)): '0'},
+        {Column(name='', type="integer", flag=(Qt.ItemIsUserCheckable,)): 0},
         {
             Column(
                 name='Scheme Number', type="text", flag=(Qt.DisplayRole,)
