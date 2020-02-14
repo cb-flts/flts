@@ -348,6 +348,20 @@ class BeaconViewerConfig(Config):
         return self.get_data('beacon_viewer_columns')
 
 
+class ServitudeViewerConfig(Config):
+    """
+    Scheme servitude viewer table view configuration interface
+    """
+    @property
+    def columns(self):
+        """
+        Scheme servitude viewer table view columns options
+        :return: Table view columns and query columns options
+        :rtype: List
+        """
+        return self.get_data('servitude_viewer_columns')
+
+
 class StyleSheet(Config):
     """
     Widget style sheet interface
@@ -1008,6 +1022,13 @@ configurations = {
             Column(
                 name='Y', type="float", flag=(Qt.DisplayRole,)
             ): 'y'
+        }
+    ],
+    'servitude_viewer_columns': [
+        {
+            Column(
+                name='Scheme Number', type="text", flag=(Qt.DisplayRole,)
+            ): {'cb_scheme': 'scheme_number'}
         }
     ],
     'tab_icons': {
