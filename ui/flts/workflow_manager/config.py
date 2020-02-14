@@ -749,8 +749,16 @@ configurations = {
                 name='Scheme Number', type="text", flag=(Qt.DisplayRole,)
             ): {'scheme_number': 'scheme_number'}
         },
-        {Column(name='First Name', type="text", flag=(Qt.DisplayRole,)): 'first_name'},
-        {Column(name='Surname', type="text", flag=(Qt.DisplayRole,)): 'surname'},
+        {
+            Column(
+                name='First Name', type="text", flag=(Qt.DisplayRole,)
+            ): 'holder_first_name'
+        },
+        {
+            Column(
+                name='Surname', type="text", flag=(Qt.DisplayRole,)
+            ): 'holder_surname'
+        },
         {
             Column(
                 name='Gender', type="text", flag=(Qt.DisplayRole,)
@@ -764,17 +772,17 @@ configurations = {
         {
             Column(
                 name='Date of Birth', type="date", flag=(Qt.DisplayRole,)
-            ): 'date_of_birth'
+            ): 'holder_date_of_birth'
         },
         {
             Column(
                 name='Name of Juristic Person', type="text", flag=(Qt.DisplayRole,)
-            ): 'name_of_juristic_person'
+            ): 'juristic_person_name'
         },
         {
             Column(
                 name='Reg. No. of Juristic Person', type="text", flag=(Qt.DisplayRole,)
-            ): 'reg_no_of_juristic_person'
+            ): 'juristic_person_number'
         },
         {
             Column(
