@@ -961,7 +961,7 @@ configurations = {
         Column(name='Geometry', type="text", flag=(Qt.DisplayRole,)),
         Column(name='Parcel Number', type="text", flag=(Qt.DisplayRole,)),
         Column(name='UPI Number', type="text", flag=(Qt.DisplayRole,)),
-        Column(name='Area', type="float", flag=(Qt.DisplayRole,))
+        Column(name='Area (sq. m)', type="float", flag=(Qt.DisplayRole,))
     ],
     'servitude_preview_columns': [
         Column(name='Geometry', type="text", flag=(Qt.DisplayRole,))
@@ -989,7 +989,7 @@ configurations = {
         },
         {
             Column(
-                name='Area', type="float", flag=(Qt.DisplayRole,)
+                name='Area (sq. m)', type="float", flag=(Qt.DisplayRole,)
             ): 'area'
         }
     ],
