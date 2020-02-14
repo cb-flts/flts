@@ -974,6 +974,11 @@ configurations = {
     'plot_viewer_columns': [
         {
             Column(
+                name='Scheme Number', type="text", flag=(Qt.DisplayRole,)
+            ): {'cb_scheme': 'scheme_number'}
+        },
+        {
+            Column(
                 name='Plot Number', type="text", flag=(Qt.DisplayRole,)
             ): 'plot_number'
         },
@@ -989,6 +994,11 @@ configurations = {
         }
     ],
     'beacon_viewer_columns': [
+        {
+            Column(
+                name='Scheme Number', type="text", flag=(Qt.DisplayRole,)
+            ): {'cb_scheme': 'scheme_number'}
+        },
         {
             Column(
                 name='X', type="float", flag=(Qt.DisplayRole,)

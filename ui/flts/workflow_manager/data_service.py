@@ -641,7 +641,12 @@ class PlotViewerDataService(DataService):
         :return: Related entity names
         :rtype: List
         """
-        pass
+        try:
+            entity_name = entity_name if entity_name else self.entity_name
+            entity = self._profile.entity(entity_name)
+            return super(PlotViewerDataService, self).related_entities(entity)
+        except AttributeError as e:
+            raise e
 
     def run_query(self):
         """
@@ -733,7 +738,12 @@ class BeaconViewerDataService(DataService):
         :return: Related entity names
         :rtype: List
         """
-        pass
+        try:
+            entity_name = entity_name if entity_name else self.entity_name
+            entity = self._profile.entity(entity_name)
+            return super(BeaconViewerDataService, self).related_entities(entity)
+        except AttributeError as e:
+            raise e
 
     def run_query(self):
         """
