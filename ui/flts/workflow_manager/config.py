@@ -1125,14 +1125,14 @@ configurations = {
                 name="First",
                 label="First",
                 icon=QIcon(":/plugins/stdm/images/icons/flts_scheme_first_record.png"),
-                size=QSize(24, 24),
+                size=None,
                 enable=True
             ),
             buttonConfig(
                 name="Previous",
                 label="Previous",
                 icon=QIcon(":/plugins/stdm/images/icons/flts_scheme_previous_record.png"),
-                size=QSize(24, 24),
+                size=None,
                 enable=True
             )
         ],
@@ -1141,14 +1141,14 @@ configurations = {
                 name="Next",
                 label="Next",
                 icon=QIcon(":/plugins/stdm/images/icons/flts_scheme_next_record.png"),
-                size=QSize(24, 24),
+                size=None,
                 enable=True
             ),
             buttonConfig(
                 name="Last",
                 label="Last",
                 icon=QIcon(":/plugins/stdm/images/icons/flts_scheme_last_record.png"),
-                size=QSize(24, 24),
+                size=None,
                 enable=True
             )
         ]
