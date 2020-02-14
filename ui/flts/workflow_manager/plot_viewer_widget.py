@@ -66,21 +66,21 @@ class PlotViewerTableView(QTableView):
             self.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
 
 
-class BeaconWidget(PlotViewerTableView):
-    """
-    Beacon table view
-    """
-    def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
-        PlotViewerTableView.__init__(self, widget_properties, profile, scheme_id, "Beacons", parent)
-        PlotViewerTableView._initial_load(self)
-
-
-class PlotWidget(PlotViewerTableView):
+class PlotTableView(PlotViewerTableView):
     """
     Beacon table view
     """
     def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
         PlotViewerTableView.__init__(self, widget_properties, profile, scheme_id, "Plots", parent)
+        PlotViewerTableView._initial_load(self)
+
+
+class BeaconTableView(PlotViewerTableView):
+    """
+    Beacon table view
+    """
+    def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
+        PlotViewerTableView.__init__(self, widget_properties, profile, scheme_id, "Beacons", parent)
         PlotViewerTableView._initial_load(self)
 
 
@@ -90,8 +90,8 @@ class PlotViewerWidget(QWidget):
     """
     def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
         super(QWidget, self).__init__(parent)
-        plot_tab = PlotWidget(widget_properties, profile, scheme_id, scheme_number, self)
-        beacon_tab = BeaconWidget(widget_properties, profile, scheme_id, scheme_number, self)
+        plot_tab = PlotTableView(widget_properties, profile, scheme_id, scheme_number, self)
+        beacon_tab = BeaconTableView(widget_properties, profile, scheme_id, scheme_number, self)
         self.model = plot_tab.model
         parent.paginationFrame.hide()
         tab_widget = QTabWidget()
