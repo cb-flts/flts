@@ -15,6 +15,7 @@ copyright            : (C) 2019
  *                                                                         *
  ***************************************************************************/
 """
+from collections import OrderedDict
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from sqlalchemy import exc
@@ -71,7 +72,20 @@ class PlotTableView(PlotViewerTableView):
     Beacon table view
     """
     def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
-        PlotViewerTableView.__init__(self, widget_properties, profile, scheme_id, "Plots", parent)
+        PlotViewerTableView.__init__(
+            self, widget_properties, profile, scheme_id, "Plots", parent
+        )
+        PlotViewerTableView._initial_load(self)
+
+
+class ServitudeTableView(PlotViewerTableView):
+    """
+    Beacon table view
+    """
+    def __init__(self, widget_properties, profile, scheme_id, parent=None):
+        PlotViewerTableView.__init__(
+            self, widget_properties, profile, scheme_id, "Servitudes", parent
+        )
         PlotViewerTableView._initial_load(self)
 
 
@@ -79,8 +93,10 @@ class BeaconTableView(PlotViewerTableView):
     """
     Beacon table view
     """
-    def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
-        PlotViewerTableView.__init__(self, widget_properties, profile, scheme_id, "Beacons", parent)
+    def __init__(self, widget_properties, profile, scheme_id, parent=None):
+        PlotViewerTableView.__init__(
+            self, widget_properties, profile, scheme_id, "Beacons", parent
+        )
         PlotViewerTableView._initial_load(self)
 
 
@@ -90,14 +106,27 @@ class PlotViewerWidget(QWidget):
     """
     def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
         super(QWidget, self).__init__(parent)
-        plot_tab = PlotTableView(widget_properties, profile, scheme_id, scheme_number, self)
-        beacon_tab = BeaconTableView(widget_properties, profile, scheme_id, scheme_number, self)
+        plot_tab = PlotTableView(widget_properties, profile, scheme_id, self)
+        servitude_tab = ServitudeTableView(widget_properties, profile, scheme_id, self)
+        beacon_tab = BeaconTableView(widget_properties, profile, scheme_id, self)
         self.model = plot_tab.model
         parent.paginationFrame.hide()
-        tab_widget = QTabWidget()
-        tab_widget.addTab(plot_tab, "Plots")
-        tab_widget.addTab(beacon_tab, "Beacons")
+        self._tab_widget = QTabWidget()
+        self._add_tab_widgets(
+            OrderedDict([
+                ("Plots", plot_tab), ("Servitudes", servitude_tab), ("Beacons", beacon_tab)
+            ])
+        )
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 11, 0, 0)
-        layout.addWidget(tab_widget)
+        layout.addWidget(self._tab_widget)
         self.setLayout(layout)
+
+    def _add_tab_widgets(self, widgets):
+        """
+        Adds a widget to a tab
+        :param widgets: Widgets to be added
+        :type widgets: Dictionary
+        """
+        for name, widget in widgets.items():
+            self._tab_widget.addTab(widget, name)
