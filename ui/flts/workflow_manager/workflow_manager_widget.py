@@ -70,10 +70,11 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
     """
     removeTab = pyqtSignal()
 
-    def __init__(self, title, object_name, parent=None):
+    def __init__(self, title, object_name, dock_area, parent=None):
         super(QWidget, self).__init__(parent)
         self.setupUi(self)
         self._object_name = object_name
+        self.dock_area = dock_area
         self._checked_ids = OrderedDict()
         self._message_box = {}
         self._tab_name = self._detail_table = self._msg_box_button = None

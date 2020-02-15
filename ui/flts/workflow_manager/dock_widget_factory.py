@@ -29,6 +29,7 @@ class DockWidget(QDockWidget):
         super(QDockWidget, self).__init__(parent)
         self.setWindowTitle(custom_widget.windowTitle())
         self.setObjectName(custom_widget.objectName())
+        # self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.setAllowedAreas(
             Qt.TopDockWidgetArea |
             Qt.RightDockWidgetArea |
@@ -111,10 +112,7 @@ class DockWidgetFactory:
         saved_widgets = DockWidgetFactory.saved_widgets
         new_widget = DockWidget(self._custom_widget, self._iface.mainWindow())
         saved_widgets[new_widget.objectName()] = new_widget
-        dock_area = Qt.BottomDockWidgetArea
-        if new_widget.objectName() in ('thirdExamination', 'importPlot'):
-            dock_area = Qt.RightDockWidgetArea
-        self._iface.addDockWidget(dock_area, new_widget)
+        self._iface.addDockWidget(self._custom_widget.dock_area, new_widget)
         DockWidgetFactory.active_widget = new_widget
 
     @classmethod

@@ -1218,7 +1218,7 @@ class STDMQGISLoader(object):
         self.secondExaminationAct.triggered.connect(self.second_examination)
         self.thirdExaminationAct.triggered.connect(self.third_examination)
         self.schemeRevisionAct.triggered.connect(self.revise_scheme)
-        self.printCertificateAct.triggered.connect(self.print_certificate)
+        self.printCertificateAct.triggered.connect(self.import_plots)
         self.scanCertificateAct.triggered.connect(self.scan_certificate)
         self.searchAct.triggered.connect(self.flts_search)
         self.reportAct.triggered.connect(self.flts_report)
@@ -2378,8 +2378,6 @@ class STDMQGISLoader(object):
                 self.third_examination()
             elif action_code == 'PLT_SCM':
                 self.import_plots()
-            elif action_code == 'P_CRT':
-                self.print_certificate()
             elif action_code == 'S_CRT':
                 self.scan_certificate()
             elif action_code == 'NTF':
@@ -2405,7 +2403,8 @@ class STDMQGISLoader(object):
         """
         workflow_manager = WorkflowManagerWidget(
             "Scheme Establishment Workflow Manager",
-            "schemeEstablishment"
+            "schemeEstablishment",
+            Qt.BottomDockWidgetArea
         )
         dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         dock_widget.show_dock_widget()
@@ -2416,7 +2415,8 @@ class STDMQGISLoader(object):
         """
         workflow_manager = WorkflowManagerWidget(
             "First Workflow Manager",
-            "firstExamination"
+            "firstExamination",
+            Qt.BottomDockWidgetArea
         )
         dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         dock_widget.show_dock_widget()
@@ -2427,7 +2427,8 @@ class STDMQGISLoader(object):
         """
         workflow_manager = WorkflowManagerWidget(
             "Second Workflow Manager",
-            "secondExamination"
+            "secondExamination",
+            Qt.BottomDockWidgetArea
         )
         dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         dock_widget.show_dock_widget()
@@ -2438,7 +2439,20 @@ class STDMQGISLoader(object):
         """
         workflow_manager = WorkflowManagerWidget(
             "Third Workflow Manager",
-            "thirdExamination"
+            "thirdExamination",
+            Qt.LeftDockWidgetArea
+        )
+        dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+        dock_widget.show_dock_widget()
+
+    def import_plots(self):
+        """
+        Docks Import Plot workflow manager widget
+        """
+        workflow_manager = WorkflowManagerWidget(
+            "Plot Import Workflow Manager",
+            "importPlot",
+            Qt.LeftDockWidgetArea
         )
         dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         dock_widget.show_dock_widget()
@@ -2449,24 +2463,11 @@ class STDMQGISLoader(object):
         """
         workflow_manager = WorkflowManagerWidget(
             "Revise Workflow Manager",
-            "schemeLodgement"
+            "schemeLodgement",
+            Qt.BottomDockWidgetArea
         )
         dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         dock_widget.show_dock_widget()
-
-    def import_plots(self):
-        """
-        Load the wizard to import plots
-        """
-        import_plot_dialog = ImportPlotWizard(self.iface.mainWindow())
-        import_plot_dialog.exec_()
-
-    # def revise_scheme(self):
-    #     """
-    #     Load the wizard for revision of scheme.
-    #     """
-    #     scheme_revision = SchemeRevisionWizard(self.iface.mainWindow())
-    #     scheme_revision.exec_()
 
     def scan_certificate(self):
         """
@@ -2474,22 +2475,6 @@ class STDMQGISLoader(object):
         """
         scan_cert = ScanCertificateDialog(self.iface.mainWindow())
         scan_cert.exec_()
-
-    def print_certificate(self):
-        """
-        Docks Import Plot workflow manager widget
-        """
-        workflow_manager = WorkflowManagerWidget(
-            "Plot Import Workflow Manager",
-            "importPlot"
-        )
-        dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        dock_widget.show_dock_widget()
-
-    # def print_certificate(self):
-    #     """Load the dialog for printing of certificate."""
-    #     print_cert = PrintCertificateDialog(self.iface.mainWindow())
-    #     print_cert.exec_()
 
     def flts_search(self):
         """
