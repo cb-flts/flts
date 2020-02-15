@@ -31,10 +31,12 @@ from stdm.ui.flts.workflow_manager.config import (
     StyleSheet,
     TabIcons,
 )
+from stdm.ui.flts.workflow_manager.data_service import PlotSTRDataService
 from stdm.ui.flts.workflow_manager.plot import(
     ImportPlot,
     PlotFile,
-    PlotPreview
+    PlotPreview,
+    SavePlotSTR
 )
 from stdm.ui.flts.workflow_manager.model import WorkflowManagerModel
 from stdm.ui.flts.workflow_manager.delegates.plot_file_delegate import PlotFileDelegate
@@ -455,6 +457,21 @@ class PlotImportWidget(QWidget):
                 "Failed to update: {}".format(e)
             )
         else:
+
+
+            # TODO: Start test
+            if import_plot > 0:
+                str_data_service = PlotSTRDataService(self._profile, self._scheme_id)
+                str_test = SavePlotSTR(
+                    str_data_service,
+                    self._preview_model.results,
+                    self._plot_preview.plot_numbers,
+                    self._scheme_id
+                )
+                str_test.save()
+            # TODO: End test
+
+
             import_type = import_type.lower()
             msg = "Successfully imported {0} {1}".\
                 format(import_plot, import_type)

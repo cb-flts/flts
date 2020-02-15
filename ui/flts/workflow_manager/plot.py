@@ -588,7 +588,7 @@ class UniqueParcelIdentifier:
             return plot_id
         except ValueError:
             return
-
+    @property
     def wkt_plot_numbers(self):
         """
         Returns plot numbers generated from the WKT file
@@ -681,6 +681,7 @@ class PlotPreview(Plot):
         self._layers = {}
         self._dirty = {}
         self._errors = {}
+        self._plot_numbers = None
         self.wkt_header_options = {
             "parcel_number": (
                 "id", "parcel_number",
@@ -822,10 +823,9 @@ class PlotPreview(Plot):
         if value == WARNING:
             return value
         plot_number = upi.plot_number(value)
-        wkt_plot_numbers = upi.wkt_plot_numbers()
         if plot_number is None:
             self._set_invalid_tip(PARCEL_NUM, "Invalid identifier")
-        elif plot_number in wkt_plot_numbers:
+        elif plot_number in upi.wkt_plot_numbers:
             self._set_invalid_tip(PARCEL_NUM, "Duplicate WKT identifier")
         elif plot_number in scheme_plot_numbers:
             value = plot_number
@@ -834,6 +834,7 @@ class PlotPreview(Plot):
         else:
             value = plot_number
             upi.store_wkt_plot_number(plot_number)
+            self._plot_numbers = upi.wkt_plot_numbers
         return value
 
     def _plot_area(self):
@@ -1455,6 +1456,15 @@ class PlotPreview(Plot):
         if caps and QgsVectorDataProvider.ChangeAttributeValues:
             layer.dataProvider().changeAttributeValues(attribute)
 
+    @property
+    def plot_numbers(self):
+        """
+        Returns plot numbers
+        :return _plot_numbers: Plot numbers
+        :rtype _plot_numbers: List
+        """
+        return self._plot_numbers
+
     def get_headers(self):
         """
         Returns column label configurations
@@ -1473,7 +1483,7 @@ class ImportPlot:
         self._scheme_id = scheme_id
         self._srid = srid
         self._data_service = data_service
-        self._options = data_service.save_columns
+        self._save_options = data_service.save_columns
         self._col_keys = col_keys
         self._geom_column = 0
 
@@ -1508,7 +1518,7 @@ class ImportPlot:
                 items = []
                 for key in self._col_keys:
                     value = data[key]
-                    option = self._options[key]
+                    option = self._save_options[key]
                     if key == self._geom_column:
                         value = "SRID={0};{1}".format(self._srid, value)
                     items.append([option.column, value, option.entity])
@@ -1524,8 +1534,135 @@ class ImportPlot:
         :return: Scheme items
         :rtype: List
         """
-        option = self._options["SCHEME_ID"]
+        option = self._save_options["SCHEME_ID"]
         return list((option.column, self._scheme_id, option.entity))
+
+
+class SavePlotSTR:
+    """
+    Saves Plot (spatial unit) and  Holders (Party)
+    Social Tenure Relationship (STR) database record(s)
+    """
+    def __init__(self, data_service, saved_plots, plot_numbers, scheme_id=None):
+        self._data_service = data_service
+        self._saved_plots = saved_plots
+        self._plot_numbers = plot_numbers
+        self._scheme_id = scheme_id
+        self._save_options = data_service.save_columns
+
+    def save(self):
+        """
+        Saves plot STR data into the database
+        :return saved: Number of saved items
+        :rtype saved: Integer
+        """
+
+        try:
+            items = self._str_items()
+            saved = Save(
+                items,
+                self._saved_plots,
+                self._data_service
+            ).save()
+        except (AttributeError, exc.SQLAlchemyError, Exception) as e:
+            raise e
+        else:
+            return saved
+
+    def _str_items(self):
+        """
+        Returns STR items to be saved
+        :return str_items: Imported items
+        :rtype str_items: Dictionary
+        """
+        try:
+            str_items = {}
+            plot_ids = self._plot_ids()
+            holder_ids = self._holder_ids()
+            for row, plot_number in enumerate(self._plot_numbers):
+                items = []
+                plot_number = self._to_int(plot_number)
+                if not plot_number or plot_number not in holder_ids:
+                    continue
+                for option in self._save_options:
+                    value = option.value
+                    if not value:
+                        if option.column == "plot_id":
+                            value = plot_ids[plot_number]
+                        elif option.column == "holder_id":
+                            value = holder_ids[plot_number]
+                    items.append([option.column, value, option.entity])
+                str_items[row] = items
+            return str_items
+        except (AttributeError, KeyError, Exception) as e:
+            raise e
+
+    def _plot_ids(self):
+        """
+        Returns plot identifiers - primary keys
+        :return: Plot identifiers
+        :rtype: Dictionary
+        """
+        columns = ["plot_number", "id"]
+        filters = {
+            "scheme_id": [self._scheme_id],
+            "plot_number": self._plot_numbers
+        }
+        result = self._data_service.filter_in("Plot", filters, columns).all()
+        results = [
+            (int(plot_number), id_)
+            for plot_number, id_ in result
+            if plot_number.isdigit()
+        ]
+        return dict(results)
+
+    def _holder_ids(self):
+        """
+        Returns holder identifiers - primary keys
+        :return: Holder identifiers
+        :rtype: Dictionary
+        """
+        plot_numbers = [
+            int(plot_number)
+            for plot_number in
+            self._plot_numbers if plot_number.isdigit()
+        ]  # Converted plot numbers to int since "plot_number" column in holders has integers only
+        filters = {"plot_number": plot_numbers}
+        results = self._data_service.filter_in("Holder", filters).all()
+        results = [
+            (int(plot_number), id_)
+            for plot_number, id_ in
+            self._scheme_holders(results)
+        ]
+        return dict(results)
+
+    @staticmethod
+    def _to_int(value):
+        """
+        Casts value to integer
+        :param value: Value object
+        :type value: Object
+        :return value: Integer value
+        :return value: Object
+        """
+        if not value.isdigit():
+            return
+        return int(value)
+
+    def _scheme_holders(self, holders):
+        """
+        Yields holder IDs and plot numbers of a scheme
+        :param holders: Holder query results
+        :type holders: Query
+        :return plot_number: Plot number
+        :rtype plot_number: Integer
+        :return id: Holder ID
+        :rtype id: Integer
+        """
+        for holder in holders:
+            for scheme in holder.cb_scheme_collection:
+                if scheme.id == self._scheme_id:
+                    yield holder.plot_number, holder.id
 
 
 class PlotFile(Plot):

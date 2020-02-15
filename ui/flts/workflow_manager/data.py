@@ -469,7 +469,7 @@ class Update(DataRoutine):
 
 class Save(DataRoutine):
     """
-    Update database record(s) on edit
+    Saves database record(s)
     """
 
     def __init__(self, save_items, model_items, data_service, parents=None):

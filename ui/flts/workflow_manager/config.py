@@ -15,7 +15,7 @@ copyright            : (C) 2019
  *                                                                         *
  ***************************************************************************/
 """
-
+import datetime
 from collections import namedtuple
 from PyQt4.QtCore import (QSize, Qt,)
 from PyQt4.QtGui import (
@@ -362,6 +362,23 @@ class ServitudeViewerConfig(Config):
         return self.get_data('servitude_viewer_columns')
 
 
+class PlotSTRConfig(Config):
+    """
+    Scheme Plot Social Tenure Relationship (STR)
+    configuration interface
+    """
+
+    @property
+    def str_save_columns(self):
+        """
+        Scheme plot STR save column options
+        :return: Save column values
+        :rtype: List
+        """
+        return self.get_data('save_columns').\
+            get('plot_str_save', None)
+
+
 class StyleSheet(Config):
     """
     Widget style sheet interface
@@ -582,7 +599,7 @@ class FilterQueryBy:
         Return query object of an entity
         :param entity_name: Entity name
         :type entity_name: String
-        :type columns: Fields to select from
+        :param columns: Fields to select from
         :type columns: List
         :return:Entity query object
         :rtype List
@@ -1336,6 +1353,26 @@ configurations = {
             "SCHEME_ID": SaveColumn(
                 column='scheme_id', value=None, entity='Servitude'
             )
-        }
+        },
+        'plot_str_save': [
+            SaveColumn(
+                column='tenure_type', value=1, entity="social_tenure_relationship"
+            ),
+            SaveColumn(
+                column='validity_start', value=datetime.date.today(), entity="social_tenure_relationship"
+            ),
+            SaveColumn(
+                column='validity_end', value=None, entity="social_tenure_relationship"
+            ),
+            SaveColumn(
+                column='tenure_share', value=100.0, entity="social_tenure_relationship"
+            ),
+            SaveColumn(
+                column='holder_id', value=None, entity="social_tenure_relationship"
+            ),
+            SaveColumn(
+                column='plot_id', value=None, entity="social_tenure_relationship"
+            ),
+        ],
     }
 }

@@ -38,6 +38,7 @@ from stdm.ui.flts.workflow_manager.config import (
     ServitudeImportPreviewConfig,
     SchemeConfig,
     TableModelIcons,
+    PlotSTRConfig
 )
 from stdm.data.configuration import entity_model
 
@@ -1210,3 +1211,133 @@ def plot_data_service(import_type):
         "Beacons": BeaconPreviewDataService
     }
     return data_service[import_type]
+
+
+class PlotSTRDataService:
+    """
+    Scheme plot Social Tenure Relationship (STR) data model service
+    """
+    def __init__(self, current_profile, scheme_id):
+        self._profile = current_profile
+        self._scheme_id = scheme_id
+        self._plot_str_config = PlotSTRConfig()
+
+    @property
+    def save_columns(self):
+        """
+        Plot STR save column options
+        :return: Save column values
+        :rtype: List
+        """
+        return self._plot_str_config.str_save_columns
+
+    @property
+    def collections(self):
+        """
+        Related entity collection names
+        :return: Related entity collection names
+        :rtype: List
+        """
+        return False
+
+    def related_entities(self, entity_name=None):
+        """
+        Related entity name identified by foreign keys
+        :param entity_name:
+        :type entity_name: String
+        """
+        pass
+
+    def filter_in(self, entity_name, filters, columns=None):
+        """
+        Return query objects as a collection of filter using in_ operator
+        :param entity_name: Name of entity to be queried
+        :type entity_name: String
+        :param filters: Query filter columns and values
+        :type filters: Dictionary
+        :param columns: Fields to select from
+        :type columns: List
+        :return: Query object results
+        :rtype: Query
+        """
+        columns = columns if isinstance(columns, list) else []
+        model = self.entity_model_(entity_name)
+        entity_object = model()
+        try:
+            filters = [
+                getattr(model, key).in_(value) for key, value in filters.iteritems()
+            ]
+            if len(columns) == 0:
+                return entity_object.queryObject().filter(*filters)
+            else:
+                columns = [getattr(model, column) for column in columns]
+                return entity_object.queryObject(columns).filter(*filters)
+        except (AttributeError, exc.SQLAlchemyError, Exception) as e:
+            raise e
+
+    # def scheme_plot_numbers(self):
+    #     """
+    #     Returns Scheme plot numbers
+    #     :return plot_numbers: Scheme Relevant Authority record/row
+    #     :rtype plot_numbers: Entity
+    #     """
+    #     filters = {"scheme_id": self._scheme_id}
+    #     model = self.entity_model_("Plot")
+    #     plot_numbers = self.filter_query_by(
+    #         "Plot",
+    #         filters,
+    #         [getattr(model, "plot_number")]
+    #     ).distinct()
+    #     return plot_numbers
+    #
+    # def scheme_relevant_authority(self):
+    #     """
+    #     Returns Scheme Relevant Authority record/row
+    #     :return relevant_authority: Scheme Relevant Authority record/row
+    #     :rtype relevant_authority: Entity
+    #     """
+    #     filters = {
+    #         "type_of_relevant_authority": self._scheme.relevant_authority,
+    #         "region": self._scheme.region
+    #     }
+    #     model = self.entity_model_("Relevant_authority")
+    #     relevant_authority = self.filter_query_by(
+    #         "Relevant_authority",
+    #         filters,
+    #         [getattr(model, "au_code")]
+    #     ).first()
+    #     return relevant_authority
+    #
+    # @staticmethod
+    # def filter_query_by(entity_name, filters, columns=None):
+    #     """
+    #     Filters query result by a column value
+    #     :param entity_name: Entity name
+    #     :type entity_name: String
+    #     :param filters: Column filters - column name and value
+    #     :type filters: Dictionary
+    #     :type columns: Fields to select from
+    #     :type columns: List
+    #     :return: Filter entity query object
+    #     :rtype: Entity object
+    #     """
+    #     try:
+    #         filter_by = FilterQueryBy()
+    #         return filter_by(entity_name, filters, columns)
+    #     except (AttributeError, exc.SQLAlchemyError, Exception) as e:
+    #         raise e
+
+    def entity_model_(self, name=None):
+        """
+        Gets entity model
+        :param name: Name of the entity
+        :type name: String
+        :return: Entity model
+        :rtype: DeclarativeMeta
+        """
+        try:
+            entity = self._profile.entity(name)
+            model = entity_model(entity)
+            return model
+        except AttributeError as e:
+            raise e
