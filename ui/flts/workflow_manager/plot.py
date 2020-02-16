@@ -1617,18 +1617,25 @@ class SavePlotSTR:
         :return: Holder identifiers
         :rtype: Dictionary
         """
-        plot_numbers = [
-            int(plot_number)
-            for plot_number in
-            self._plot_numbers if plot_number.isdigit()
-        ]  # Converted plot numbers to int since "plot_number" column in holders has integers only
-        results = self._data_service.holder_ids(plot_numbers)
+        results = self._data_service.holder_ids(self._int_plot_numbers())
         results = [
             (int(plot_number), id_)
             for plot_number, id_ in
             self._scheme_holders(results)
         ]
         return dict(results)
+
+    def _int_plot_numbers(self):
+        """
+        Converts plot numbers to integer
+        :return plot_numbers: List of plot numbers
+        :return plot_numbers: List
+        """
+        plot_numbers = []
+        for plot_number in self._plot_numbers:
+            if plot_number.isdigit():
+                plot_numbers.append(int(plot_number))
+        return plot_numbers
 
     @staticmethod
     def _to_int(value):
