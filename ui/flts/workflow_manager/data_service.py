@@ -1248,6 +1248,30 @@ class PlotSTRDataService:
         """
         pass
 
+    def plot_ids(self, plot_numbers):
+        """
+        Returns plot identifiers - primary keys
+        :param plot_numbers: Plot identifiers
+        :type plot_numbers: Plot identifiers
+        :return: Plot identifiers
+        :rtype: Dictionary
+        """
+        columns = ["plot_number", "id"]
+        filters = {
+            "scheme_id": [self._scheme_id],
+            "plot_number": plot_numbers
+        }
+        return self.filter_in("Plot", filters, columns).all()
+
+    def holder_ids(self, plot_numbers):
+        """
+        Returns holder identifiers - primary keys
+        :return: Holder identifiers
+        :rtype: Dictionary
+        """
+        filters = {"plot_number": plot_numbers}
+        return self.filter_in("Holder", filters).all()
+
     def filter_in(self, entity_name, filters, columns=None):
         """
         Return query objects as a collection of filter using in_ operator

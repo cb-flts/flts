@@ -1603,15 +1603,10 @@ class SavePlotSTR:
         :return: Plot identifiers
         :rtype: Dictionary
         """
-        columns = ["plot_number", "id"]
-        filters = {
-            "scheme_id": [self._scheme_id],
-            "plot_number": self._plot_numbers
-        }
-        result = self._data_service.filter_in("Plot", filters, columns).all()
+        results = self._data_service.plot_ids(self._plot_numbers)
         results = [
             (int(plot_number), id_)
-            for plot_number, id_ in result
+            for plot_number, id_ in results
             if plot_number.isdigit()
         ]
         return dict(results)
@@ -1627,8 +1622,7 @@ class SavePlotSTR:
             for plot_number in
             self._plot_numbers if plot_number.isdigit()
         ]  # Converted plot numbers to int since "plot_number" column in holders has integers only
-        filters = {"plot_number": plot_numbers}
-        results = self._data_service.filter_in("Holder", filters).all()
+        results = self._data_service.holder_ids(plot_numbers)
         results = [
             (int(plot_number), id_)
             for plot_number, id_ in
