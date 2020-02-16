@@ -71,6 +71,7 @@ class PlotImportWidget(QWidget):
         self._plot_file = PlotFile(self._file_service)
         self._previewed = {}
         self.is_dirty = None
+        self._import_counter = 0
         import_component = PlotImportComponent()
         toolbar = import_component.components
         self._add_button = toolbar["addFiles"]
@@ -450,32 +451,34 @@ class PlotImportWidget(QWidget):
                 data_service,
                 columns
             )
-            import_plot = import_plot.save()
+            self._import_counter = import_plot.save()
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             self._show_critical_message(
                 "Workflow Manager - Plot Import",
                 "Failed to update: {}".format(e)
             )
         else:
-
-
-            # TODO: Start test
-            if import_plot > 0:
-                str_data_service = PlotSTRDataService(self._profile, self._scheme_id)
-                str_test = SavePlotSTR(
-                    str_data_service,
-                    self._preview_model.results,
-                    self._plot_preview.plot_numbers,
-                    self._scheme_id
-                )
-                str_test.save()
-            # TODO: End test
-
-
+            self._save_plot_str()
             import_type = import_type.lower()
             msg = "Successfully imported {0} {1}".\
-                format(import_plot, import_type)
+                format(self._import_counter, import_type)
             self.notif_bar.insertInformationNotification(msg)
+
+    def _save_plot_str(self):
+        """
+        Saves Plot (spatial unit) and  Holders (Party)
+        Social Tenure Relationship (STR) database record(s)
+        """
+        if self._import_counter == 0:
+            return
+        str_data_service = PlotSTRDataService(self._profile, self._scheme_id)
+        plot_str = SavePlotSTR(
+            str_data_service,
+            self._preview_model.results,
+            self._plot_preview.plot_numbers,
+            self._scheme_id
+        )
+        plot_str.save()
 
     @staticmethod
     def _import_type_columns(import_type):
