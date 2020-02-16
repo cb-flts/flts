@@ -1299,58 +1299,6 @@ class PlotSTRDataService:
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
 
-    # def scheme_plot_numbers(self):
-    #     """
-    #     Returns Scheme plot numbers
-    #     :return plot_numbers: Scheme Relevant Authority record/row
-    #     :rtype plot_numbers: Entity
-    #     """
-    #     filters = {"scheme_id": self._scheme_id}
-    #     model = self.entity_model_("Plot")
-    #     plot_numbers = self.filter_query_by(
-    #         "Plot",
-    #         filters,
-    #         [getattr(model, "plot_number")]
-    #     ).distinct()
-    #     return plot_numbers
-    #
-    # def scheme_relevant_authority(self):
-    #     """
-    #     Returns Scheme Relevant Authority record/row
-    #     :return relevant_authority: Scheme Relevant Authority record/row
-    #     :rtype relevant_authority: Entity
-    #     """
-    #     filters = {
-    #         "type_of_relevant_authority": self._scheme.relevant_authority,
-    #         "region": self._scheme.region
-    #     }
-    #     model = self.entity_model_("Relevant_authority")
-    #     relevant_authority = self.filter_query_by(
-    #         "Relevant_authority",
-    #         filters,
-    #         [getattr(model, "au_code")]
-    #     ).first()
-    #     return relevant_authority
-    #
-    # @staticmethod
-    # def filter_query_by(entity_name, filters, columns=None):
-    #     """
-    #     Filters query result by a column value
-    #     :param entity_name: Entity name
-    #     :type entity_name: String
-    #     :param filters: Column filters - column name and value
-    #     :type filters: Dictionary
-    #     :type columns: Fields to select from
-    #     :type columns: List
-    #     :return: Filter entity query object
-    #     :rtype: Entity object
-    #     """
-    #     try:
-    #         filter_by = FilterQueryBy()
-    #         return filter_by(entity_name, filters, columns)
-    #     except (AttributeError, exc.SQLAlchemyError, Exception) as e:
-    #         raise e
-
     def entity_model_(self, name=None):
         """
         Gets entity model
