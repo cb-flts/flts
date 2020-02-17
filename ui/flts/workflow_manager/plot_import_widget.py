@@ -71,7 +71,7 @@ class PlotImportWidget(QWidget):
         self._plot_file = PlotFile(self._file_service)
         self._previewed = {}
         self.is_dirty = None
-        self._import_counter = 0
+        self._import_counter = None
         import_component = PlotImportComponent()
         toolbar = import_component.components
         self._add_button = toolbar["addFiles"]
@@ -250,8 +250,11 @@ class PlotImportWidget(QWidget):
         """
         Removes plot import file from table view
         """
+        self._import_counter = None
         fpath = self._selected_file()
         if not fpath or not self._ok_to_remove(fpath):
+            return
+        if self._import_counter == 0:
             return
         self._remove_file()
         self._plot_preview.remove_error(fpath)
@@ -303,6 +306,7 @@ class PlotImportWidget(QWidget):
         """
         Previews selected plot import file content
         """
+        self._import_counter = None
         index = self._current_index(self._file_table_view)
         if index is None:
             return
@@ -423,9 +427,8 @@ class PlotImportWidget(QWidget):
                 not self._ok_to_import(index, import_type):
             return
         self._import_plot()
-        self._remove_file()
-        # TODO: On zero(0) import show warning notification.
-        #  Do not remove the file.
+        if self._import_counter != 0:
+            self._remove_file()
 
     def _import_plot(self):
         """
@@ -458,8 +461,14 @@ class PlotImportWidget(QWidget):
                 "Failed to update: {}".format(e)
             )
         else:
-            self._save_plot_str()
+            self.notif_bar.clear()
             import_type = import_type.lower()
+            if self._import_counter == 0:
+                msg = "Something went wrong. {0} imported {1}".\
+                    format(self._import_counter, import_type)
+                self.notif_bar.insertWarningNotification(msg)
+                return
+            self._save_plot_str()
             msg = "Successfully imported {0} {1}".\
                 format(self._import_counter, import_type)
             self.notif_bar.insertInformationNotification(msg)
@@ -469,8 +478,6 @@ class PlotImportWidget(QWidget):
         Saves Plot (spatial unit) and  Holders (Party)
         Social Tenure Relationship (STR) database record(s)
         """
-        if self._import_counter == 0:
-            return
         str_data_service = PlotSTRDataService(self._profile, self._scheme_id)
         plot_str = SavePlotSTR(
             str_data_service,
