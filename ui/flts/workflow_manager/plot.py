@@ -681,7 +681,7 @@ class PlotPreview(Plot):
         self._layers = {}
         self._dirty = {}
         self._errors = {}
-        self._plot_numbers = None
+        self._plot_numbers = {}
         self.wkt_header_options = {
             "parcel_number": (
                 "id", "parcel_number",
@@ -748,6 +748,23 @@ class PlotPreview(Plot):
             self._dirty[self._settings.fpath] = True
             self._set_errors(fpath)
         return results
+
+    @staticmethod
+    def _filter_whitespace(in_file, hrow):
+        """
+        Returns non-whitespace line of data
+        :param in_file: Input file
+        :param in_file: TextIOWrapper
+        :param hrow: Header row number
+        :type hrow: Integer
+        :return line: Non-whitespace line
+        :return line: generator
+        """
+        for row, line in enumerate(in_file):
+            if row == hrow:
+                continue
+            if not line.isspace():
+                yield line
 
     def _set_errors(self, fpath):
         """
@@ -834,7 +851,7 @@ class PlotPreview(Plot):
         else:
             value = plot_number
             upi.store_wkt_plot_number(plot_number)
-            self._plot_numbers = upi.wkt_plot_numbers
+            self._plot_numbers[self._settings.fpath] = upi.wkt_plot_numbers
         return value
 
     def _plot_area(self):
@@ -875,6 +892,7 @@ class PlotPreview(Plot):
         :return results: List
         """
         results = []
+        self._remove_plot_numbers(self._settings.fpath)
         for row, data in enumerate(csv_reader):
             contents = {}
             self._items = {}
@@ -896,6 +914,7 @@ class PlotPreview(Plot):
         :return results: List
         """
         results = []
+        self._remove_plot_numbers(self._settings.fpath)
         for row, data in enumerate(csv_reader):
             contents = {}
             self._items = {}
@@ -910,23 +929,6 @@ class PlotPreview(Plot):
                 self._create_layer(contents[GEOMETRY_PT], attributes)
                 results.append(contents)
         return results
-
-    @staticmethod
-    def _filter_whitespace(in_file, hrow):
-        """
-        Returns non-whitespace line of data
-        :param in_file: Input file
-        :param in_file: TextIOWrapper
-        :param hrow: Header row number
-        :type hrow: Integer
-        :return line: Non-whitespace line
-        :return line: generator
-        """
-        for row, line in enumerate(in_file):
-            if row == hrow:
-                continue
-            if not line.isspace():
-                yield line
 
     def _geometry_type(self):
         """
@@ -1461,9 +1463,18 @@ class PlotPreview(Plot):
         """
         Returns plot numbers
         :return _plot_numbers: Plot numbers
-        :rtype _plot_numbers: List
+        :rtype _plot_numbers: Dictionary
         """
         return self._plot_numbers
+
+    def _remove_plot_numbers(self, fpath):
+        """
+        Removes plot numbers of a previewed file
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        """
+        if fpath in self._plot_numbers:
+            del self._plot_numbers[fpath]
 
     def get_headers(self):
         """

@@ -461,27 +461,32 @@ class PlotImportWidget(QWidget):
                 "Failed to import: {}".format(e)
             )
         else:
-            import_type = import_type.lower()
             if self._import_counter == 0:
                 msg = "Failed to import. {0} {1} imported ".\
-                    format(self._import_counter, import_type)
+                    format(self._import_counter, import_type.lower())
                 self.notif_bar.insertWarningNotification(msg)
                 return
             msg = "Successfully imported {0} {1}".\
-                format(self._import_counter, import_type)
+                format(self._import_counter, import_type.lower())
             self.notif_bar.insertInformationNotification(msg)
-            self._save_plot_str()
+            if import_type == "Plots":
+                self._save_plot_str(fpath)
 
-    def _save_plot_str(self):
+    def _save_plot_str(self, fpath):
         """
         Saves Plot (spatial unit) and  Holders (Party)
         Social Tenure Relationship (STR) database record(s)
+        :param fpath: Plot import file absolute path
+        :type fpath: String
         """
+        plot_numbers = self._plot_preview.plot_numbers.get(fpath)
+        if not plot_numbers:
+            return
         str_data_service = PlotSTRDataService(self._profile, self._scheme_id)
         plot_str = SavePlotSTR(
             str_data_service,
             self._preview_model.results,
-            self._plot_preview.plot_numbers,
+            plot_numbers,
             self._scheme_id
         )
         plot_str.save()
