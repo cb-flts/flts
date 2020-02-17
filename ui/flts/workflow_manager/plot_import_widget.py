@@ -254,10 +254,9 @@ class PlotImportWidget(QWidget):
         fpath = self._selected_file()
         if not fpath or not self._ok_to_remove(fpath):
             return
-        if self._import_counter == 0:
-            return
-        self._remove_file()
-        self._plot_preview.remove_error(fpath)
+        if self._import_counter != 0:
+            self._remove_file()
+            self._plot_preview.remove_error(fpath)
 
     def _ok_to_remove(self, fpath):
         """
@@ -434,6 +433,7 @@ class PlotImportWidget(QWidget):
         """
         Imports plot values
         """
+        self.notif_bar.clear()
         index = self._current_index(self._file_table_view)
         if index is None:
             return
@@ -458,20 +458,19 @@ class PlotImportWidget(QWidget):
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             self._show_critical_message(
                 "Workflow Manager - Plot Import",
-                "Failed to update: {}".format(e)
+                "Failed to import: {}".format(e)
             )
         else:
-            self.notif_bar.clear()
             import_type = import_type.lower()
             if self._import_counter == 0:
-                msg = "Something went wrong. {0} imported {1}".\
+                msg = "Failed to import. {0} {1} imported ".\
                     format(self._import_counter, import_type)
                 self.notif_bar.insertWarningNotification(msg)
                 return
-            self._save_plot_str()
             msg = "Successfully imported {0} {1}".\
                 format(self._import_counter, import_type)
             self.notif_bar.insertInformationNotification(msg)
+            self._save_plot_str()
 
     def _save_plot_str(self):
         """
