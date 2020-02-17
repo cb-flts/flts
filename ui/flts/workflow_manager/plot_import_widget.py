@@ -482,10 +482,11 @@ class PlotImportWidget(QWidget):
         plot_numbers = self._plot_preview.plot_numbers.get(fpath)
         if not plot_numbers:
             return
+        model = self._preview_models[fpath]
         str_data_service = PlotSTRDataService(self._profile, self._scheme_id)
         plot_str = SavePlotSTR(
             str_data_service,
-            self._preview_model.results,
+            model.results,
             plot_numbers,
             self._scheme_id
         )
