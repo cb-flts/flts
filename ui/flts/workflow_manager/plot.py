@@ -40,6 +40,7 @@ from qgis.core import (
 )
 from qgis.utils import iface
 from sqlalchemy import exc
+from stdm.data.pg_utils import qgsgeometry_from_wkbelement
 from stdm.ui.flts.workflow_manager.data import Save
 
 NAME, IMPORT_AS, DELIMITER, HEADER_ROW, CRS_ID, \
@@ -393,6 +394,8 @@ class PlotLayer:
         :rtype: QgsGeometry
         """
         return QgsGeometry.fromWkt(wkt)
+
+    qgsgeometry_from_wkbelement
 
     @classmethod
     def project_instance(cls):
@@ -1186,7 +1189,7 @@ class PlotPreview(Plot):
             if column == GEOMETRY or column == 'items':
                 continue
             name = headers[column].name
-            name = "_".join(name.split())[:10]
+            name = name.strip().replace(" ", "_")[:10]
             attr.append(name)
             if headers[column].type == "float":
                 value = self._attribute_to_float(value)

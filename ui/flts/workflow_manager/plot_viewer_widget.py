@@ -15,7 +15,13 @@ copyright            : (C) 2019
  *                                                                         *
  ***************************************************************************/
 """
+import re
 from collections import OrderedDict
+
+
+from stdm.data.database import STDMDb
+
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from sqlalchemy import exc
@@ -30,12 +36,16 @@ class PlotViewerTableView(QTableView):
     Plot viewer base table view
     """
 
-    def __init__(self, data_service, load_collections, parent=None):
+    def __init__(self, data_service, load_collections, scheme_number, label, parent=None):
         super(QTableView, self).__init__(parent)
         self._data_service = data_service
-        self._load_collections = load_collections
         self._data_loader = Load(self._data_service)
         self.model = WorkflowManagerModel(self._data_service)
+        self._load_collections = load_collections
+        self._scheme_number = scheme_number
+        self._label = label
+        self._plot_layer = None
+        self._reg_exes = re.compile(r'^\s*([\w\s]+)\s*\(\s*(.*)\s*\)\s*$')
         self.setModel(self.model)
         self.setAlternatingRowColors(True)
         self.setShowGrid(False)
@@ -64,33 +74,140 @@ class PlotViewerTableView(QTableView):
             self.horizontalHeader().setStretchLastSection(True)
             self.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
 
+    def add_layer(self):
+        """
+        Adds map layer to the canvas
+        """
+        for row, data in enumerate(self.model.results):
+            attributes = self._layer_attributes(data)
+            query_obj = data.get("data")
+            self._create_layer(query_obj.geom, attributes)
+        if self._plot_layer:
+            self._plot_layer.update_extents()
+            self._plot_layer.add_map_layer()
+
+    def _layer_attributes(self, data):
+        """
+        Returns layer attributes (field name, type, value)
+        :param data: Model data
+        :type data: Dictionary
+        :return attributes: Layer attributes
+        :rtype attributes: List
+        """
+        attributes = []
+        for n, prop in enumerate(self._data_service.columns):
+            column = prop.keys()[0]
+            header = self._condense_header(column.name)
+            value = data.get(n)
+            field_type = QVariant.String
+            if column.type == "float":
+                value = float(QVariant.Double)
+                field_type = QVariant.String
+            attributes.append([header, field_type, value])
+        return attributes
+
+    @staticmethod
+    def _condense_header(name):
+        """
+        Returns condensed layer attribute header name
+        :param name: Layer attribute header name
+        :type name: String
+        :return name: Condensed layer attribute header name
+        :rtype name: String
+        """
+        if name.find("(") > 0:
+            name = name.split("(")[0]
+        else:
+            name = name.strip().replace(" ", "_")
+        return name
+
+    def _create_layer(self, wkb_element, attributes):
+        """
+        Creates a  vector layer
+        :param wkb_element: Geoalchemy WKB data type class wrap
+        :type wkb_element: WKBElement
+        :param attributes: Layer attributes
+        :type attributes: List
+        """
+        db_session = STDMDb.instance().session
+        wkt = db_session.scalar(wkb_element.ST_AsText())
+        if not self._plot_layer:
+            crs_id = "EPSG:{0}".format(wkb_element.srid)
+            geom_type = self._wkt_type(wkt)
+            uri = "{0}?crs={1}&index=yes".format(geom_type, crs_id)
+            fields = [(field, type_) for field, type_, value in attributes]
+            name = self._generate_layer_name()
+            self._plot_layer = PlotLayer(uri, name, fields=fields)
+            self._plot_layer.create_layer()
+            self.layer.setReadOnly()
+        value = {field: value for field, type_, value in attributes}
+        self._plot_layer.wkt_geometry(wkt, value)
+
+    def _wkt_type(self, wkt):
+        """
+        Returns WKT geometry type
+        :param wkt: WKT data
+        :type wkt: String
+        :return geom_type: Geometry type
+        :rtype geom_type: String
+        """
+        geom_type = None
+        matches = self._reg_exes.match(wkt)
+        if matches:
+            geom_type, coordinates = matches.groups()
+            if geom_type:
+                geom_type = geom_type.strip()
+                geom_type = geom_type.lower().capitalize()
+        return geom_type
+
+    def _generate_layer_name(self):
+        """
+        Generates layer name
+        :return layer_name: Layer name
+        :rtype layer_name: String
+        """
+        layer_name = "{0}_{1}".format(self._scheme_number, self._label)
+        return layer_name
+
+    @property
+    def layer(self):
+        """
+        Returns created layer
+        :return _layer: Layer
+        :rtype _layer: QgsVectorLayer
+        """
+        if self._plot_layer:
+            return self._plot_layer.layer
+
 
 class PlotTableView(PlotViewerTableView):
     """
     Beacon table view
     """
-    def __init__(self, data_service, load_collections, scheme_id, parent=None):
-
-        PlotViewerTableView.__init__(self, data_service, load_collections, parent)
+    def __init__(self, data_service, load_collections, scheme_id, scheme_number, label, parent=None):
+        PlotViewerTableView.__init__(self, data_service, load_collections, scheme_number, label, parent)
         PlotViewerTableView._initial_load(self)
+        self.add_layer()
 
 
 class ServitudeTableView(PlotViewerTableView):
     """
     Beacon table view
     """
-    def __init__(self, data_service, load_collections, scheme_id, parent=None):
-        PlotViewerTableView.__init__(self, data_service, load_collections, parent)
+    def __init__(self, data_service, load_collections, scheme_id, scheme_number, label, parent=None):
+        PlotViewerTableView.__init__(self, data_service, load_collections, scheme_number, label, parent)
         PlotViewerTableView._initial_load(self)
+        self.add_layer()
 
 
 class BeaconTableView(PlotViewerTableView):
     """
     Beacon table view
     """
-    def __init__(self, data_service, load_collections, scheme_id, parent=None):
-        PlotViewerTableView.__init__(self, data_service, load_collections, parent)
+    def __init__(self, data_service, load_collections, scheme_id, scheme_number, label, parent=None):
+        PlotViewerTableView.__init__(self, data_service, load_collections, scheme_number, label, parent)
         PlotViewerTableView._initial_load(self)
+        self.add_layer()
 
 
 class PlotViewerWidget(QWidget):
@@ -104,6 +221,7 @@ class PlotViewerWidget(QWidget):
         self._load_collections = widget_properties["load_collections"]
         self._profile = profile
         self._scheme_id = scheme_id
+        self._scheme_number = scheme_number
         self._table_views = OrderedDict()
         self._init_table_views()
         self._default_table = self._default_table_view()
@@ -126,7 +244,14 @@ class PlotViewerWidget(QWidget):
             if not data_service.is_entity_empty():
                 view = plot_table_view(label)
                 self._table_views[label] = \
-                    view(data_service, self._load_collections, self._scheme_id, self)
+                    view(
+                        data_service,
+                        self._load_collections,
+                        self._scheme_id,
+                        self._scheme_number,
+                        label,
+                        self
+                    )
 
     def _default_table_view(self):
         """
@@ -142,7 +267,14 @@ class PlotViewerWidget(QWidget):
         data_service = data_service(self._profile, self._scheme_id)
         table_view = plot_table_view(label)
         table_view = \
-            table_view(data_service, self._load_collections, self._scheme_id, self)
+            table_view(
+                data_service,
+                self._load_collections,
+                self._scheme_id,
+                self._scheme_number,
+                label,
+                self
+            )
         return table_view
 
     def _add_tab_widgets(self, widgets):
