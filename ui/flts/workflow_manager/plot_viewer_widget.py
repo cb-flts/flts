@@ -17,14 +17,11 @@ copyright            : (C) 2019
 """
 import re
 from collections import OrderedDict
-
-
-from stdm.data.database import STDMDb
-
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from qgis.utils import iface
 from sqlalchemy import exc
+from stdm.data.database import STDMDb
 from stdm.ui.flts.workflow_manager.data import Load
 from stdm.ui.flts.workflow_manager.config import StyleSheet
 from stdm.ui.flts.workflow_manager.model import WorkflowManagerModel
@@ -221,17 +218,20 @@ class PlotViewerWidget(QWidget):
         self._profile = profile
         self._scheme_id = scheme_id
         self._scheme_number = scheme_number
+        self._parent = parent
         self._table_views = OrderedDict()
         self._init_table_views()
         self._default_table = self._default_table_view()
         self.model = self._default_table.model
-        parent.paginationFrame.hide()
+        self._parent.paginationFrame.hide()
         self._tab_widget = QTabWidget()
         self._add_tab_widgets(self._table_views)
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 11, 0, 0)
         layout.addWidget(self._tab_widget)
         self.setLayout(layout)
+        self._dock_widget.closing.connect(PlotViewerWidget._on_dock_close)
+        self._parent.removeTab.connect(self._on_remove_tab)
         self._add_layers()
 
     def _init_table_views(self):
@@ -299,13 +299,40 @@ class PlotViewerWidget(QWidget):
             table_view.add_layer()
             PlotViewerWidget.layers[label] = table_view.layer
 
+    @property
+    def _dock_widget(self):
+        """
+        Returns parent dock widget
+        :return: Parent dock widget
+        :rtype: QDockWidget
+        """
+        return iface.mainWindow().findChild(
+            QDockWidget,
+            self._parent.objectName()
+        )
+
+    @classmethod
+    def _on_dock_close(cls, event):
+        """
+        Handles on parent QDockWidget close event
+        """
+        cls._remove_layers()
+        event.accept()
+
+    @classmethod
+    def _on_remove_tab(cls):
+        """
+        Handles on tab remove event
+        """
+        cls._remove_layers()
+
     @classmethod
     def _remove_layers(cls):
         """
         Removes all layers from the registry/map canvas
         given layer IDs
         """
-        if not PlotViewerWidget.layers:
+        if not cls.layers:
             return
         try:
             layer_ids = cls.layer_ids()
