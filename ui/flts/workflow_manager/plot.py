@@ -1573,24 +1573,39 @@ class ImportPlot:
         """
         try:
             import_items = {}
-            srid = str(self._data_service.geom_srid)
+            source_srid = str(self._crs_id.split(":")[1])
+            destination_srid = str(self._data_service.geom_srid)
             for row, data in enumerate(self._model.results):
                 items = []
                 for key in self._col_keys:
                     value = data[key]
                     option = self._save_options[key]
                     if key == self._geom_column:
-                        if srid != self._crs_id:
-                            geom = PlotLayer.from_wkt(value)
-                            PlotLayer.transform_feature(geom, str(self._crs_id), srid)
-                            value = PlotLayer.export_to_wkt(geom)
-                        value = "SRID={0};{1}".format(srid, value)
+                        if destination_srid != source_srid:
+                            value = self._transform_wkt(value, source_srid, destination_srid)
+                        value = "SRID={0};{1}".format(destination_srid, value)
                     items.append([option.column, value, option.entity])
                 items.append(self._scheme_items())
                 import_items[row] = items
             return import_items
         except (AttributeError, KeyError, Exception) as e:
             raise e
+
+    @staticmethod
+    def _transform_wkt(wkt, source_crs, destination_crs):
+        """
+        Transforms Well-Known (WKT) Text string from source
+        Coordinate Reference System (CRS) to target CRS
+        :param wkt: Well-Known Text
+        :type wkt: String
+        :param source_crs: Source CRS
+        :type source_crs: String
+        :param destination_crs: Target CRS
+        :type destination_crs: String
+        """
+        geom = PlotLayer.from_wkt(wkt)
+        PlotLayer.transform_feature(geom, source_crs, destination_crs)
+        return PlotLayer.export_to_wkt(geom)
 
     def _scheme_items(self):
         """
