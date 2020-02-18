@@ -60,7 +60,7 @@ CREATE TABLE "public"."cb_holder_log" (
 )
 ;
 
----- SCHEME LOG
+----  TRIGGER FUNCTIONS
 
 CREATE OR REPLACE FUNCTION cb_scheme_log() RETURNS TRIGGER AS $cb_scheme_log$
     BEGIN
@@ -82,11 +82,6 @@ CREATE OR REPLACE FUNCTION cb_scheme_log() RETURNS TRIGGER AS $cb_scheme_log$
     END;
 $cb_scheme_log$ LANGUAGE plpgsql;
 
-CREATE TRIGGER cb_scheme_log
-AFTER INSERT OR UPDATE OR DELETE ON cb_scheme
-    FOR EACH ROW EXECUTE PROCEDURE cb_scheme_log();
-
----- HOLDER LOG
 
 CREATE OR REPLACE FUNCTION cb_holder_log() RETURNS TRIGGER AS $cb_holder_log$
     BEGIN
@@ -108,11 +103,6 @@ CREATE OR REPLACE FUNCTION cb_holder_log() RETURNS TRIGGER AS $cb_holder_log$
     END;
 $cb_holder_log$ LANGUAGE plpgsql;
 
-CREATE TRIGGER cb_holder_log
-AFTER INSERT OR UPDATE OR DELETE ON cb_holder
-    FOR EACH ROW EXECUTE PROCEDURE cb_holder_log();
-
----- UPDATE PLOTS FROM STAGING TABLE
 
 CREATE OR REPLACE FUNCTION insert_plots() RETURNS TRIGGER AS $insert_plots$
     BEGIN
@@ -129,11 +119,15 @@ CREATE OR REPLACE FUNCTION insert_plots() RETURNS TRIGGER AS $insert_plots$
 
 $insert_plots$ LANGUAGE plpgsql;
 
-CREATE TRIGGER insert_plots
-AFTER INSERT ON cb_lis_plot
-    FOR EACH ROW EXECUTE PROCEDURE insert_plots();
 
----- INSERT TIMESTAMP AFTER INSERT
+CREATE OR REPLACE FUNCTION comment_user_timestamp() RETURNS TRIGGER AS $comment_user_timestamp$
+    BEGIN
+        NEW.user_id = (SELECT cb_user."id" FROM cb_user WHERE cb_user.user_name = "session_user"());
+				NEW.timestamp = now();
+				RETURN NEW;
+    END;
+$comment_user_timestamp$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION insert_timestamp() RETURNS TRIGGER AS $insert_timestamp$
     BEGIN
@@ -144,12 +138,26 @@ CREATE OR REPLACE FUNCTION insert_timestamp() RETURNS TRIGGER AS $insert_timesta
 
 $insert_timestamp$ LANGUAGE plpgsql;
 
-CREATE TRIGGER insert_comment_timestamp
-BEFORE INSERT OR UPDATE ON cb_comment
-    FOR EACH ROW EXECUTE PROCEDURE insert_timestamp();
+--- TRIGGERS
 
----- TRIGGER EXECUTED ON SCHEME WORKFLOW INSERT OR UPDATE
+CREATE TRIGGER cb_scheme_log
+AFTER INSERT OR UPDATE OR DELETE ON cb_scheme
+    FOR EACH ROW EXECUTE PROCEDURE cb_scheme_log();
+
+CREATE TRIGGER cb_holder_log
+AFTER INSERT OR UPDATE OR DELETE ON cb_holder
+    FOR EACH ROW EXECUTE PROCEDURE cb_holder_log();
+
+CREATE TRIGGER insert_plots
+AFTER INSERT ON cb_lis_plot
+    FOR EACH ROW EXECUTE PROCEDURE insert_plots();
+
+CREATE TRIGGER comment_user_timestamp
+BEFORE INSERT OR UPDATE ON cb_comment
+    FOR EACH ROW EXECUTE PROCEDURE comment_user_timestamp();
 
 CREATE TRIGGER insert_workflow_timestamp
 BEFORE INSERT OR UPDATE ON cb_scheme_workflow
     FOR EACH ROW EXECUTE PROCEDURE insert_timestamp();
+
+---- TODO Add exception handling
