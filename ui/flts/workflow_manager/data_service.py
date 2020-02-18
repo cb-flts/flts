@@ -665,6 +665,17 @@ class PlotViewerDataService(DataService):
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
 
+    def is_entity_empty(self):
+        """
+        Checks if entity is empty
+        :return: True on empty entity
+        :rtype: Boolean
+        """
+        filters = {"scheme_id": self._scheme_id}
+        model = self.entity_model_(self.entity_name)
+        columns = [getattr(model, "id")]
+        return is_entity_empty(self.entity_name, filters, columns)
+
     def entity_model_(self, name=None):
         """
         Gets entity model
@@ -745,6 +756,17 @@ class BeaconViewerDataService(DataService):
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
 
+    def is_entity_empty(self):
+        """
+        Checks if entity is empty
+        :return: True on empty entity
+        :rtype: Boolean
+        """
+        filters = {"scheme_id": self._scheme_id}
+        model = self.entity_model_(self.entity_name)
+        columns = [getattr(model, "id")]
+        return is_entity_empty(self.entity_name, filters, columns)
+
     def entity_model_(self, name=None):
         """
         Gets entity model
@@ -824,6 +846,17 @@ class ServitudeViewerDataService(DataService):
             return query_object.all()
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
+
+    def is_entity_empty(self):
+        """
+        Checks if entity is empty
+        :return: True on empty entity
+        :rtype: Boolean
+        """
+        filters = {"scheme_id": self._scheme_id}
+        model = self.entity_model_(self.entity_name)
+        columns = [getattr(model, "id")]
+        return is_entity_empty(self.entity_name, filters, columns)
 
     def entity_model_(self, name=None):
         """
@@ -1073,7 +1106,7 @@ class ServitudePreviewDataService(DataService):
         :rtype: List
         """
         return self._servitude_config.columns
-    
+
     @property
     def geom_srid(self):
         """
@@ -1389,3 +1422,40 @@ def _column_type(model, column_name):
     for name, column in model.__table__.c.items():
         if name == column_name:
             return column.type
+
+
+def is_entity_empty(entity_name, filters=None, columns=None):
+    """
+    Checks if entity is empty
+    :param entity_name: Entity name
+    :type entity_name: String
+    :param filters: Column filters - column name and value
+    :type filters: Dictionary
+    :type columns: Fields to select from
+    :type columns: List
+    :return: True on empty entity
+    :rtype: Boolean
+    """
+    record = filter_query_by(entity_name, filters, columns).first()
+    if record:
+        return False
+    return True
+
+
+def filter_query_by(entity_name, filters=None, columns=None):
+    """
+    Filters query result by a column value
+    :param entity_name: Entity name
+    :type entity_name: String
+    :param filters: Column filters - column name and value
+    :type filters: Dictionary
+    :type columns: Fields to select from
+    :type columns: List
+    :return: Filter entity query object
+    :rtype: Entity object
+    """
+    try:
+        filter_by = FilterQueryBy()
+        return filter_by(entity_name, filters, columns)
+    except (AttributeError, exc.SQLAlchemyError, Exception) as e:
+        raise e

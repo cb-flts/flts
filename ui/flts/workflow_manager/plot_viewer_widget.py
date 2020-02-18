@@ -30,12 +30,10 @@ class PlotViewerTableView(QTableView):
     Plot viewer base table view
     """
 
-    def __init__(self, widget_properties, profile, scheme_id, geom_name, parent=None):
+    def __init__(self, data_service, load_collections, parent=None):
         super(QTableView, self).__init__(parent)
-        self._load_collections = widget_properties["load_collections"]
-        self._data_service = widget_properties["data_service"]
-        self._data_service = self._data_service(geom_name)
-        self._data_service = self._data_service(profile, scheme_id)
+        self._data_service = data_service
+        self._load_collections = load_collections
         self._data_loader = Load(self._data_service)
         self.model = WorkflowManagerModel(self._data_service)
         self.setModel(self.model)
@@ -71,10 +69,9 @@ class PlotTableView(PlotViewerTableView):
     """
     Beacon table view
     """
-    def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
-        PlotViewerTableView.__init__(
-            self, widget_properties, profile, scheme_id, "Plots", parent
-        )
+    def __init__(self, data_service, load_collections, scheme_id, parent=None):
+
+        PlotViewerTableView.__init__(self, data_service, load_collections, parent)
         PlotViewerTableView._initial_load(self)
 
 
@@ -82,10 +79,8 @@ class ServitudeTableView(PlotViewerTableView):
     """
     Beacon table view
     """
-    def __init__(self, widget_properties, profile, scheme_id, parent=None):
-        PlotViewerTableView.__init__(
-            self, widget_properties, profile, scheme_id, "Servitudes", parent
-        )
+    def __init__(self, data_service, load_collections, scheme_id, parent=None):
+        PlotViewerTableView.__init__(self, data_service, load_collections, parent)
         PlotViewerTableView._initial_load(self)
 
 
@@ -93,10 +88,8 @@ class BeaconTableView(PlotViewerTableView):
     """
     Beacon table view
     """
-    def __init__(self, widget_properties, profile, scheme_id, parent=None):
-        PlotViewerTableView.__init__(
-            self, widget_properties, profile, scheme_id, "Beacons", parent
-        )
+    def __init__(self, data_service, load_collections, scheme_id, parent=None):
+        PlotViewerTableView.__init__(self, data_service, load_collections, parent)
         PlotViewerTableView._initial_load(self)
 
 
@@ -106,21 +99,51 @@ class PlotViewerWidget(QWidget):
     """
     def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
         super(QWidget, self).__init__(parent)
-        plot_tab = PlotTableView(widget_properties, profile, scheme_id, self)
-        servitude_tab = ServitudeTableView(widget_properties, profile, scheme_id, self)
-        beacon_tab = BeaconTableView(widget_properties, profile, scheme_id, self)
-        self.model = plot_tab.model
+        self._tab_label = ["Plots", "Servitudes", "Beacons"]
+        self._data_service = widget_properties["data_service"]
+        self._load_collections = widget_properties["load_collections"]
+        self._profile = profile
+        self._scheme_id = scheme_id
+        self._table_views = OrderedDict()
+        self._init_table_views()
+        self._default_table = self._default_table_view()
+        self.model = self._default_table.model
         parent.paginationFrame.hide()
         self._tab_widget = QTabWidget()
-        self._add_tab_widgets(
-            OrderedDict([
-                ("Plots", plot_tab), ("Servitudes", servitude_tab), ("Beacons", beacon_tab)
-            ])
-        )
+        self._add_tab_widgets(self._table_views)
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 11, 0, 0)
         layout.addWidget(self._tab_widget)
         self.setLayout(layout)
+
+    def _init_table_views(self):
+        """
+        Initialize table view widgets
+        """
+        for label in self._tab_label:
+            data_service = self._data_service(label)
+            data_service = data_service(self._profile, self._scheme_id)
+            if not data_service.is_entity_empty():
+                view = plot_table_view(label)
+                self._table_views[label] = \
+                    view(data_service, self._load_collections, self._scheme_id, self)
+
+    def _default_table_view(self):
+        """
+        Returns default table view
+        :return table_view: Default table view
+        :rtype table_view: QTableView
+        """
+        if self._table_views:
+            table_view = self._table_views.itervalues().next()
+            return table_view
+        label = self._tab_label[0]
+        data_service = self._data_service(label)
+        data_service = data_service(self._profile, self._scheme_id)
+        table_view = plot_table_view(label)
+        table_view = \
+            table_view(data_service, self._load_collections, self._scheme_id, self)
+        return table_view
 
     def _add_tab_widgets(self, widgets):
         """
@@ -128,5 +151,23 @@ class PlotViewerWidget(QWidget):
         :param widgets: Widgets to be added
         :type widgets: Dictionary
         """
-        for name, widget in widgets.items():
-            self._tab_widget.addTab(widget, name)
+        if not widgets:
+            widgets = {self._tab_label[0]: self._default_table}
+        for label, widget in widgets.items():
+            self._tab_widget.addTab(widget, label)
+
+
+def plot_table_view(tab_label):
+    """
+    Returns plot QTableView class based on tab label
+    :param tab_label: QTabWidget label
+    :type tab_label: String
+    :return: Plot QTableView class
+    :rtype: QTableView
+    """
+    table_view = {
+        "Plots": PlotTableView,
+        "Servitudes": ServitudeTableView,
+        "Beacons": BeaconTableView
+    }
+    return table_view[tab_label]
