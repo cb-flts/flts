@@ -40,7 +40,6 @@ from qgis.core import (
 )
 from qgis.utils import iface
 from sqlalchemy import exc
-from stdm.data.pg_utils import qgsgeometry_from_wkbelement
 from stdm.ui.flts.workflow_manager.data import Save
 
 NAME, IMPORT_AS, DELIMITER, HEADER_ROW, CRS_ID, \
@@ -394,8 +393,6 @@ class PlotLayer:
         :rtype: QgsGeometry
         """
         return QgsGeometry.fromWkt(wkt)
-
-    qgsgeometry_from_wkbelement
 
     @classmethod
     def project_instance(cls):

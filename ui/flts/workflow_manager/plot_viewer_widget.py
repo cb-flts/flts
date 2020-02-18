@@ -187,7 +187,6 @@ class PlotTableView(PlotViewerTableView):
     def __init__(self, data_service, load_collections, scheme_id, scheme_number, label, parent=None):
         PlotViewerTableView.__init__(self, data_service, load_collections, scheme_number, label, parent)
         PlotViewerTableView._initial_load(self)
-        self.add_layer()
 
 
 class ServitudeTableView(PlotViewerTableView):
@@ -197,7 +196,6 @@ class ServitudeTableView(PlotViewerTableView):
     def __init__(self, data_service, load_collections, scheme_id, scheme_number, label, parent=None):
         PlotViewerTableView.__init__(self, data_service, load_collections, scheme_number, label, parent)
         PlotViewerTableView._initial_load(self)
-        self.add_layer()
 
 
 class BeaconTableView(PlotViewerTableView):
@@ -207,13 +205,14 @@ class BeaconTableView(PlotViewerTableView):
     def __init__(self, data_service, load_collections, scheme_id, scheme_number, label, parent=None):
         PlotViewerTableView.__init__(self, data_service, load_collections, scheme_number, label, parent)
         PlotViewerTableView._initial_load(self)
-        self.add_layer()
 
 
 class PlotViewerWidget(QWidget):
     """
     Widget to view plots of a scheme.
     """
+    layers = {}
+
     def __init__(self, widget_properties, profile, scheme_id, scheme_number, parent=None):
         super(QWidget, self).__init__(parent)
         self._tab_label = ["Plots", "Servitudes", "Beacons"]
@@ -233,6 +232,7 @@ class PlotViewerWidget(QWidget):
         layout.setContentsMargins(0, 11, 0, 0)
         layout.addWidget(self._tab_widget)
         self.setLayout(layout)
+        self._add_layers()
 
     def _init_table_views(self):
         """
@@ -243,15 +243,14 @@ class PlotViewerWidget(QWidget):
             data_service = data_service(self._profile, self._scheme_id)
             if not data_service.is_entity_empty():
                 view = plot_table_view(label)
-                self._table_views[label] = \
-                    view(
-                        data_service,
-                        self._load_collections,
-                        self._scheme_id,
-                        self._scheme_number,
-                        label,
-                        self
-                    )
+                self._table_views[label] = view(
+                    data_service,
+                    self._load_collections,
+                    self._scheme_id,
+                    self._scheme_number,
+                    label,
+                    self
+                )
 
     def _default_table_view(self):
         """
@@ -266,15 +265,14 @@ class PlotViewerWidget(QWidget):
         data_service = self._data_service(label)
         data_service = data_service(self._profile, self._scheme_id)
         table_view = plot_table_view(label)
-        table_view = \
-            table_view(
-                data_service,
-                self._load_collections,
-                self._scheme_id,
-                self._scheme_number,
-                label,
-                self
-            )
+        table_view = table_view(
+            data_service,
+            self._load_collections,
+            self._scheme_id,
+            self._scheme_number,
+            label,
+            self
+        )
         return table_view
 
     def _add_tab_widgets(self, widgets):
@@ -287,6 +285,43 @@ class PlotViewerWidget(QWidget):
             widgets = {self._tab_label[0]: self._default_table}
         for label, widget in widgets.items():
             self._tab_widget.addTab(widget, label)
+
+    def _add_layers(self):
+        """
+        Adds map layers to the canvas
+        """
+        if not self._table_views:
+            return
+        self._remove_layers()
+        for label, table_view in self._table_views.items():
+            table_view.add_layer()
+            PlotViewerWidget.layers[label] = table_view.layer
+
+    @classmethod
+    def _remove_layers(cls):
+        """
+        Removes all layers from the registry/map canvas
+        given layer IDs
+        """
+        if not PlotViewerWidget.layers:
+            return
+        try:
+            layer_ids = cls.layer_ids()
+            if layer_ids:
+                PlotLayer.remove_layers(layer_ids)
+                cls.layers = {}
+        except (RuntimeError, OSError, Exception) as e:
+            raise e
+
+    @classmethod
+    def layer_ids(cls):
+        """
+        Returns all layers from the registry/map canvas
+        :return layer_ids: Layer IDs
+        :rtype layer_ids: List
+        """
+        layer_ids = [layer.id() for layer in cls.layers.values()]
+        return layer_ids
 
 
 def plot_table_view(tab_label):
