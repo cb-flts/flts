@@ -243,6 +243,7 @@ class PlotViewerWidget(QWidget):
             data_service = data_service(self._profile, self._scheme_id)
             if not data_service.is_entity_empty():
                 view = plot_table_view(label)
+                # noinspection PyCallingNonCallable
                 self._table_views[label] = view(
                     data_service,
                     self._load_collections,
@@ -265,6 +266,7 @@ class PlotViewerWidget(QWidget):
         data_service = self._data_service(label)
         data_service = data_service(self._profile, self._scheme_id)
         table_view = plot_table_view(label)
+        # noinspection PyCallingNonCallable
         table_view = table_view(
             data_service,
             self._load_collections,
