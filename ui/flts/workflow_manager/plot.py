@@ -28,6 +28,7 @@ from PyQt4.QtCore import (
     QVariant
 )
 from qgis.core import (
+    QgsCoordinateTransform,
     QgsFeature,
     QgsField,
     QgsGeometry,
@@ -46,6 +47,7 @@ GEOM_FIELD, GEOM_TYPE = range(7)
 GEOMETRY, PARCEL_NUM, UPI_NUM, AREA = range(4)
 GEOMETRY_PT, X_PT, Y_PT = range(3)
 WARNING = "Warning"
+IMPORT_CRS = "EPSG:4006"
 
 
 class PlotLayer:
@@ -355,6 +357,43 @@ class PlotLayer:
         :type ids: List
         """
         cls.qgs_project.removeMapLayers(ids)
+
+    @classmethod
+    def transform_feature(cls, geom, source_crs, destination_crs):
+        """
+        Transforms a feature from source Coordinate
+        Reference System (CRS) to target CRS
+        :param geom: Input geometry
+        :type geom: QgsGeometry
+        :param source_crs: Source CRS
+        :type source_crs: String
+        :param destination_crs: Target CRS
+        :type destination_crs: String
+        """
+        tr = QgsCoordinateTransform(source_crs, destination_crs)
+        geom.transform(tr)
+
+    @classmethod
+    def export_to_wkt(cls, geom):
+        """
+        Exports geometry to WKT
+        :param geom: Input geometry
+        :type geom: QgsGeometry
+        :return: WKT
+        :rtype: String
+        """
+        return geom.exportToWkt()
+
+    @classmethod
+    def from_wkt(cls, wkt):
+        """
+        Creates and returns a new geometry from a WKT string
+        :param wkt: WKT data
+        :type wkt: String
+        :return: Geometry
+        :rtype: QgsGeometry
+        """
+        return QgsGeometry.fromWkt(wkt)
 
     @classmethod
     def project_instance(cls):
@@ -1298,6 +1337,16 @@ class PlotPreview(Plot):
         if self._plot_layer:
             return self._plot_layer.layer
 
+    def get_layer(self, parent_id):
+        """
+        Returns a layer identified by parent identifier
+        :param parent_id: Parent record/item identifier
+        :type parent_id: String
+        :return _layer: Layer
+        :rtype _layer: QgsVectorLayer
+        """
+        return self._layers.get(parent_id)
+
     def _signal_layers_removed(self):
         """
         Emits layersWillBeRemoved signal
@@ -1489,13 +1538,13 @@ class ImportPlot:
     """
     Imports plot data
     """
-    def __init__(self, model, scheme_id, srid, data_service, col_keys):
+    def __init__(self, model, scheme_id, data_service, col_keys, crs_id):
         self._model = model
         self._scheme_id = scheme_id
-        self._srid = srid
         self._data_service = data_service
         self._save_options = data_service.save_columns
         self._col_keys = col_keys
+        self._crs_id = crs_id
         self._geom_column = 0
 
     def save(self):
@@ -1525,13 +1574,18 @@ class ImportPlot:
         """
         try:
             import_items = {}
+            srid = IMPORT_CRS.split(":")[1]
             for row, data in enumerate(self._model.results):
                 items = []
                 for key in self._col_keys:
                     value = data[key]
                     option = self._save_options[key]
                     if key == self._geom_column:
-                        value = "SRID={0};{1}".format(self._srid, value)
+                        if IMPORT_CRS != self._crs_id:
+                            geom = PlotLayer.from_wkt(value)
+                            PlotLayer.transform_feature(geom, str(self._crs_id), IMPORT_CRS)
+                            value = PlotLayer.export_to_wkt(geom)
+                        value = "SRID={0};{1}".format(srid, value)
                     items.append([option.column, value, option.entity])
                 items.append(self._scheme_items())
                 import_items[row] = items
