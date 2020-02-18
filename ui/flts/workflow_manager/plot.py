@@ -47,7 +47,6 @@ GEOM_FIELD, GEOM_TYPE = range(7)
 GEOMETRY, PARCEL_NUM, UPI_NUM, AREA = range(4)
 GEOMETRY_PT, X_PT, Y_PT = range(3)
 WARNING = "Warning"
-IMPORT_CRS = "EPSG:4006"
 
 
 class PlotLayer:
@@ -1574,16 +1573,16 @@ class ImportPlot:
         """
         try:
             import_items = {}
-            srid = IMPORT_CRS.split(":")[1]
+            srid = str(self._data_service.geom_srid)
             for row, data in enumerate(self._model.results):
                 items = []
                 for key in self._col_keys:
                     value = data[key]
                     option = self._save_options[key]
                     if key == self._geom_column:
-                        if IMPORT_CRS != self._crs_id:
+                        if srid != self._crs_id:
                             geom = PlotLayer.from_wkt(value)
-                            PlotLayer.transform_feature(geom, str(self._crs_id), IMPORT_CRS)
+                            PlotLayer.transform_feature(geom, str(self._crs_id), srid)
                             value = PlotLayer.export_to_wkt(geom)
                         value = "SRID={0};{1}".format(srid, value)
                     items.append([option.column, value, option.entity])

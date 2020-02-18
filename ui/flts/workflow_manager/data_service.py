@@ -180,7 +180,7 @@ class SchemeDataService(DataService):
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         :return: Related entity names
         :rtype: List
@@ -349,7 +349,7 @@ class DocumentDataService(DataService):
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         :return: Related entity names
         :rtype: List
@@ -450,7 +450,7 @@ class HolderDataService(DataService):
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         :return: Related entity names
         :rtype: List
@@ -558,7 +558,7 @@ class CommentDataService(DataService):
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         :return: Related entity names
         :rtype: List
@@ -638,7 +638,7 @@ class PlotViewerDataService(DataService):
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         :return: Related entity names
         :rtype: List
@@ -718,7 +718,7 @@ class BeaconViewerDataService(DataService):
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         :return: Related entity names
         :rtype: List
@@ -798,7 +798,7 @@ class ServitudeViewerDataService(DataService):
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         :return: Related entity names
         :rtype: List
@@ -913,6 +913,27 @@ class PlotPreviewDataService(DataService):
         return self._plot_config.columns
 
     @property
+    def geom_srid(self):
+        """
+        Returns geometry Spatial Reference Identity (SRID)
+        :return srid: Spatial Reference Identity
+        :rtype srid: Integer
+        """
+        srid = self._column_type("Plot", "geom").srid
+        return srid
+
+    def _column_type(self, entity_name, column_name):
+        """
+        Returns entity column type
+        :param entity_name: Entity name
+        :type entity_name: String
+        :param column_name: Column name
+        :type column_name: String
+        """
+        model = self.entity_model_(entity_name)
+        return _column_type(model, column_name)
+
+    @property
     def vertical_header(self):
         """
         Scheme table view vertical orientation
@@ -951,7 +972,7 @@ class PlotPreviewDataService(DataService):
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         """
         pass
@@ -1052,6 +1073,27 @@ class ServitudePreviewDataService(DataService):
         :rtype: List
         """
         return self._servitude_config.columns
+    
+    @property
+    def geom_srid(self):
+        """
+        Returns geometry Spatial Reference Identity (SRID)
+        :return srid: Spatial Reference Identity
+        :rtype srid: Integer
+        """
+        srid = self._column_type("Plot", "geom").srid
+        return srid
+
+    def _column_type(self, entity_name, column_name):
+        """
+        Returns entity column type
+        :param entity_name: Entity name
+        :type entity_name: String
+        :param column_name: Column name
+        :type column_name: String
+        """
+        model = self.entity_model_(entity_name)
+        return _column_type(model, column_name)
 
     @property
     def vertical_header(self):
@@ -1092,7 +1134,7 @@ class ServitudePreviewDataService(DataService):
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         """
         pass
@@ -1135,6 +1177,27 @@ class BeaconPreviewDataService(DataService):
         return self._beacon_config.columns
 
     @property
+    def geom_srid(self):
+        """
+        Returns geometry Spatial Reference Identity (SRID)
+        :return srid: Spatial Reference Identity
+        :rtype srid: Integer
+        """
+        srid = self._column_type("Plot", "geom").srid
+        return srid
+
+    def _column_type(self, entity_name, column_name):
+        """
+        Returns entity column type
+        :param entity_name: Entity name
+        :type entity_name: String
+        :param column_name: Column name
+        :type column_name: String
+        """
+        model = self.entity_model_(entity_name)
+        return _column_type(model, column_name)
+
+    @property
     def vertical_header(self):
         """
         Scheme table view vertical orientation
@@ -1173,7 +1236,7 @@ class BeaconPreviewDataService(DataService):
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         """
         pass
@@ -1243,7 +1306,7 @@ class PlotSTRDataService:
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         """
         pass
@@ -1313,3 +1376,16 @@ class PlotSTRDataService:
             return model
         except AttributeError as e:
             raise e
+
+
+def _column_type(model, column_name):
+    """
+    Returns entity column type
+    :param model: Entity name
+    :type model: DeclarativeMeta
+    :param column_name: Column name
+    :type column_name: String
+    """
+    for name, column in model.__table__.c.items():
+        if name == column_name:
+            return column.type
