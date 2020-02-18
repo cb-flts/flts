@@ -290,9 +290,9 @@ class PlotViewerWidget(QWidget):
         """
         Adds map layers to the canvas
         """
+        self._remove_layers()
         if not self._table_views:
             return
-        self._remove_layers()
         for label, table_view in self._table_views.items():
             table_view.add_layer()
             PlotViewerWidget.layers[label] = table_view.layer
