@@ -177,6 +177,8 @@ class STDMQGISLoader(object):
         self.configuration_file_updater = ConfigurationFileUpdater(self.iface)
         copy_startup()
 
+        self.dock_widget = None
+
     def initGui(self):
         # Initial actions on starting up the application
         self._menu_items()
@@ -1041,11 +1043,11 @@ class STDMQGISLoader(object):
         #                          QApplication.translate("ReportBuilderAction", "Export Data"),
         #                          self.iface.mainWindow())
         #
-        self.docDesignerAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_certificate.png"), \
+        self.docDesignerAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_document_designer.png"), \
                                       QApplication.translate("DocumentDesignerAction", "Document Designer"),
                                       self.iface.mainWindow())
 
-        self.docGeneratorAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_certificate_print.png"), \
+        self.docGeneratorAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_document_generator.png"), \
                                        QApplication.translate("DocumentGeneratorAction", "Document Generator"),
                                        self.iface.mainWindow())
         #
@@ -1331,22 +1333,22 @@ class STDMQGISLoader(object):
         # create a separator
         tbSeparator = QAction(self.iface.mainWindow())
         tbSeparator.setSeparator(True)
-        if not self.current_profile is None:
-            if pg_table_exists(self.current_profile.social_tenure.name):
-                # add separator to menu
-                separator_group = TableContentGroup(username, 'separator', tbSeparator)
-                # separator_group.register()
-                self.moduleContentGroups.append(separator_group)
-
-                moduleCntGroup = self._create_table_content_group(
-                    QApplication.translate(
-                        'STDMQGISLoader',
-                        'New Social Tenure Relationship'
-                    ),
-                    username,
-                    'new_str.png'
-                )
-                self.moduleContentGroups.append(moduleCntGroup)
+        # if not self.current_profile is None:
+        #     if pg_table_exists(self.current_profile.social_tenure.name):
+        #         # add separator to menu
+        #         separator_group = TableContentGroup(username, 'separator', tbSeparator)
+        #         # separator_group.register()
+        #         self.moduleContentGroups.append(separator_group)
+        #
+        #         moduleCntGroup = self._create_table_content_group(
+        #             QApplication.translate(
+        #                 'STDMQGISLoader',
+        #                 'New Social Tenure Relationship'
+        #             ),
+        #             username,
+        #             'new_str.png'
+        #         )
+        #         self.moduleContentGroups.append(moduleCntGroup)
 
         # Create content groups and add items
 
@@ -2157,8 +2159,14 @@ class STDMQGISLoader(object):
         """
         Logout the user and remove default user buttons when logged in
         """
-        try:
+        for name, widget in DockWidgetFactory.saved_widgets.items():
+            if widget:
+                widget.close()
+                # TODO state when layer is dirty
+                # if no:
+                    # return
 
+        try:
             self.stdmInitToolbar.removeAction(self.logoutAct)
             self.stdmInitToolbar.removeAction(self.changePasswordAct)
             self.stdmInitToolbar.removeAction(self.wzdAct)
@@ -2438,8 +2446,8 @@ class STDMQGISLoader(object):
             "Scheme Establishment Workflow Manager",
             "schemeEstablishment"
         )
-        dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        dock_widget.show_dock_widget()
+        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+        self.dock_widget.show_dock_widget()
 
     def first_examination(self):
         """
@@ -2449,8 +2457,8 @@ class STDMQGISLoader(object):
             "First Workflow Manager",
             "firstExamination"
         )
-        dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        dock_widget.show_dock_widget()
+        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+        self.dock_widget.show_dock_widget()
 
     def second_examination(self):
         """
@@ -2460,8 +2468,8 @@ class STDMQGISLoader(object):
             "Second Workflow Manager",
             "secondExamination"
         )
-        dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        dock_widget.show_dock_widget()
+        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+        self.dock_widget.show_dock_widget()
 
     def third_examination(self):
         """
@@ -2471,8 +2479,8 @@ class STDMQGISLoader(object):
             "Third Workflow Manager",
             "thirdExamination"
         )
-        dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        dock_widget.show_dock_widget()
+        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+        self.dock_widget.show_dock_widget()
 
     def revise_scheme(self):
         """
@@ -2482,8 +2490,8 @@ class STDMQGISLoader(object):
             "Revise Workflow Manager",
             "schemeLodgement"
         )
-        dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        dock_widget.show_dock_widget()
+        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+        self.dock_widget.show_dock_widget()
 
     def scan_certificate(self):
         """
@@ -2500,8 +2508,8 @@ class STDMQGISLoader(object):
             "Plot Import Workflow Manager",
             "importPlot"
         )
-        dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        dock_widget.show_dock_widget()
+        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+        self.dock_widget.show_dock_widget()
 
     def print_certificate(self):
         """Load the dialog for printing of certificate."""
