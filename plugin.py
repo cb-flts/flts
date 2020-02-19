@@ -177,6 +177,8 @@ class STDMQGISLoader(object):
         self.configuration_file_updater = ConfigurationFileUpdater(self.iface)
         copy_startup()
 
+        self.dock_widget = None
+
     def initGui(self):
         # Initial actions on starting up the application
         self._menu_items()
@@ -1041,11 +1043,11 @@ class STDMQGISLoader(object):
         #                          QApplication.translate("ReportBuilderAction", "Export Data"),
         #                          self.iface.mainWindow())
         #
-        self.docDesignerAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_certificate.png"), \
+        self.docDesignerAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_document_designer.png"), \
                                       QApplication.translate("DocumentDesignerAction", "Document Designer"),
                                       self.iface.mainWindow())
 
-        self.docGeneratorAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_certificate_print.png"), \
+        self.docGeneratorAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_document_generator.png"), \
                                        QApplication.translate("DocumentGeneratorAction", "Document Generator"),
                                        self.iface.mainWindow())
         #
@@ -1061,9 +1063,9 @@ class STDMQGISLoader(object):
         #                                    self.iface.mainWindow())
         # self.feature_details_act.setCheckable(True)
         #
-        self.viewSTRAct = QAction(QIcon(":/plugins/stdm/images/icons/view_str.png"), \
-                                  QApplication.translate("ViewSTRToolbarAction", "View Social Tenure Relationship"),
-                                  self.iface.mainWindow())
+        # self.viewSTRAct = QAction(QIcon(":/plugins/stdm/images/icons/view_str.png"), \
+        #                           QApplication.translate("ViewSTRToolbarAction", "View Social Tenure Relationship"),
+        #                           self.iface.mainWindow())
         #
         self.wzdAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_database_designer.png"), \
                               QApplication.translate("ConfigWizard", "Configuration Wizard"), self.iface.mainWindow())
@@ -1196,7 +1198,7 @@ class STDMQGISLoader(object):
         self.docDesignerAct.triggered.connect(self.onDocumentDesigner)
         self.docGeneratorAct.triggered.connect(self.onDocumentGenerator)
         self.wzdAct.triggered.connect(self.load_config_wizard)
-        self.viewSTRAct.triggered.connect(self.onViewSTR)
+        # self.viewSTRAct.triggered.connect(self.onViewSTR)
         # flts
         self.schemeLodgementAct.triggered.connect(self.lodge_scheme)
         self.schemeEstablishmentAct.triggered.connect(self.establish_scheme)
@@ -1246,8 +1248,8 @@ class STDMQGISLoader(object):
         wzdConfigCnt = ContentGroup.contentItemFromQAction(self.wzdAct)
         wzdConfigCnt.code = "F16CA4AC-3E8C-49C8-BD3C-96111EA74206"
         #
-        strViewCnt = ContentGroup.contentItemFromQAction(self.viewSTRAct)
-        strViewCnt.code = "D13B0415-30B4-4497-B471-D98CA98CD841"
+        # strViewCnt = ContentGroup.contentItemFromQAction(self.viewSTRAct)
+        # strViewCnt.code = "D13B0415-30B4-4497-B471-D98CA98CD841"
 
         # FLTS
 
@@ -1331,22 +1333,22 @@ class STDMQGISLoader(object):
         # create a separator
         tbSeparator = QAction(self.iface.mainWindow())
         tbSeparator.setSeparator(True)
-        if not self.current_profile is None:
-            if pg_table_exists(self.current_profile.social_tenure.name):
-                # add separator to menu
-                separator_group = TableContentGroup(username, 'separator', tbSeparator)
-                # separator_group.register()
-                self.moduleContentGroups.append(separator_group)
-
-                moduleCntGroup = self._create_table_content_group(
-                    QApplication.translate(
-                        'STDMQGISLoader',
-                        'New Social Tenure Relationship'
-                    ),
-                    username,
-                    'new_str.png'
-                )
-                self.moduleContentGroups.append(moduleCntGroup)
+        # if not self.current_profile is None:
+        #     if pg_table_exists(self.current_profile.social_tenure.name):
+        #         # add separator to menu
+        #         separator_group = TableContentGroup(username, 'separator', tbSeparator)
+        #         # separator_group.register()
+        #         self.moduleContentGroups.append(separator_group)
+        #
+        #         moduleCntGroup = self._create_table_content_group(
+        #             QApplication.translate(
+        #                 'STDMQGISLoader',
+        #                 'New Social Tenure Relationship'
+        #             ),
+        #             username,
+        #             'new_str.png'
+        #         )
+        #         self.moduleContentGroups.append(moduleCntGroup)
 
         # Create content groups and add items
 
@@ -1369,14 +1371,14 @@ class STDMQGISLoader(object):
         self.wzdConfigCntGroup.addContentItem(wzdConfigCnt)
         self.wzdConfigCntGroup.register()
 
-        self.STRCntGroup = TableContentGroup(username,
-                                             self.viewSTRAct.text(),
-                                             self.viewSTRAct)
-        self.STRCntGroup.createContentItem().code = "71EC2ED8-5D7F-4A27-8514-CFFE94E1294F"
-        self.STRCntGroup.readContentItem().code = "ED607F24-11A2-427C-B395-2E2A3EBA4EBD"
-        self.STRCntGroup.updateContentItem().code = "5D45A49D-F640-4A48-94D9-A10F502655F5"
-        self.STRCntGroup.deleteContentItem().code = "15E27A59-28F7-42B4-858F-C070E2C3AE10"
-        self.STRCntGroup.register()
+        # self.STRCntGroup = TableContentGroup(username,
+        #                                      self.viewSTRAct.text(),
+        #                                      self.viewSTRAct)
+        # self.STRCntGroup.createContentItem().code = "71EC2ED8-5D7F-4A27-8514-CFFE94E1294F"
+        # self.STRCntGroup.readContentItem().code = "ED607F24-11A2-427C-B395-2E2A3EBA4EBD"
+        # self.STRCntGroup.updateContentItem().code = "5D45A49D-F640-4A48-94D9-A10F502655F5"
+        # self.STRCntGroup.deleteContentItem().code = "15E27A59-28F7-42B4-858F-C070E2C3AE10"
+        # self.STRCntGroup.register()
 
         self.docDesignerCntGroup = ContentGroup(username, self.docDesignerAct)
         self.docDesignerCntGroup.addContentItem(documentDesignerCnt)
@@ -1456,7 +1458,7 @@ class STDMQGISLoader(object):
         # certSettingsCntGroups.append(self.scanCertCntGroup)
         certSettingsCntGroups.append(self.docGeneratorCntGroup)
         certSettingsCntGroups.append(self.docDesignerCntGroup)
-        certSettingsCntGroups.append(self.STRCntGroup)
+        # certSettingsCntGroups.append(self.STRCntGroup)
 
         # self.fltsSearchCntGroup = ContentGroup(username, self.searchAct)
         # self.fltsSearchCntGroup.addContentItem(fltsSearchCnt)
@@ -1520,7 +1522,7 @@ class STDMQGISLoader(object):
 
         self.toolbarLoader.addContent(self.docDesignerCntGroup)
         self.toolbarLoader.addContent(self.docGeneratorCntGroup)
-        self.toolbarLoader.addContent(self.STRCntGroup)
+        # self.toolbarLoader.addContent(self.STRCntGroup)
 
         # self.toolbarLoader.addContent(self.fltsNotificationCntGroup)
 
@@ -2157,8 +2159,14 @@ class STDMQGISLoader(object):
         """
         Logout the user and remove default user buttons when logged in
         """
-        try:
+        for name, widget in DockWidgetFactory.saved_widgets.items():
+            if widget:
+                widget.close()
+                # TODO state when layer is dirty
+                # if no:
+                    # return
 
+        try:
             self.stdmInitToolbar.removeAction(self.logoutAct)
             self.stdmInitToolbar.removeAction(self.changePasswordAct)
             self.stdmInitToolbar.removeAction(self.wzdAct)
@@ -2173,7 +2181,7 @@ class STDMQGISLoader(object):
             # self.stdmInitToolbar.removeAction(self.exportAct)
             self.stdmInitToolbar.removeAction(self.docDesignerAct)
             self.stdmInitToolbar.removeAction(self.docGeneratorAct)
-            self.stdmInitToolbar.removeAction(self.viewSTRAct)
+            # self.stdmInitToolbar.removeAction(self.viewSTRAct)
 
             # flts
             self.stdmInitToolbar.removeAction(self.schemeLodgementAct)
@@ -2413,8 +2421,8 @@ class STDMQGISLoader(object):
                 self.print_certificate()
             elif action_code == 'S_CRT':
                 self.scan_certificate()
-            elif action_code == 'NTF':
-                self.flts_notification()
+            # elif action_code == 'NTF':
+            #     self.flts_notification()
             elif action_code == 'SRC':
                 self.flts_search()
             elif action_code == 'RPT':
@@ -2439,8 +2447,8 @@ class STDMQGISLoader(object):
             "schemeEstablishment",
             Qt.BottomDockWidgetArea
         )
-        dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        dock_widget.show_dock_widget()
+        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+        self.dock_widget.show_dock_widget()
 
     def first_examination(self):
         """
@@ -2451,8 +2459,8 @@ class STDMQGISLoader(object):
             "firstExamination",
             Qt.BottomDockWidgetArea
         )
-        dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        dock_widget.show_dock_widget()
+        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+        self.dock_widget.show_dock_widget()
 
     def second_examination(self):
         """
@@ -2463,8 +2471,8 @@ class STDMQGISLoader(object):
             "secondExamination",
             Qt.BottomDockWidgetArea
         )
-        dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        dock_widget.show_dock_widget()
+        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+        self.dock_widget.show_dock_widget()
 
     def third_examination(self):
         """
@@ -2475,8 +2483,8 @@ class STDMQGISLoader(object):
             "thirdExamination",
             Qt.LeftDockWidgetArea
         )
-        dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        dock_widget.show_dock_widget()
+        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+        self.dock_widget.show_dock_widget()
 
     def revise_scheme(self):
         """
@@ -2487,8 +2495,8 @@ class STDMQGISLoader(object):
             "schemeLodgement",
             Qt.BottomDockWidgetArea
         )
-        dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        dock_widget.show_dock_widget()
+        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+        self.dock_widget.show_dock_widget()
 
     def scan_certificate(self):
         """
@@ -2506,8 +2514,8 @@ class STDMQGISLoader(object):
             "importPlot",
             Qt.LeftDockWidgetArea
         )
-        dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        dock_widget.show_dock_widget()
+        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+        self.dock_widget.show_dock_widget()
 
     def print_certificate(self):
         """Load the dialog for printing of certificate."""

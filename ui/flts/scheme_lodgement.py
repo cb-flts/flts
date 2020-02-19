@@ -1314,6 +1314,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         # Get scheme db object for manual saving to database.
         self.submit(True)
         scheme_obj = self.model()
+        scheme_obj.plot_status = 2    # TODO: Add plot status as foreign key
         QgsApplication.processEvents()
 
         pg_dlg.setLabelText(self.tr(
@@ -1499,7 +1500,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
     def populate_plot_workflow(self):
         """
         Update the workflow link table with import plot as unapproved.
-        :return:
+        :return: None
         """
         # Entity objects
         scheme_obj = self.schm_model()

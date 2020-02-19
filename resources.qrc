@@ -36,7 +36,9 @@
     <file>images/icons/flts_notification.png</file>
     <file>images/icons/flts_database_designer.png</file>
     <file>images/icons/flts_delete.png</file>
-    <file>images/icons/flts_certificate_print.png</file>
+    <file>images/icons/flts_delete.png</file>
+    <file>images/icons/flts_document_designer.png</file>
+    <file>images/icons/flts_document_generator.png</file>
     <file>images/icons/flts_certificate_scan.png</file>
     <file>images/icons/flts_content_auth.png</file>
     <file>images/icons/flts_scheme_establishment.png</file>

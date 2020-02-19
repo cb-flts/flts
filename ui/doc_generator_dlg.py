@@ -69,12 +69,14 @@ __all__ = ["DocumentGeneratorDialog", "EntityConfig"]
 
 LOGGER = logging.getLogger('stdm')
 
+
 class EntityConfig(object):
     """
     Configuration class for specifying
     the foreign key mapper and document
     generator settings.
     """
+
     def __init__(self, **kwargs):
         self._title = kwargs.pop("title", "")
         self._link_field = kwargs.pop("link_field", "")
@@ -147,20 +149,24 @@ class EntityConfig(object):
     def set_link_field(self, field):
         self._link_field = field
 
+
 class DocumentGeneratorDialogWrapper(object):
     """
     A utility class that fetches the tables in the active profile
     and creates the corresponding EntityConfig objects, which are then
     added to the DocumentGeneratorDialog.
     """
+
     def __init__(self, iface, parent=None, plugin=None):
         self._iface = iface
 
         self._doc_gen_dlg = DocumentGeneratorDialog(self._iface, parent, plugin=plugin)
+        self._doc_gen_dlg.hide_show_record_selection(False)
+        self._doc_gen_dlg.setWindowTitle('LandHold Title Generator')
         self._notif_bar = self._doc_gen_dlg.notification_bar()
 
         self.curr_profile = current_profile()
-        #Load entity configurations
+        # Load entity configurations
         self._load_entity_configurations()
 
     def _load_entity_configurations(self):
@@ -174,6 +180,9 @@ class DocumentGeneratorDialogWrapper(object):
 
             for i, t in enumerate(entities):
                 QApplication.processEvents()
+                # TODO modify these to select table based on context/docuemnts
+                if t.name != 'cb_plot':
+                    continue
                 # Exclude custom tenure entities
                 if 'check' in t.name:
                     continue
@@ -203,10 +212,10 @@ class DocumentGeneratorDialogWrapper(object):
 
         if model is not None:
             return EntityConfig(title=table_display_name,
-                            data_source=table_name,
-                            model=model,
-                            expression_builder=True,
-                            entity_selector=None)
+                                data_source=table_name,
+                                model=model,
+                                expression_builder=True,
+                                entity_selector=None)
 
         else:
             return None
@@ -227,11 +236,31 @@ class DocumentGeneratorDialogWrapper(object):
         return self._doc_gen_dlg.exec_()
 
 
+class ReportGeneratorDialogWrapper(object):
+    """
+        A utility class necessary for the generation of report sfrom tables in
+        flts profile.
+    """
+
+    def __init__(self, iface, parent=None, plugin=None):
+        self._iface = iface
+
+        self._doc_gen_dlg = DocumentGeneratorDialog(self._iface, parent, plugin=plugin)
+        self._doc_gen_dlg.hide_show_record_selection(False)
+        self._doc_gen_dlg.setWindowTitle('LandHold Report Generator')
+        self._notif_bar = self._doc_gen_dlg.notification_bar()
+
+        self.curr_profile = current_profile()
+
+        # TODO Add report generator configs
+
+
 class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
     """
     Dialog that enables a user to generate documents by using configuration
-    information for different entities.
+    information for different entities. 
     """
+
     def __init__(self, iface, parent=None, plugin=None):
         QDialog.__init__(self, parent)
         self.setupUi(self)
@@ -243,7 +272,7 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         self.curr_profile = current_profile()
         self.last_data_source = None
         self._config_mapping = OrderedDict()
-        
+
         self._notif_bar = NotificationBar(self.vlNotification)
 
         self._doc_generator = DocumentGenerator(self._iface, self)
@@ -252,20 +281,20 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
 
         enable_drag_sort(self.lstDocNaming)
 
-        #Configure generate button
+        # Configure generate button
         generateBtn = self.buttonBox.button(QDialogButtonBox.Ok)
         if not generateBtn is None:
             generateBtn.setText(QApplication.translate("DocumentGeneratorDialog",
                                                        "Generate"))
-        
-        #Load supported image types
+
+        # Load supported image types
         supportedImageTypes = QImageWriter.supportedImageFormats()
         for imageType in supportedImageTypes:
             imageTypeStr = imageType.data()
             self.cboImageType.addItem(imageTypeStr)
 
         self._init_progress_dialog()
-        #Connect signals
+        # Connect signals
         self.btnSelectTemplate.clicked.connect(self.onSelectTemplate)
         self.buttonBox.accepted.connect(self.onGenerate)
         self.chkUseOutputFolder.stateChanged.connect(self.onToggledOutputFolder)
@@ -275,6 +304,8 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
 
         self.btnShowOutputFolder.clicked.connect(self.onShowOutputFolder)
 
+    def hide_show_record_selection(self, state):
+        self.chk_template_datasource.setVisible(state)
 
     def _init_progress_dialog(self):
         """
@@ -288,7 +319,6 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         ent_config = EntityConfig(**kwargs)
         self.add_entity_config(ent_config)
 
-
     def add_entity_config(self, ent_config, progress_value=0):
         QApplication.processEvents()
         if not self._config_mapping.get(ent_config.title(), ""):
@@ -296,7 +326,7 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
             self.tabWidget.addTab(fk_mapper, ent_config.title())
             self._config_mapping[ent_config.title()] = ent_config
 
-            #Force list of column names to be loaded
+            # Force list of column names to be loaded
             if self.tabWidget.currentIndex() != 0:
                 self.tabWidget.setCurrentIndex(0)
 
@@ -312,7 +342,7 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         config = self.config(index)
 
         if not config is None:
-            #Set data source name
+            # Set data source name
             self._data_source = config.data_source()
 
     def on_use_template_datasource(self, state):
@@ -330,7 +360,7 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
     def onShowOutputFolder(self):
         reg_config = RegistryConfig()
         path = reg_config.read([COMPOSER_OUTPUT])
-        output_path = path.get(COMPOSER_OUTPUT,'')
+        output_path = path.get(COMPOSER_OUTPUT, '')
 
         # windows
         if sys.platform.startswith('win32'):
@@ -339,11 +369,10 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         # *nix systems
         if sys.platform.startswith('linux'):
             subprocess.Popen(['xdg-open', output_path])
-        
+
         # macOS
         if sys.platform.startswith('darwin'):
             subprocess.Popen(['open', output_path])
-
 
     def notification_bar(self):
         """
@@ -409,7 +438,7 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         fk_mapper.setNotificationBar(self._notif_bar)
 
         return fk_mapper
-            
+
     def onSelectTemplate(self):
         """
         Slot raised to load the template selector dialog.
@@ -432,7 +461,7 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
             )
             return
 
-        #Set the template selector to only load those templates that
+        # Set the template selector to only load those templates that
         # reference the current data source.
         filter_table = current_config.data_source()
         templateSelector = TemplateDocumentSelector(
@@ -441,20 +470,21 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         )
 
         if templateSelector.exec_() == QDialog.Accepted:
-            docName,docPath = templateSelector.documentMapping()
-            
+            docName, docPath = templateSelector.documentMapping()
+
             self.lblTemplateName.setText(docName)
             self._docTemplatePath = docPath
             if filter_table != self.last_data_source:
-                #Load template data source fields
+                # Load template data source fields
                 self._load_template_datasource_fields()
 
     def _load_template_datasource_fields(self):
-        #If using template data source
+        # If using template data source
         template_doc, err_msg = self._doc_generator.template_document(self._docTemplatePath)
         if template_doc is None:
             QMessageBox.critical(self, "Error Generating documents", QApplication.translate("DocumentGeneratorDialog",
-                                                "Error Generating documents - %s"%(err_msg)))
+                                                                                            "Error Generating documents - %s" % (
+                                                                                                err_msg)))
 
             return
 
@@ -462,11 +492,12 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
 
         if composer_ds is None:
             QMessageBox.critical(self, "Error Generating documents", QApplication.translate("DocumentGeneratorDialog",
-                                                "Error Generating documents - %s"%(err_msg)))
+                                                                                            "Error Generating documents - %s" % (
+                                                                                                err_msg)))
 
             return
 
-        #Load data source columns
+        # Load data source columns
         self._data_source = self.current_config().data_source()
 
         self.ds_entity = self.curr_profile.entity_by_name(
@@ -474,8 +505,8 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         )
 
         self._load_data_source_columns(self.ds_entity)
-            
-    def onToggledOutputFolder(self,state):
+
+    def onToggledOutputFolder(self, state):
         """
         Slot raised to enable/disable the generated output documents to be 
         written to the plugin composer output folder using the specified
@@ -483,10 +514,10 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         """
         if state == Qt.Checked:
             self.gbDocNaming.setEnabled(True)
-            
+
         elif state == Qt.Unchecked:
             self.gbDocNaming.setEnabled(False)
-            
+
     def reset(self, success_status=False):
         """
         Clears/resets the dialog from user-defined options.
@@ -498,7 +529,7 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         self.lblTemplateName.setText("")
         # reset form only if generation is successful
         if success_status:
-            fk_table_view = self.tabWidget.currentWidget().\
+            fk_table_view = self.tabWidget.currentWidget(). \
                 findChild(QTableView)
             while fk_table_view.model().rowCount() > 0:
                 fk_table_view.model().rowCount(0)
@@ -510,7 +541,7 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
 
             if self.cboImageType.count() > 0:
                 self.cboImageType.setCurrentIndex(0)
-        
+
     def onToggleExportImage(self, state):
         """
         Slot raised to enable/disable the image formats combobox.
@@ -531,10 +562,10 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         self.last_data_source = config.data_source()
         if config is None:
             self._notif_bar.insertErrorNotification(QApplication.translate("DocumentGeneratorDialog", \
-                                            "The entity configuration could not be extracted."))
+                                                                           "The entity configuration could not be extracted."))
             return
-        
-        #Get selected records and validate
+
+        # Get selected records and validate
         records = self.tabWidget.currentWidget().entities()
 
         if self.chk_template_datasource.isChecked():
@@ -542,62 +573,62 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
 
         if len(records) == 0:
             self._notif_bar.insertErrorNotification(QApplication.translate("DocumentGeneratorDialog", \
-                                                                          "Please load at least one entity record"))
+                                                                           "Please load at least one entity record"))
             return
-        
+
         if not self._docTemplatePath:
             self._notif_bar.insertErrorNotification(QApplication.translate("DocumentGeneratorDialog", \
-                                                                          "Please select a document template to use"))
+                                                                           "Please select a document template to use"))
             return
-        
+
         documentNamingAttrs = self.lstDocNaming.selectedMappings()
 
         if self.chkUseOutputFolder.checkState() == Qt.Checked and len(documentNamingAttrs) == 0:
             self._notif_bar.insertErrorNotification(QApplication.translate("DocumentGeneratorDialog", \
-                                                "Please select at least one field for naming the output document"))
+                                                                           "Please select at least one field for naming the output document"))
 
             return
-        
-        #Set output file properties
+
+        # Set output file properties
         if self.rbExpImage.isChecked():
             outputMode = DocumentGenerator.Image
             fileExtension = self.cboImageType.currentText()
             saveAsText = "Image File"
 
         else:
-            outputMode = DocumentGenerator.PDF 
+            outputMode = DocumentGenerator.PDF
             fileExtension = "pdf"
             saveAsText = "PDF File"
-            
-        #Show save file dialog if not using output folder
+
+        # Show save file dialog if not using output folder
         if self.chkUseOutputFolder.checkState() == Qt.Unchecked:
             docDir = source_document_location()
-            
+
             if self._outputFilePath:
                 fileInfo = QFileInfo(self._outputFilePath)
                 docDir = fileInfo.dir().path()
-                
+
             self._outputFilePath = QFileDialog.getSaveFileName(self,
-                                                    QApplication.translate("DocumentGeneratorDialog",
-                                                    "Save Document"),
-                                                    docDir,
-                                                    "{0} (*.{1})".format(
-                                                    QApplication.translate("DocumentGeneratorDialog",
-                                                                          saveAsText),
-                                                    fileExtension))
-            
+                                                               QApplication.translate("DocumentGeneratorDialog",
+                                                                                      "Save Document"),
+                                                               docDir,
+                                                               "{0} (*.{1})".format(
+                                                                   QApplication.translate("DocumentGeneratorDialog",
+                                                                                          saveAsText),
+                                                                   fileExtension))
+
             if not self._outputFilePath:
                 self._notif_bar.insertErrorNotification(
                     QApplication.translate("DocumentGeneratorDialog",
-                                "Process aborted. No output file was specified."))
+                                           "Process aborted. No output file was specified."))
 
                 return
-            
-            #Include extension in file name
-            self._outputFilePath = self._outputFilePath #+ "." + fileExtension
-            
+
+            # Include extension in file name
+            self._outputFilePath = self._outputFilePath  # + "." + fileExtension
+
         else:
-            #Multiple files to be generated.
+            # Multiple files to be generated.
             pass
 
         self._doc_generator.set_link_field(config.link_field())
@@ -605,12 +636,12 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         self._doc_generator.clear_attr_value_formatters()
 
         if not self.chk_template_datasource.isChecked():
-            #Apply cell formatters for naming output files
+            # Apply cell formatters for naming output files
             self._doc_generator.set_attr_value_formatters(config.formatters())
 
         entity_field_name = "id"
-        
-        #Iterate through the selected records
+
+        # Iterate through the selected records
         progressDlg = QProgressDialog(self)
         progressDlg.setMaximum(len(records))
 
@@ -624,21 +655,26 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
                     success_status = False
                     break
 
-                #User-defined location
+                # User-defined location
                 if self.chkUseOutputFolder.checkState() == Qt.Unchecked:
-                    status,msg = self._doc_generator.run(self._docTemplatePath, entity_field_name,
-                                                  record.id, outputMode,
-                                                  filePath = self._outputFilePath)
+                    status, msg = self._doc_generator.run(self._docTemplatePath, entity_field_name,
+                                                          record.id, outputMode,
+                                                          filePath=self._outputFilePath)
                     self._doc_generator.clear_temporary_layers()
-                #Output folder location using custom naming
+                    # Generate certificate number on document generation
+                    # self._doc_generator.gen_certificate_number()
+
+                # Output folder location using custom naming
                 else:
 
                     status, msg = self._doc_generator.run(self._docTemplatePath, entity_field_name,
-                                                    record.id, outputMode,
-                                                    dataFields = documentNamingAttrs,
-                                                    fileExtension = fileExtension,
-                                                    data_source = self.ds_entity.name)
+                                                          record.id, outputMode,
+                                                          dataFields=documentNamingAttrs,
+                                                          fileExtension=fileExtension,
+                                                          data_source=self.ds_entity.name)
                     self._doc_generator.clear_temporary_layers()
+
+                    # FLTS certificate number
 
                 if not status:
                     result = QMessageBox.warning(self,
@@ -650,17 +686,17 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
                         progressDlg.close()
                         success_status = False
 
-                        #Restore cursor
+                        # Restore cursor
                         QApplication.restoreOverrideCursor()
 
                         return
 
-                    #If its the last record and user has selected to ignore
-                    if i+1 == len(records):
+                    # If its the last record and user has selected to ignore
+                    if i + 1 == len(records):
                         progressDlg.close()
                         success_status = False
 
-                        #Restore cursor
+                        # Restore cursor
                         QApplication.restoreOverrideCursor()
 
                         return
@@ -671,10 +707,10 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
             QApplication.restoreOverrideCursor()
 
             QMessageBox.information(self,
-                QApplication.translate("DocumentGeneratorDialog",
-                                       "Document Generation Complete"),
-                QApplication.translate("DocumentGeneratorDialog",
-                                    "Document generation has successfully completed.")
+                                    QApplication.translate("DocumentGeneratorDialog",
+                                                           "Document Generation Complete"),
+                                    QApplication.translate("DocumentGeneratorDialog",
+                                                           "Document generation has successfully completed.")
                                     )
 
         except Exception as ex:
@@ -687,12 +723,12 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
                 "STDM",
                 QApplication.translate(
                     "DocumentGeneratorDialog",
-                    "Error Generating documents - %s"%(err_msg)
+                    "Error Generating documents - %s" % (err_msg)
                 )
             )
             success_status = False
 
-        #Reset UI
+        # Reset UI
         self.reset(success_status)
 
     def _dummy_template_records(self):
@@ -703,6 +739,7 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         data source records will be done internally within the
         DocumentGenerator class.
         """
+
         class _DummyRecord:
             id = 1
 
