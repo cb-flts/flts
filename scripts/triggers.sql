@@ -120,20 +120,18 @@ CREATE OR REPLACE FUNCTION insert_plots() RETURNS TRIGGER AS $insert_plots$
 $insert_plots$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION comment_user_timestamp() RETURNS TRIGGER AS $comment_user_timestamp$
-    BEGIN
-        NEW.user_id = (SELECT cb_user."id" FROM cb_user WHERE cb_user.user_name = "session_user"());
-				NEW.timestamp = now();
-				RETURN NEW;
-    END;
-$comment_user_timestamp$ LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION comment_user_timestamp() RETURNS TRIGGER AS $comment_user_timestamp$
+--     BEGIN
+--         NEW.user_id = (SELECT cb_user."id" FROM cb_user WHERE cb_user.user_name = "session_user"());
+-- 		RETURN NEW;
+--     END;
+-- $comment_user_timestamp$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION insert_timestamp() RETURNS TRIGGER AS $insert_timestamp$
     BEGIN
         NEW.timestamp = NOW();
 				RETURN NEW;
-        RETURN NULL;
     END;
 
 $insert_timestamp$ LANGUAGE plpgsql;
@@ -152,9 +150,13 @@ CREATE TRIGGER insert_plots
 AFTER INSERT ON cb_lis_plot
     FOR EACH ROW EXECUTE PROCEDURE insert_plots();
 
-CREATE TRIGGER comment_user_timestamp
+CREATE TRIGGER comment_timestamp
 BEFORE INSERT OR UPDATE ON cb_comment
-    FOR EACH ROW EXECUTE PROCEDURE comment_user_timestamp();
+    FOR EACH ROW EXECUTE PROCEDURE insert_timestamp();
+
+-- CREATE TRIGGER comment_user_timestamp
+-- BEFORE INSERT OR UPDATE ON cb_comment
+--     FOR EACH ROW EXECUTE PROCEDURE comment_user_timestamp();
 
 CREATE TRIGGER insert_workflow_timestamp
 BEFORE INSERT OR UPDATE ON cb_scheme_workflow
