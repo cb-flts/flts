@@ -2436,7 +2436,8 @@ class STDMQGISLoader(object):
         """
         workflow_manager = WorkflowManagerWidget(
             "Scheme Establishment Workflow Manager",
-            "schemeEstablishment"
+            "schemeEstablishment",
+            Qt.BottomDockWidgetArea
         )
         dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         dock_widget.show_dock_widget()
@@ -2447,7 +2448,8 @@ class STDMQGISLoader(object):
         """
         workflow_manager = WorkflowManagerWidget(
             "First Workflow Manager",
-            "firstExamination"
+            "firstExamination",
+            Qt.BottomDockWidgetArea
         )
         dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         dock_widget.show_dock_widget()
@@ -2458,7 +2460,8 @@ class STDMQGISLoader(object):
         """
         workflow_manager = WorkflowManagerWidget(
             "Second Workflow Manager",
-            "secondExamination"
+            "secondExamination",
+            Qt.BottomDockWidgetArea
         )
         dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         dock_widget.show_dock_widget()
@@ -2469,7 +2472,8 @@ class STDMQGISLoader(object):
         """
         workflow_manager = WorkflowManagerWidget(
             "Third Workflow Manager",
-            "thirdExamination"
+            "thirdExamination",
+            Qt.LeftDockWidgetArea
         )
         dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         dock_widget.show_dock_widget()
@@ -2480,7 +2484,8 @@ class STDMQGISLoader(object):
         """
         workflow_manager = WorkflowManagerWidget(
             "Revise Workflow Manager",
-            "schemeLodgement"
+            "schemeLodgement",
+            Qt.BottomDockWidgetArea
         )
         dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         dock_widget.show_dock_widget()
@@ -2498,7 +2503,8 @@ class STDMQGISLoader(object):
         """
         workflow_manager = WorkflowManagerWidget(
             "Plot Import Workflow Manager",
-            "importPlot"
+            "importPlot",
+            Qt.LeftDockWidgetArea
         )
         dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         dock_widget.show_dock_widget()
