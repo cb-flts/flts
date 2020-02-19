@@ -74,8 +74,7 @@ class WorkflowManagerModel(QAbstractTableModel):
         elif role == Qt.ToolTipRole and Qt.ToolTipRole in flag:
             return self._item_tooltip(index)
         elif role == Qt.CheckStateRole and Qt.ItemIsUserCheckable in flag:
-            if isinstance(value, float):
-                return Qt.Checked if int(value) == 1 else Qt.Unchecked
+            return Qt.Checked if value == 1 else Qt.Unchecked
         elif role == Qt.TextAlignmentRole:
             if Qt.ItemIsUserCheckable in flag:
                 return int(Qt.AlignCenter | Qt.AlignVCenter)
@@ -135,7 +134,6 @@ class WorkflowManagerModel(QAbstractTableModel):
             result = self.results[index.row()]
             column = index.column()
             if role == Qt.CheckStateRole:
-                # self.itemAboutToChange.emit(index, value)
                 result[column] = 1.0 if value == Qt.Checked else 0.0
             elif role == Qt.EditRole:
                 # TODO: Convert back to the data type value
@@ -218,8 +216,6 @@ class WorkflowManagerModel(QAbstractTableModel):
             icon_id = self._item_icon_id(index)
             if icon_id:
                 value = icon_id
-            elif isinstance(value, float):
-                value = int(value)
             return self._icons.get(value)
 
     def _item_icon_id(self, index):

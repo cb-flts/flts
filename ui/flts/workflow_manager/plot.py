@@ -16,6 +16,7 @@ copyright            : (C) 2019
  ***************************************************************************/
 """
 import re
+import decimal
 import itertools
 from collections import OrderedDict
 import csv
@@ -27,12 +28,15 @@ from PyQt4.QtCore import (
     QVariant
 )
 from qgis.core import (
+    QgsCoordinateTransform,
     QgsFeature,
     QgsField,
     QgsGeometry,
     QgsMapLayerRegistry,
     QgsProject,
-    QgsVectorLayer
+    QgsVectorDataProvider,
+    QgsVectorLayer,
+    QgsWKBTypes
 )
 from qgis.utils import iface
 from sqlalchemy import exc
@@ -40,7 +44,7 @@ from stdm.ui.flts.workflow_manager.data import Save
 
 NAME, IMPORT_AS, DELIMITER, HEADER_ROW, CRS_ID, \
 GEOM_FIELD, GEOM_TYPE = range(7)
-GEOMETRY, PARCEL_NUM, UPI_NUM, AREA, SCHEME_ID, PLOT_STATUS = range(6)
+GEOMETRY, PARCEL_NUM, UPI_NUM, AREA = range(4)
 GEOMETRY_PT, X_PT, Y_PT = range(3)
 WARNING = "Warning"
 
@@ -56,8 +60,10 @@ class PlotLayer:
         self._name = name
         self._provider_lib = provider_lib
         self._fields = fields
+        self._attribute_names = []
         self._data_provider = None
         self._layer = None
+        self._features = []
         self.project_instance().legendLayersAdded.connect(self._move_layer_top)
 
     @property
@@ -78,12 +84,31 @@ class PlotLayer:
         """
         self._layer = value
 
+    @property
+    def features(self):
+        """
+        Returns list of added features
+        :return _feature: Added features
+        :rtype _feature: List
+        """
+        return self._features
+
+    @property
+    def attribute_names(self):
+        """
+        Returns attribute names
+        :return _attribute_names: Attribute names
+        :rtype _attribute_names: List
+        """
+        return self._attribute_names
+
     def create_layer(self):
         """
         Creates a vector layer
         """
         self._layer = QgsVectorLayer(self._uri, self._name, self._provider_lib)
         self._set_data_provider()
+        self.add_attributes(self._attribute_fields)
         self._layer.updateFields()
 
     def _set_data_provider(self):
@@ -91,9 +116,27 @@ class PlotLayer:
         Sets the data provider
         """
         self._data_provider = self._layer.dataProvider()
-        fields = self._attribute_fields
-        if fields:
-            self._data_provider.addAttributes(fields)
+
+    def add_attributes(self, attributes):
+        """
+        Adds attributes to the layer
+        :param attributes: Layer attributes
+        :type attributes: List
+        """
+        if attributes:
+            self._data_provider.addAttributes(attributes)
+            self._set_attribute_name(attributes)
+
+    def _set_attribute_name(self, attributes):
+        """
+        Sets attribute names
+        :param attributes: Layer attributes
+        :type attributes: List
+        """
+        for attribute in attributes:
+            name = attribute.name()
+            if name not in self._attribute_names:
+                self._attribute_names.append(name)
 
     @property
     def _attribute_fields(self):
@@ -104,7 +147,7 @@ class PlotLayer:
         """
         if not self._fields:
             return
-        fields = [QgsField(name, type_)for name, type_ in self._fields]
+        fields = [QgsField(name, type_) for name, type_ in self._fields]
         return fields
 
     def wkt_geometry(self, wkt, attributes):
@@ -124,7 +167,8 @@ class PlotLayer:
         values = self._attribute_values(attributes)
         if values:
             feature.setAttributes(values)
-        self._data_provider.addFeatures([feature])
+        result, feature = self._data_provider.addFeatures([feature])
+        self._features.extend(feature)
 
     def _attribute_values(self, attributes):
         """
@@ -143,9 +187,11 @@ class PlotLayer:
 
     def get_fields(self, layer=None):
         """
-        Returns a list of layer fields
+        Returns the fields associated with this layer
         :param layer: Geometry layer
         :type layer: QgsVectorLayer
+        :return layer: QgsFields
+        :rtype layer: QgsFields
         """
         if not layer:
             layer = self._layer
@@ -156,11 +202,26 @@ class PlotLayer:
         """
         Returns a list of layer fields and types
         :param fields: Layer fields
-        :type fields: QgsField
+        :type fields: QgsFields
+        :return fields: Layer fields name and type
+        :rtype fields: List
         """
         if len(fields) > 0:
             fields = [(field.name(), field.type()) for field in fields]
             return fields
+
+    @staticmethod
+    def feature_area(feature):
+        """
+        Returns feature geometry area
+        :param feature: Feature
+        :type feature: QgsFeature
+        :return: Feature area
+        :rtype: Float
+        """
+        geom = feature.geometry()
+        if geom.wkbType() == QgsWKBTypes.Polygon:
+            return geom.area()
 
     @staticmethod
     def _move_layer_top(layers):
@@ -295,6 +356,43 @@ class PlotLayer:
         :type ids: List
         """
         cls.qgs_project.removeMapLayers(ids)
+
+    @classmethod
+    def transform_feature(cls, geom, source_crs, destination_crs):
+        """
+        Transforms a feature from source Coordinate
+        Reference System (CRS) to target CRS
+        :param geom: Input geometry
+        :type geom: QgsGeometry
+        :param source_crs: Source CRS
+        :type source_crs: String
+        :param destination_crs: Target CRS
+        :type destination_crs: String
+        """
+        tr = QgsCoordinateTransform(source_crs, destination_crs)
+        geom.transform(tr)
+
+    @classmethod
+    def export_to_wkt(cls, geom):
+        """
+        Exports geometry to WKT
+        :param geom: Input geometry
+        :type geom: QgsGeometry
+        :return: WKT
+        :rtype: String
+        """
+        return geom.exportToWkt()
+
+    @classmethod
+    def from_wkt(cls, wkt):
+        """
+        Creates and returns a new geometry from a WKT string
+        :param wkt: WKT data
+        :type wkt: String
+        :return: Geometry
+        :rtype: QgsGeometry
+        """
+        return QgsGeometry.fromWkt(wkt)
 
     @classmethod
     def project_instance(cls):
@@ -442,10 +540,24 @@ class UniqueParcelIdentifier:
     """
     Unique Parcel Identifier (UPI) object
     """
+
+    rems = ["REM", "ACCES", "POS"]
+
     def __init__(self, data_service, prefix):
         self._data_service = data_service
         self._prefix = prefix
         self._plot_counter = 0
+        self._wkt_plot_numbers = []
+
+    def scheme_plot_numbers(self):
+        """
+        Returns the Scheme plot numbers
+        :return plot_numbers: Scheme plot numbers
+        :rtype plot_numbers: List
+        """
+        plot_numbers = self._data_service.scheme_plot_numbers()
+        plot_numbers = [num for num, in plot_numbers]
+        return plot_numbers
 
     def aucode(self):
         """
@@ -456,19 +568,24 @@ class UniqueParcelIdentifier:
         relevant_authority = self._data_service.scheme_relevant_authority()
         return relevant_authority.au_code
 
-    def plot_number(self):
+    def plot_number(self, plot_id):
         """
         Returns Scheme Plot Number
+        :param plot_id: Plot identifier
+        :type: Object
         :return: Plot number
         :rtype: String
         """
-        if self._plot_counter == 0 and self._data_service.is_plot():
-            plot_number = self._data_service.max_plot_number()
-            if plot_number:
-                return self._generate_plot_number(int(plot_number) + 1)
-        return self._generate_plot_number(1)
+        plot_id = str(plot_id)
+        if self._is_id_remainder(plot_id):
+            return plot_id
+        plot_number = self._extract_plot_number(plot_id)
+        if plot_number:
+            plot_number = self._generate_plot_number(plot_number)
+        return plot_number
 
-    def _generate_plot_number(self, num):
+    @staticmethod
+    def _generate_plot_number(num):
         """
         Returns a new plot number
         :param num: New number
@@ -477,10 +594,69 @@ class UniqueParcelIdentifier:
         :rtype: String
         """
         prefix = "000000"
-        self._plot_counter += num
-        suffix = str(self._plot_counter)
+        suffix = str(num)
         prefix = prefix[:-len(suffix)]
         return prefix + suffix
+
+    def _is_id_remainder(self, plot_id):
+        """
+        Checks if the WKT plot ID is the remainder
+        :param plot_id: Plot ID
+        :param plot_id: String
+        :return: True or False
+        :return: Boolean
+        """
+        for rem in self.rems:
+            if plot_id.find(rem) != -1:
+                return True
+        return False
+
+    @staticmethod
+    def _extract_plot_number(plot_id):
+        """
+        Extracts plot number from the WKT plot ID
+        :param plot_id: Plot ID
+        :param plot_id: String
+        :return plot_id: Plot number
+        :param plot_id: Integer
+        """
+        try:
+            plot_id = [c for c in plot_id if c.isdigit()]
+            plot_id = int("".join(plot_id))
+            return plot_id
+        except ValueError:
+            return
+    @property
+    def wkt_plot_numbers(self):
+        """
+        Returns plot numbers generated from the WKT file
+        :return _wkt_plot_numbers: Plot numbers
+        :rtype _wkt_plot_numbers: List
+        """
+        return self._wkt_plot_numbers
+
+    def store_wkt_plot_number(self, plot_number):
+        """
+        Stores plot numbers generated from the WKT file
+        :param plot_number: Plot number
+        :type plot_number: String
+        """
+        self._wkt_plot_numbers.append(plot_number)
+
+    @staticmethod
+    def _is_number(value):
+        """
+        Checks if value is a number
+        :param value: Input value
+        :type value: Object
+        :return: True if number otherwise return False
+        :rtype: Boolean
+        """
+        try:
+            float(value)
+            return True
+        except (ValueError, TypeError, Exception):
+            return False
 
     def upi(self, plot_number, aucode):
         """
@@ -492,7 +668,7 @@ class UniqueParcelIdentifier:
         :return upi: Unique Parcel Identifier
         :return upi: String
         """
-        upi = "{0}/{1}/{2}".format(self._prefix, aucode, plot_number)
+        upi = "{0}/{1}/{2}".format(self._prefix, plot_number, aucode)
         return upi
 
 
@@ -543,6 +719,13 @@ class PlotPreview(Plot):
         self._layers = {}
         self._dirty = {}
         self._errors = {}
+        self._plot_numbers = {}
+        self.wkt_header_options = {
+            "parcel_number": (
+                "id", "parcel_number",
+                "parcel number", "parcel"
+            )
+        }
 
     def set_settings(self, settings):
         """
@@ -604,6 +787,23 @@ class PlotPreview(Plot):
             self._set_errors(fpath)
         return results
 
+    @staticmethod
+    def _filter_whitespace(in_file, hrow):
+        """
+        Returns non-whitespace line of data
+        :param in_file: Input file
+        :param in_file: TextIOWrapper
+        :param hrow: Header row number
+        :type hrow: Integer
+        :return line: Non-whitespace line
+        :return line: generator
+        """
+        for row, line in enumerate(in_file):
+            if row == hrow:
+                continue
+            if not line.isspace():
+                yield line
+
     def _set_errors(self, fpath):
         """
         Sets counted errors in a previewed file
@@ -634,27 +834,92 @@ class PlotPreview(Plot):
         """
         results = []
         upi = UniqueParcelIdentifier(self._data_service, "W")
+        scheme_plot_numbers = upi.scheme_plot_numbers()
         aucode = upi.aucode()
+        area_attribute = False
         for row, data in enumerate(csv_reader):
             contents = {}
             self._items = {}
             value = self._get_wkt(data, GEOMETRY)
             if value:
                 contents[GEOMETRY] = unicode(value)
-                # value = self._get_value(
-                #     data, ("parcel", "parcel number", "id"), PARCEL_NUM
-                # )
-                # contents[PARCEL_NUM] = unicode(value)
-                value = upi.plot_number()
-                contents[PARCEL_NUM] = unicode(value)
-                contents[UPI_NUM] = unicode(upi.upi(aucode, value))
-                value = self._get_value(data, ("area",), AREA)
-                contents[AREA] = self._to_float(value, AREA)
-                contents["items"] = self._items
+                field_options = self.wkt_header_options["parcel_number"]
+                value = self._get_value(data, field_options, PARCEL_NUM)
+                plot_number = self._plot_number(value, upi, scheme_plot_numbers)
+                contents[PARCEL_NUM] = unicode(plot_number)
+                if plot_number != WARNING:
+                    plot_number = unicode(upi.upi(aucode, plot_number))
+                contents[UPI_NUM] = self._on_empty_value(UPI_NUM, plot_number)
+                contents[AREA] = ""
                 attributes = self._layer_attributes(contents)
                 self._create_layer(contents[GEOMETRY], attributes)
+                if not area_attribute:
+                    self._add_attributes([QgsField("Area", QVariant.Double)])
+                    area_attribute = True
+                value = self._plot_area()
+                self._update_plot_attribute("Area", value)
+                contents[AREA] = unicode(self._to_float(value, AREA))
+                contents["items"] = self._items
                 results.append(contents)
         return results
+
+    def _plot_number(self, value, upi, scheme_plot_numbers):
+        """
+        Returns plot number
+        :param value: WKT value
+        :param value: Object
+        :param upi: Unique Parcel Identifier
+        :param upi: UniqueParcelIdentifier
+        :param scheme_plot_numbers: Existing scheme plot numbers
+        :param scheme_plot_numbers: String
+        :return value: Plot number
+        :return value: String
+        """
+        if value == WARNING:
+            return value
+        plot_number = upi.plot_number(value)
+        if plot_number is None:
+            self._set_invalid_tip(PARCEL_NUM, "Invalid identifier")
+        elif plot_number in upi.wkt_plot_numbers:
+            self._set_invalid_tip(PARCEL_NUM, "Duplicate WKT identifier")
+        elif plot_number in scheme_plot_numbers:
+            value = plot_number
+            tip = "Scheme plot number exist in the database"
+            self._set_invalid_tips({PARCEL_NUM: tip, UPI_NUM: tip})
+        else:
+            value = plot_number
+            upi.store_wkt_plot_number(plot_number)
+            self._plot_numbers[self._settings.fpath] = upi.wkt_plot_numbers
+        return value
+
+    def _plot_area(self):
+        """
+        Returns area value
+        :return area: Area value
+        :rtype area: Object
+        """
+        if self._plot_layer and self._plot_layer.features:
+            feature = self._plot_layer.features[-1]
+            area = self._feature_area(feature)
+            area = self._on_empty_value(AREA, area)
+            return area
+        else:
+            return self._on_empty_value(AREA)
+
+    def _update_plot_attribute(self, field_name, value):
+        """
+        Updates plot attribute
+        :param field_name: Field name
+        :type field_name: String
+        :param value: Update value
+        :type value: Object
+        """
+        if self._plot_layer and self._plot_layer.features:
+            layer = self._plot_layer.layer
+            feature = self._plot_layer.features[-1]
+            value = self._replace_warning(value)
+            attribute = {layer.fieldNameIndex(field_name): value}
+            self._update_feature_attribute(layer, feature, attribute)
 
     def _servitude_file_contents(self, csv_reader):
         """
@@ -665,6 +930,7 @@ class PlotPreview(Plot):
         :return results: List
         """
         results = []
+        self._remove_plot_numbers(self._settings.fpath)
         for row, data in enumerate(csv_reader):
             contents = {}
             self._items = {}
@@ -686,6 +952,7 @@ class PlotPreview(Plot):
         :return results: List
         """
         results = []
+        self._remove_plot_numbers(self._settings.fpath)
         for row, data in enumerate(csv_reader):
             contents = {}
             self._items = {}
@@ -693,30 +960,13 @@ class PlotPreview(Plot):
             if value:
                 contents[GEOMETRY_PT] = unicode(value)
                 lat, long_ = self._beacon_coordinates(value)
-                contents[X_PT] = self._to_float(lat, X_PT)
-                contents[Y_PT] = self._to_float(long_, Y_PT)
+                contents[X_PT] = unicode(self._to_float(lat, X_PT))
+                contents[Y_PT] = unicode(self._to_float(long_, Y_PT))
                 contents["items"] = self._items
                 attributes = self._layer_attributes(contents)
                 self._create_layer(contents[GEOMETRY_PT], attributes)
                 results.append(contents)
         return results
-
-    @staticmethod
-    def _filter_whitespace(in_file, hrow):
-        """
-        Returns non-whitespace line of data
-        :param in_file: Input file
-        :param in_file: TextIOWrapper
-        :param hrow: Header row number
-        :type hrow: Integer
-        :return line: Non-whitespace line
-        :return line: generator
-        """
-        for row, line in enumerate(in_file):
-            if row == hrow:
-                continue
-            if not line.isspace():
-                yield line
 
     def _geometry_type(self):
         """
@@ -745,36 +995,30 @@ class PlotPreview(Plot):
         :return value: Plot import file value
         :return value: Object
         """
-        invalid_tip = self._display_tooltip("Invalid WKT", WARNING)
+        invalid_tip = "Invalid WKT"
         value = data.get(self._settings.geom_field)
         if value is None:
             return
         elif isinstance(value, list):
-            self._items[column] = invalid_tip
+            self._set_invalid_tip(column, invalid_tip)
             return value
         geom_type, coordinates, geom = self._geometry(value)
         if not geom:
-            self._items[column] = invalid_tip
+            self._set_invalid_tip(column, invalid_tip)
             return value
         else:
             geom_type = self._geometry_types.get(geom_type)
             if not geom_type:
-                self._items[column] = self._display_tooltip(
-                    "Geometry type not allowed", WARNING
-                )
-                self._error_counter += 1
+                self._set_invalid_tip(column, "Geometry type not allowed")
             elif geom_type != self._settings.geom_type:
-                self._items[column] = self._display_tooltip(
-                    "Does not match set geometry type ({})".format(self._settings.geom_type),
-                    WARNING
-                )
-                self._error_counter += 1
-            elif self._import_type.get(self._settings.geom_type) != self._settings.import_as:
-                self._items[column] = self._display_tooltip(
-                    "Does not match set import type ({})".format(self._settings.import_as),
-                    WARNING
-                )
-                self._error_counter += 1
+                tip = "Mismatch with set geometry type ({})".\
+                    format(self._settings.geom_type)
+                self._set_invalid_tip(column, tip)
+            elif self._import_type.get(self._settings.geom_type) != \
+                    self._settings.import_as:
+                tip = "Mismatch with set import type ({})".\
+                    format(self._settings.import_as)
+                self._set_invalid_tip(column, tip)
             return value
 
     def _get_value(self, data, field_names, column):
@@ -790,9 +1034,7 @@ class PlotPreview(Plot):
         :return value: Object
         """
         value = self._field_value(data, field_names)
-        warning_flag = self._empty_value(column, value)
-        if warning_flag:
-            value = warning_flag
+        value = self._on_empty_value(column, value)
         return value
 
     @staticmethod
@@ -838,14 +1080,12 @@ class PlotPreview(Plot):
         :return coordinate: Coordinate value
         :rtype coordinate: String
         """
-        warning_flag = self._empty_value(column, coordinate)
-        if warning_flag:
-            coordinate = warning_flag
+        coordinate = self._on_empty_value(column, coordinate)
         return coordinate
 
-    def _empty_value(self, column, value):
+    def _on_empty_value(self, column, value=None):
         """
-        Returns flag for empty value
+        Set empty value
         :param column: Table view column position
         :type column: Integer
         :param value: Plot import file value
@@ -853,11 +1093,11 @@ class PlotPreview(Plot):
         :return value: Empty value flag
         :return value: String
         """
-        if value is None or not str(value).strip():
+        if value == WARNING or value is None or not str(value).strip():
             value = WARNING
             self._items[column] = self._decoration_tooltip("Missing value")
             self._error_counter += 1
-            return value
+        return value
 
     def _to_float(self, value, column):
         """
@@ -870,12 +1110,10 @@ class PlotPreview(Plot):
         :return value: Object
         """
         if self._is_number(value):
-            value = float(value)
+            value = round(decimal.Decimal(value), 6)
         else:
             if value != WARNING:
-                self._items[column] = \
-                    self._display_tooltip("Value is not a number", WARNING)
-                self._error_counter += 1
+                self._set_invalid_tip(column, "Value is not a number")
         return value
 
     @staticmethod
@@ -892,6 +1130,29 @@ class PlotPreview(Plot):
             return True
         except (ValueError, TypeError, Exception):
             return False
+
+    def _set_invalid_tips(self, tips):
+        """
+        Sets invalid tips to columns
+        :param tips: Table view column tips
+        :type tips: Dictionary
+        """
+        for column, tip in tips.items():
+            self._set_invalid_tip(column, tip)
+
+    def _set_invalid_tip(self, column, tip=None):
+        """
+        Sets invalid tip on a column
+        :param column: Table view column position
+        :type column: Integer
+        :param tip: Tooltip message
+        :type tip: String
+        """
+        invalid_tip = self._display_tooltip("Invalid value", WARNING)
+        if tip:
+            invalid_tip = self._display_tooltip(tip, WARNING)
+        self._items[column] = invalid_tip
+        self._error_counter += 1
 
     @staticmethod
     def _display_tooltip(tip, icon_id):
@@ -925,7 +1186,7 @@ class PlotPreview(Plot):
             if column == GEOMETRY or column == 'items':
                 continue
             name = headers[column].name
-            name = "_".join(name.split())[:10]
+            name = name.strip().replace(" ", "_")[:10]
             attr.append(name)
             if headers[column].type == "float":
                 value = self._attribute_to_float(value)
@@ -1075,6 +1336,16 @@ class PlotPreview(Plot):
         if self._plot_layer:
             return self._plot_layer.layer
 
+    def get_layer(self, parent_id):
+        """
+        Returns a layer identified by parent identifier
+        :param parent_id: Parent record/item identifier
+        :type parent_id: String
+        :return _layer: Layer
+        :rtype _layer: QgsVectorLayer
+        """
+        return self._layers.get(parent_id)
+
     def _signal_layers_removed(self):
         """
         Emits layersWillBeRemoved signal
@@ -1197,6 +1468,62 @@ class PlotPreview(Plot):
         """
         self._errors = {}
 
+    def _add_attributes(self, attributes):
+        """
+        Adds attributes to the layer
+        :param attributes: Layer attributes
+        :type attributes: List
+        """
+        if not self._plot_layer:
+            return
+        self._plot_layer.add_attributes(attributes)
+        self.layer.updateFields()
+
+    def _feature_area(self, feature):
+        """
+        :param feature: Feature
+        :type feature: QgsFeature
+        :return: Feature area
+        :rtype: Float
+        """
+        if not self._plot_layer:
+            return
+        return self._plot_layer.feature_area(feature)
+
+    @staticmethod
+    def _update_feature_attribute(layer, feature, attribute):
+        """
+        Updates feature attribute value
+        :param feature: Feature
+        :type feature: QgsFeature
+        :param attribute: Attribute to be set (field index, value)
+        :type attribute: Tuple
+        """
+        if not layer or not feature:
+            return
+        caps = layer.dataProvider().capabilities()
+        attribute = {feature.id(): attribute}
+        if caps and QgsVectorDataProvider.ChangeAttributeValues:
+            layer.dataProvider().changeAttributeValues(attribute)
+
+    @property
+    def plot_numbers(self):
+        """
+        Returns plot numbers
+        :return _plot_numbers: Plot numbers
+        :rtype _plot_numbers: Dictionary
+        """
+        return self._plot_numbers
+
+    def _remove_plot_numbers(self, fpath):
+        """
+        Removes plot numbers of a previewed file
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        """
+        if fpath in self._plot_numbers:
+            del self._plot_numbers[fpath]
+
     def get_headers(self):
         """
         Returns column label configurations
@@ -1208,23 +1535,24 @@ class PlotPreview(Plot):
 
 class ImportPlot:
     """
-    Imports plot values
+    Imports plot data
     """
-    def __init__(self, model, scheme_id, srid, data_service, col_keys):
+    def __init__(self, model, scheme_id, data_service, col_keys, crs_id):
         self._model = model
         self._scheme_id = scheme_id
-        self._srid = srid
         self._data_service = data_service
-        self._options = data_service.save_columns
-        self.col_keys = col_keys
+        self._save_options = data_service.save_columns
+        self._col_keys = col_keys
+        self._crs_id = crs_id
+        self._geom_column = 0
 
     def save(self):
         """
-        Imports plots into the database
+        Imports plots data into the database
         :return saved: Number of saved items
         :rtype saved: Integer
         """
-        imported = 0
+
         try:
             items = self._import_items()
             imported = Save(
@@ -1234,7 +1562,7 @@ class ImportPlot:
             ).save()
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
-        finally:
+        else:
             return imported
 
     def _import_items(self):
@@ -1245,15 +1573,17 @@ class ImportPlot:
         """
         try:
             import_items = {}
+            source_srid = str(self._crs_id.split(":")[1])
+            destination_srid = str(self._data_service.geom_srid)
             for row, data in enumerate(self._model.results):
                 items = []
-                for key in self.col_keys:
+                for key in self._col_keys:
                     value = data[key]
-                    option = self._options[key]
-                    if key == GEOMETRY:
-                        value = "SRID={0};{1}".format(self._srid, value)
-                    elif key == SCHEME_ID:
-                        value = self._scheme_id
+                    option = self._save_options[key]
+                    if key == self._geom_column:
+                        if destination_srid != source_srid:
+                            value = self._transform_wkt(value, source_srid, destination_srid)
+                        value = "SRID={0};{1}".format(destination_srid, value)
                     items.append([option.column, value, option.entity])
                 items.append(self._scheme_items())
                 import_items[row] = items
@@ -1261,15 +1591,158 @@ class ImportPlot:
         except (AttributeError, KeyError, Exception) as e:
             raise e
 
+    @staticmethod
+    def _transform_wkt(wkt, source_crs, destination_crs):
+        """
+        Transforms Well-Known (WKT) Text string from source
+        Coordinate Reference System (CRS) to target CRS
+        :param wkt: Well-Known Text
+        :type wkt: String
+        :param source_crs: Source CRS
+        :type source_crs: String
+        :param destination_crs: Target CRS
+        :type destination_crs: String
+        """
+        geom = PlotLayer.from_wkt(wkt)
+        PlotLayer.transform_feature(geom, source_crs, destination_crs)
+        return PlotLayer.export_to_wkt(geom)
+
     def _scheme_items(self):
         """
         Return scheme items
         :return: Scheme items
         :rtype: List
         """
-        option = self._options[SCHEME_ID]
-        scheme_id = option.column
-        return list((scheme_id, self._scheme_id, option.entity))
+        option = self._save_options["SCHEME_ID"]
+        return list((option.column, self._scheme_id, option.entity))
+
+
+class SavePlotSTR:
+    """
+    Saves Plot (spatial unit) and  Holders (Party)
+    Social Tenure Relationship (STR) database record(s)
+    """
+    def __init__(self, data_service, saved_plots, plot_numbers, scheme_id=None):
+        self._data_service = data_service
+        self._saved_plots = saved_plots
+        self._plot_numbers = plot_numbers
+        self._scheme_id = scheme_id
+        self._save_options = data_service.save_columns
+
+    def save(self):
+        """
+        Saves plot STR data into the database
+        :return saved: Number of saved items
+        :rtype saved: Integer
+        """
+
+        try:
+            items = self._str_items()
+            saved = Save(
+                items,
+                self._saved_plots,
+                self._data_service
+            ).save()
+        except (AttributeError, exc.SQLAlchemyError, Exception) as e:
+            raise e
+        else:
+            return saved
+
+    def _str_items(self):
+        """
+        Returns STR items to be saved
+        :return str_items: Imported items
+        :rtype str_items: Dictionary
+        """
+        try:
+            str_items = {}
+            plot_ids = self._plot_ids()
+            holder_ids = self._holder_ids()
+            for row, plot_number in enumerate(self._plot_numbers):
+                items = []
+                plot_number = self._to_int(plot_number)
+                if not plot_number or plot_number not in holder_ids:
+                    continue
+                for option in self._save_options:
+                    value = option.value
+                    if not value:
+                        if option.column == "plot_id":
+                            value = plot_ids[plot_number]
+                        elif option.column == "holder_id":
+                            value = holder_ids[plot_number]
+                    items.append([option.column, value, option.entity])
+                str_items[row] = items
+            return str_items
+        except (AttributeError, KeyError, Exception) as e:
+            raise e
+
+    def _plot_ids(self):
+        """
+        Returns plot identifiers - primary keys
+        :return: Plot identifiers
+        :rtype: Dictionary
+        """
+        results = self._data_service.plot_ids(self._plot_numbers)
+        results = [
+            (int(plot_number), id_)
+            for plot_number, id_ in results
+            if plot_number.isdigit()
+        ]
+        return dict(results)
+
+    def _holder_ids(self):
+        """
+        Returns holder identifiers - primary keys
+        :return: Holder identifiers
+        :rtype: Dictionary
+        """
+        results = self._data_service.holder_ids(self._int_plot_numbers())
+        results = [
+            (int(plot_number), id_)
+            for plot_number, id_ in
+            self._scheme_holders(results)
+        ]
+        return dict(results)
+
+    def _int_plot_numbers(self):
+        """
+        Converts plot numbers to integer
+        :return plot_numbers: List of plot numbers
+        :return plot_numbers: List
+        """
+        plot_numbers = []
+        for plot_number in self._plot_numbers:
+            if plot_number.isdigit():
+                plot_numbers.append(int(plot_number))
+        return plot_numbers
+
+    @staticmethod
+    def _to_int(value):
+        """
+        Casts value to integer
+        :param value: Value object
+        :type value: Object
+        :return value: Integer value
+        :return value: Object
+        """
+        if not value.isdigit():
+            return
+        return int(value)
+
+    def _scheme_holders(self, holders):
+        """
+        Yields holder IDs and plot numbers of a scheme
+        :param holders: Holder query results
+        :type holders: Query
+        :return plot_number: Plot number
+        :rtype plot_number: Integer
+        :return id: Holder ID
+        :rtype id: Integer
+        """
+        for holder in holders:
+            for scheme in holder.cb_scheme_collection:
+                if scheme.id == self._scheme_id:
+                    yield holder.plot_number, holder.id
 
 
 class PlotFile(Plot):

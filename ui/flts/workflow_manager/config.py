@@ -15,7 +15,7 @@ copyright            : (C) 2019
  *                                                                         *
  ***************************************************************************/
 """
-
+import datetime
 from collections import namedtuple
 from PyQt4.QtCore import (QSize, Qt,)
 from PyQt4.QtGui import (
@@ -281,6 +281,17 @@ class ServitudeImportPreviewConfig(Config):
         """
         return self.get_data('servitude_preview_columns')
 
+    @property
+    def servitude_save_columns(self):
+        """
+        Scheme servitude import preview
+        table view save column options
+        :return: Save column values
+        :rtype: List
+        """
+        return self.get_data('save_columns').\
+            get('servitude_import_save', None)
+
 
 class BeaconImportPreviewConfig(Config):
     """
@@ -297,6 +308,17 @@ class BeaconImportPreviewConfig(Config):
         """
         return self.get_data('beacon_preview_columns')
 
+    @property
+    def beacon_save_columns(self):
+        """
+        Scheme beacon import preview
+        table view save column options
+        :return: Save column values
+        :rtype: List
+        """
+        return self.get_data('save_columns').\
+            get('beacon_import_save', None)
+
 
 class PlotViewerConfig(Config):
     """
@@ -310,6 +332,51 @@ class PlotViewerConfig(Config):
         :rtype: List
         """
         return self.get_data('plot_viewer_columns')
+
+
+class BeaconViewerConfig(Config):
+    """
+    Scheme beacon viewer table view configuration interface
+    """
+    @property
+    def columns(self):
+        """
+        Scheme beacon viewer table view columns options
+        :return: Table view columns and query columns options
+        :rtype: List
+        """
+        return self.get_data('beacon_viewer_columns')
+
+
+class ServitudeViewerConfig(Config):
+    """
+    Scheme servitude viewer table view configuration interface
+    """
+    @property
+    def columns(self):
+        """
+        Scheme servitude viewer table view columns options
+        :return: Table view columns and query columns options
+        :rtype: List
+        """
+        return self.get_data('servitude_viewer_columns')
+
+
+class PlotSTRConfig(Config):
+    """
+    Scheme Plot Social Tenure Relationship (STR)
+    configuration interface
+    """
+
+    @property
+    def str_save_columns(self):
+        """
+        Scheme plot STR save column options
+        :return: Save column values
+        :rtype: List
+        """
+        return self.get_data('save_columns').\
+            get('plot_str_save', None)
 
 
 class StyleSheet(Config):
@@ -489,20 +556,24 @@ class FilterQueryBy:
     def __init__(self):
         self._profile = None
 
-    def __call__(self, entity_name, filters):
+    def __call__(self, entity_name, filters=None, columns=None):
         """
         Return query object on filter by a column value
         :param entity_name: Entity name
         :type entity_name: String
         :param filters: Column filters - column name and value
         :type filters: Dictionary
+        :type columns: Fields to select from
+        :type columns: List
         :return: Filter entity query object
         :rtype: Entity object
         """
         try:
             if not self._profile:
                 self._profile = current_profile()
-            query_obj = self._entity_query_object(entity_name)
+            query_obj = self._entity_query_object(entity_name, columns)
+            if not filters:
+                return query_obj
             return self._filter_by(query_obj, filters)
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
@@ -523,18 +594,24 @@ class FilterQueryBy:
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
 
-    def _entity_query_object(self, entity_name):
+    def _entity_query_object(self, entity_name, columns=None):
         """
         Return query object of an entity
         :param entity_name: Entity name
         :type entity_name: String
+        :param columns: Fields to select from
+        :type columns: List
         :return:Entity query object
         :rtype List
         """
+        columns = columns if isinstance(columns, list) else []
         model = self._entity_model(entity_name)
         entity_object = model()
         try:
-            return entity_object.queryObject()
+            if len(columns) == 0:
+                return entity_object.queryObject()
+            else:
+                return entity_object.queryObject(columns)
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
 
@@ -608,7 +685,8 @@ class ColumnSettings:
         return column
 
 
-GEOMETRY, PARCEL_NUM, UPI_NUM, AREA, SCHEME_ID, PLOT_STATUS = range(6)
+GEOMETRY, PARCEL_NUM, UPI_NUM, AREA = range(4)
+GEOMETRY_PT, X_PT, Y_PT = range(3)
 Column = namedtuple('Column', ['name', 'type', 'flag'])
 Icon = namedtuple('Icon', ['icon', 'size'])
 LookUp = namedtuple(
@@ -702,8 +780,16 @@ configurations = {
                 name='Scheme Number', type="text", flag=(Qt.DisplayRole,)
             ): {'scheme_number': 'scheme_number'}
         },
-        {Column(name='First Name', type="text", flag=(Qt.DisplayRole,)): 'first_name'},
-        {Column(name='Surname', type="text", flag=(Qt.DisplayRole,)): 'surname'},
+        {
+            Column(
+                name='First Name', type="text", flag=(Qt.DisplayRole,)
+            ): 'holder_first_name'
+        },
+        {
+            Column(
+                name='Surname', type="text", flag=(Qt.DisplayRole,)
+            ): 'holder_surname'
+        },
         {
             Column(
                 name='Gender', type="text", flag=(Qt.DisplayRole,)
@@ -717,17 +803,17 @@ configurations = {
         {
             Column(
                 name='Date of Birth', type="date", flag=(Qt.DisplayRole,)
-            ): 'date_of_birth'
+            ): 'holder_date_of_birth'
         },
         {
             Column(
                 name='Name of Juristic Person', type="text", flag=(Qt.DisplayRole,)
-            ): 'name_of_juristic_person'
+            ): 'juristic_person_name'
         },
         {
             Column(
                 name='Reg. No. of Juristic Person', type="text", flag=(Qt.DisplayRole,)
-            ): 'reg_no_of_juristic_person'
+            ): 'juristic_person_number'
         },
         {
             Column(
@@ -820,7 +906,7 @@ configurations = {
         COMMENT_COLUMN='comment', VIEW_PDF=5
     ),
     'scheme_columns': [
-        {Column(name='', type="integer", flag=(Qt.ItemIsUserCheckable,)): '0'},
+        {Column(name='', type="integer", flag=(Qt.ItemIsUserCheckable,)): 0},
         {
             Column(
                 name='Scheme Number', type="text", flag=(Qt.DisplayRole,)
@@ -856,7 +942,6 @@ configurations = {
                 name='Region', type="text", flag=(Qt.DisplayRole,)
             ): {'cb_check_lht_region': 'value'}
         },
-        {Column(name='Township', type="text", flag=(Qt.DisplayRole,)): 'township_name'},
         {
             Column(
                 name='Registration Division', type="integer", flag=(Qt.DisplayRole,)
@@ -907,7 +992,7 @@ configurations = {
         Column(name='Geometry', type="text", flag=(Qt.DisplayRole,)),
         Column(name='Parcel Number', type="text", flag=(Qt.DisplayRole,)),
         Column(name='UPI Number', type="text", flag=(Qt.DisplayRole,)),
-        Column(name='Area', type="float", flag=(Qt.DisplayRole,))
+        Column(name='Area (sq. m)', type="float", flag=(Qt.DisplayRole,))
     ],
     'servitude_preview_columns': [
         Column(name='Geometry', type="text", flag=(Qt.DisplayRole,))
@@ -920,6 +1005,11 @@ configurations = {
     'plot_viewer_columns': [
         {
             Column(
+                name='Scheme Number', type="text", flag=(Qt.DisplayRole,)
+            ): {'cb_scheme': 'scheme_number'}
+        },
+        {
+            Column(
                 name='Plot Number', type="text", flag=(Qt.DisplayRole,)
             ): 'plot_number'
         },
@@ -930,8 +1020,32 @@ configurations = {
         },
         {
             Column(
-                name='Area', type="float", flag=(Qt.DisplayRole,)
+                name='Area (sq. m)', type="float", flag=(Qt.DisplayRole,)
             ): 'area'
+        }
+    ],
+    'beacon_viewer_columns': [
+        {
+            Column(
+                name='Scheme Number', type="text", flag=(Qt.DisplayRole,)
+            ): {'cb_scheme': 'scheme_number'}
+        },
+        {
+            Column(
+                name='X', type="float", flag=(Qt.DisplayRole,)
+            ): 'x'
+        },
+        {
+            Column(
+                name='Y', type="float", flag=(Qt.DisplayRole,)
+            ): 'y'
+        }
+    ],
+    'servitude_viewer_columns': [
+        {
+            Column(
+                name='Scheme Number', type="text", flag=(Qt.DisplayRole,)
+            ): {'cb_scheme': 'scheme_number'}
         }
     ],
     'tab_icons': {
@@ -939,7 +1053,9 @@ configurations = {
         'Documents': QIcon(":/plugins/stdm/images/icons/flts_scheme_documents.png"),
         'Comments': QIcon(":/plugins/stdm/images/icons/flts_scheme_comment.png"),
         'Hold': QIcon(":/plugins/stdm/images/icons/flts_scheme_withdraw.png"),
-        'Scheme': QIcon(":/plugins/stdm/images/icons/flts_scheme.png")
+        'Scheme': QIcon(":/plugins/stdm/images/icons/flts_scheme.png"),
+        'Plots': QIcon(":/plugins/stdm/images/icons/flts_plot_module_cropped.png"),
+        'Import': QIcon(":/plugins/stdm/images/icons/flts_import_plot_cropped.png")
     },
     'table_model_icons': {
         1: QIcon(":/plugins/stdm/images/icons/flts_approve.png"),
@@ -1026,7 +1142,7 @@ configurations = {
         ],
         'importPlot': [
             buttonConfig(
-                name="plotsImportButton",
+                name="Import",
                 label="Import",
                 icon=QIcon(":/plugins/stdm/images/icons/flts_import_plot_cropped.png"),
                 size=QSize(24, 24),
@@ -1047,14 +1163,14 @@ configurations = {
                 name="First",
                 label="First",
                 icon=QIcon(":/plugins/stdm/images/icons/flts_scheme_first_record.png"),
-                size=QSize(24, 24),
+                size=None,
                 enable=True
             ),
             buttonConfig(
                 name="Previous",
                 label="Previous",
                 icon=QIcon(":/plugins/stdm/images/icons/flts_scheme_previous_record.png"),
-                size=QSize(24, 24),
+                size=None,
                 enable=True
             )
         ],
@@ -1063,14 +1179,14 @@ configurations = {
                 name="Next",
                 label="Next",
                 icon=QIcon(":/plugins/stdm/images/icons/flts_scheme_next_record.png"),
-                size=QSize(24, 24),
+                size=None,
                 enable=True
             ),
             buttonConfig(
                 name="Last",
                 label="Last",
                 icon=QIcon(":/plugins/stdm/images/icons/flts_scheme_last_record.png"),
-                size=QSize(24, 24),
+                size=None,
                 enable=True
             )
         ]
@@ -1106,7 +1222,7 @@ configurations = {
                 enable=False
             ),
             buttonConfig(
-                name="Import",
+                name="plotsImportButton",
                 label="Import",
                 icon=QIcon(":/plugins/stdm/images/icons/flts_import_plot_cropped.png"),
                 size=None,
@@ -1212,9 +1328,51 @@ configurations = {
             AREA: SaveColumn(
                 column='area', value=None, entity='Plot'
             ),
-            SCHEME_ID: SaveColumn(
+            "SCHEME_ID": SaveColumn(
                 column='scheme_id', value=None, entity='Plot'
             )
-        }
+        },
+        'beacon_import_save': {
+            GEOMETRY_PT: SaveColumn(
+                column='geom', value=None, entity='Beacon'
+            ),
+            X_PT: SaveColumn(
+                column='x', value=None, entity='Beacon'
+            ),
+            Y_PT: SaveColumn(
+                column='y', value=None, entity='Beacon'
+            ),
+            "SCHEME_ID": SaveColumn(
+                column='scheme_id', value=None, entity='Beacon'
+            )
+        },
+        'servitude_import_save': {
+            GEOMETRY: SaveColumn(
+                column='geom', value=None, entity='Servitude'
+            ),
+            "SCHEME_ID": SaveColumn(
+                column='scheme_id', value=None, entity='Servitude'
+            )
+        },
+        'plot_str_save': [
+            SaveColumn(
+                column='tenure_type', value=1, entity="social_tenure_relationship"
+            ),
+            SaveColumn(
+                column='validity_start', value=datetime.date.today(), entity="social_tenure_relationship"
+            ),
+            SaveColumn(
+                column='validity_end', value=None, entity="social_tenure_relationship"
+            ),
+            SaveColumn(
+                column='tenure_share', value=100.0, entity="social_tenure_relationship"
+            ),
+            SaveColumn(
+                column='holder_id', value=None, entity="social_tenure_relationship"
+            ),
+            SaveColumn(
+                column='plot_id', value=None, entity="social_tenure_relationship"
+            ),
+        ],
     }
 }

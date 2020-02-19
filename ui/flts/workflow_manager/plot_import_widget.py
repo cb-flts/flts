@@ -15,6 +15,7 @@ copyright            : (C) 2019
  *                                                                         *
  ***************************************************************************/
 """
+import copy
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.gui import QgsGenericProjectionSelector
@@ -30,10 +31,12 @@ from stdm.ui.flts.workflow_manager.config import (
     StyleSheet,
     TabIcons,
 )
+from stdm.ui.flts.workflow_manager.data_service import PlotSTRDataService
 from stdm.ui.flts.workflow_manager.plot import(
     ImportPlot,
     PlotFile,
-    PlotPreview
+    PlotPreview,
+    SavePlotSTR
 )
 from stdm.ui.flts.workflow_manager.model import WorkflowManagerModel
 from stdm.ui.flts.workflow_manager.delegates.plot_file_delegate import PlotFileDelegate
@@ -42,6 +45,12 @@ from stdm.ui.flts.workflow_manager.components.plot_import_component import PlotI
 
 NAME, IMPORT_AS, DELIMITER, HEADER_ROW, CRS_ID, \
 GEOM_FIELD, GEOM_TYPE = range(7)
+NAM_CRS = [
+    "EPSG:29373", "EPSG:29375",
+    "EPSG:29377", "EPSG:29379",
+    "EPSG:29381", "EPSG:29383",
+    "EPSG:29385", "EPSG:4006"
+]
 
 
 class PlotImportWidget(QWidget):
@@ -62,13 +71,14 @@ class PlotImportWidget(QWidget):
         self._plot_file = PlotFile(self._file_service)
         self._previewed = {}
         self.is_dirty = None
+        self._import_counter = None
         import_component = PlotImportComponent()
         toolbar = import_component.components
         self._add_button = toolbar["addFiles"]
         self._remove_button = toolbar["removeFiles"]
         self._set_crs_button = toolbar["setCRS"]
         self._preview_button = toolbar["Preview"]
-        self._import_button = toolbar["Import"]
+        self._import_button = toolbar["plotsImportButton"]
         header_style = StyleSheet().header_style
         self._file_table_view = QTableView(self)
         self.model = WorkflowManagerModel(self._file_service)
@@ -82,6 +92,7 @@ class PlotImportWidget(QWidget):
         self._file_table_view.setSelectionBehavior(QTableView.SelectRows)
         self._file_table_view.setSelectionMode(QAbstractItemView.SingleSelection)
         self._preview_table_view = QTableView(self)
+        self._preview_models = {}
         self._preview_data_service = self._preview_model = None
         self._plot_preview = PlotPreview(scheme_number, self._preview_data_service)
         self._preview_model = WorkflowManagerModel(self._preview_data_service)
@@ -239,11 +250,13 @@ class PlotImportWidget(QWidget):
         """
         Removes plot import file from table view
         """
+        self._import_counter = None
         fpath = self._selected_file()
         if not fpath or not self._ok_to_remove(fpath):
             return
-        self._remove_file()
-        self._plot_preview.remove_error(fpath)
+        if self._import_counter != 0:
+            self._remove_file()
+            self._plot_preview.remove_error(fpath)
 
     def _ok_to_remove(self, fpath):
         """
@@ -292,6 +305,7 @@ class PlotImportWidget(QWidget):
         """
         Previews selected plot import file content
         """
+        self._import_counter = None
         index = self._current_index(self._file_table_view)
         if index is None:
             return
@@ -309,6 +323,7 @@ class PlotImportWidget(QWidget):
             self._plot_preview.set_settings(settings)
             self._preview_load()
             self._set_preview_groupbox_title(settings[NAME])
+            self._set_preview_models(fpath)
             self._previewed[fpath] = fpath
 
     def _clear_feature(self):
@@ -331,6 +346,14 @@ class PlotImportWidget(QWidget):
         if import_type not in self._preview_data_service:
             service = self._preview_service(import_type)
             self._preview_data_service[import_type] = service
+
+    def _set_preview_models(self, fpath):
+        """
+        Sets plot preview models
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        """
+        self._preview_models[fpath] = copy.copy(self._preview_model)
 
     def _preview_service(self, import_type):
         """
@@ -402,42 +425,86 @@ class PlotImportWidget(QWidget):
                 self._import_error_message(fpath) or \
                 not self._ok_to_import(index, import_type):
             return
-        if settings.get(IMPORT_AS) == "Plots":
-            self._import_plot()
-        else:
-            pass
-        self._remove_file()
+        self._import_plot()
+        if self._import_counter != 0:
+            self._remove_file()
 
     def _import_plot(self):
         """
         Imports plot values
         """
+        self.notif_bar.clear()
         index = self._current_index(self._file_table_view)
         if index is None:
             return
-        settings = self._file_settings(index.row())
+        row = index.row()
+        fpath = self.model.results[row].get("fpath")
+        model = self._preview_models[fpath]
+        settings = self._file_settings(row)
+        crs_id = settings.get(CRS_ID)
         import_type = settings.get(IMPORT_AS)
-        srid = settings.get(CRS_ID)
-        srid = srid.split(":")[1]
         data_service = self._preview_data_service[import_type]
-        column_keys = range(4)
+        columns = self._import_type_columns(import_type)
         try:
             import_plot = ImportPlot(
-                self._preview_model,
-                self._scheme_id,
-                srid,
-                data_service,
-                column_keys
+                model, self._scheme_id, data_service, columns, crs_id
             )
-            import_plot = import_plot.save()
+            self._import_counter = import_plot.save()
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             self._show_critical_message(
                 "Workflow Manager - Plot Import",
-                "Failed to update: {}".format(e)
+                "Failed to import: {}".format(e)
             )
         else:
-            msg = "Successfully imported {0} plots".format(import_plot)
+            if self._import_counter == 0:
+                msg = "Failed to import. {0} {1} imported ".\
+                    format(self._import_counter, import_type.lower())
+                self.notif_bar.insertWarningNotification(msg)
+                return
+            msg = "Successfully imported {0} {1}".\
+                format(self._import_counter, import_type.lower())
             self.notif_bar.insertInformationNotification(msg)
+            if import_type == "Plots":
+                self._save_plot_str(fpath)
+
+    def _save_plot_str(self, fpath):
+        """
+        Saves Plot (spatial unit) and  Holders (Party)
+        Social Tenure Relationship (STR) database record(s)
+        :param fpath: Plot import file absolute path
+        :type fpath: String
+        """
+        plot_numbers = self._plot_preview.plot_numbers.get(fpath)
+        if not plot_numbers:
+            return
+        model = self._preview_models[fpath]
+        str_data_service = PlotSTRDataService(self._profile, self._scheme_id)
+        plot_str = SavePlotSTR(
+            str_data_service,
+            model.results,
+            plot_numbers,
+            self._scheme_id
+        )
+        plot_str.save()
+
+    @staticmethod
+    def _import_type_columns(import_type):
+        """
+        Return preview table view column positions
+        based on import type (Plots, Beacons or Servitudes)
+        :param import_type: Import type
+        :param import_type: String
+        :return: Preview table view column positions
+        :rtype: Integer
+        """
+        if import_type == "Plots":
+            return range(4)
+            # TODO: On success update upload_status in the Scheme entity
+            #  Update method to be coded in the ImportPlot Class
+        elif import_type == "Servitudes":
+            return 0
+        else:
+            return range(3)
 
     def _file_settings(self, row):
         """
@@ -670,6 +737,7 @@ class PlotImportWidget(QWidget):
         :return auth_id: String
         """
         proj_selector = QgsGenericProjectionSelector()
+        proj_selector.setOgcWmsCrsFilter(NAM_CRS)
         proj_selector.exec_()
         auth_id = proj_selector.selectedAuthId()
         return auth_id

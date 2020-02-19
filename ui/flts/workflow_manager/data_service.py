@@ -32,10 +32,13 @@ from stdm.ui.flts.workflow_manager.config import (
     PlotImportFileConfig,
     PlotImportPreviewConfig,
     PlotViewerConfig,
+    BeaconViewerConfig,
     BeaconImportPreviewConfig,
+    ServitudeViewerConfig,
     ServitudeImportPreviewConfig,
     SchemeConfig,
     TableModelIcons,
+    PlotSTRConfig
 )
 from stdm.data.configuration import entity_model
 
@@ -177,7 +180,7 @@ class SchemeDataService(DataService):
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         :return: Related entity names
         :rtype: List
@@ -346,7 +349,7 @@ class DocumentDataService(DataService):
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         :return: Related entity names
         :rtype: List
@@ -447,7 +450,7 @@ class HolderDataService(DataService):
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         :return: Related entity names
         :rtype: List
@@ -555,7 +558,7 @@ class CommentDataService(DataService):
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         :return: Related entity names
         :rtype: List
@@ -635,12 +638,17 @@ class PlotViewerDataService(DataService):
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
         :return: Related entity names
         :rtype: List
         """
-        return False
+        try:
+            entity_name = entity_name if entity_name else self.entity_name
+            entity = self._profile.entity(entity_name)
+            return super(PlotViewerDataService, self).related_entities(entity)
+        except AttributeError as e:
+            raise e
 
     def run_query(self):
         """
@@ -657,22 +665,16 @@ class PlotViewerDataService(DataService):
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
 
-    @staticmethod
-    def filter_query_by(entity_name, filters):
+    def is_entity_empty(self):
         """
-        Filters query result by a column value
-        :param entity_name: Entity name
-        :type entity_name: String
-        :param filters: Column filters - column name and value
-        :type filters: Dictionary
-        :return: Filter entity query object
-        :rtype: Entity object
+        Checks if entity is empty
+        :return: True on empty entity
+        :rtype: Boolean
         """
-        try:
-            filter_by = FilterQueryBy()
-            return filter_by(entity_name, filters)
-        except (AttributeError, exc.SQLAlchemyError, Exception) as e:
-            raise e
+        filters = {"scheme_id": self._scheme_id}
+        model = self.entity_model_(self.entity_name)
+        columns = [getattr(model, "id")]
+        return is_entity_empty(self.entity_name, filters, columns)
 
     def entity_model_(self, name=None):
         """
@@ -686,6 +688,188 @@ class PlotViewerDataService(DataService):
         return super(PlotViewerDataService, self).entity_model_(entity)
 
 
+class BeaconViewerDataService(DataService):
+    """
+    Scheme beacon viewer data model service
+    """
+    def __init__(self, current_profile, scheme_id):
+        self._profile = current_profile
+        self._scheme_id = scheme_id
+        self.entity_name = "Beacon"
+        self.beacon_viewer_config = BeaconViewerConfig()
+
+    @property
+    def columns(self):
+        """
+        Scheme beacon viewer table view columns options
+        :return: Table view columns and query columns options
+        :rtype: List
+        """
+        return self.beacon_viewer_config.columns
+
+    @property
+    def vertical_header(self):
+        """
+        Scheme table view vertical orientation
+        :return: True for vertical headers
+                 or False otherwise
+        :rtype: Boolean
+        """
+        return True
+
+    @property
+    def collections(self):
+        """
+        Related entity collection names
+        :return: Related entity collection names
+        :rtype: List
+        """
+        return False
+
+    def related_entities(self, entity_name=None):
+        """
+        Related entity name identified by foreign keys
+        :param entity_name: Entity name
+        :type entity_name: String
+        :return: Related entity names
+        :rtype: List
+        """
+        try:
+            entity_name = entity_name if entity_name else self.entity_name
+            entity = self._profile.entity(entity_name)
+            return super(BeaconViewerDataService, self).related_entities(entity)
+        except AttributeError as e:
+            raise e
+
+    def run_query(self):
+        """
+        Run query on an entity
+        :return query_obj: Query results
+        :rtype query_obj: List
+        """
+        model = self.entity_model_(self.entity_name)
+        entity_object = model()
+        try:
+            query_object = entity_object.queryObject(). \
+                filter(model.scheme_id == self._scheme_id)
+            return query_object.all()
+        except (AttributeError, exc.SQLAlchemyError, Exception) as e:
+            raise e
+
+    def is_entity_empty(self):
+        """
+        Checks if entity is empty
+        :return: True on empty entity
+        :rtype: Boolean
+        """
+        filters = {"scheme_id": self._scheme_id}
+        model = self.entity_model_(self.entity_name)
+        columns = [getattr(model, "id")]
+        return is_entity_empty(self.entity_name, filters, columns)
+
+    def entity_model_(self, name=None):
+        """
+        Gets entity model
+        :param name: Name of the entity
+        :type name: String
+        :return: Entity model
+        :rtype: DeclarativeMeta
+        """
+        entity = self._profile.entity(name)
+        return super(BeaconViewerDataService, self).entity_model_(entity)
+
+
+class ServitudeViewerDataService(DataService):
+    """
+    Scheme servitude viewer data model service
+    """
+    def __init__(self, current_profile, scheme_id):
+        self._profile = current_profile
+        self._scheme_id = scheme_id
+        self.entity_name = "Servitude"
+        self.servitude_viewer_config = ServitudeViewerConfig()
+
+    @property
+    def columns(self):
+        """
+        Scheme servitude viewer table view columns options
+        :return: Table view columns and query columns options
+        :rtype: List
+        """
+        return self.servitude_viewer_config.columns
+
+    @property
+    def vertical_header(self):
+        """
+        Scheme table view vertical orientation
+        :return: True for vertical headers
+                 or False otherwise
+        :rtype: Boolean
+        """
+        return True
+
+    @property
+    def collections(self):
+        """
+        Related entity collection names
+        :return: Related entity collection names
+        :rtype: List
+        """
+        return False
+
+    def related_entities(self, entity_name=None):
+        """
+        Related entity name identified by foreign keys
+        :param entity_name: Entity name
+        :type entity_name: String
+        :return: Related entity names
+        :rtype: List
+        """
+        try:
+            entity_name = entity_name if entity_name else self.entity_name
+            entity = self._profile.entity(entity_name)
+            return super(ServitudeViewerDataService, self).related_entities(entity)
+        except AttributeError as e:
+            raise e
+
+    def run_query(self):
+        """
+        Run query on an entity
+        :return query_obj: Query results
+        :rtype query_obj: List
+        """
+        model = self.entity_model_(self.entity_name)
+        entity_object = model()
+        try:
+            query_object = entity_object.queryObject(). \
+                filter(model.scheme_id == self._scheme_id)
+            return query_object.all()
+        except (AttributeError, exc.SQLAlchemyError, Exception) as e:
+            raise e
+
+    def is_entity_empty(self):
+        """
+        Checks if entity is empty
+        :return: True on empty entity
+        :rtype: Boolean
+        """
+        filters = {"scheme_id": self._scheme_id}
+        model = self.entity_model_(self.entity_name)
+        columns = [getattr(model, "id")]
+        return is_entity_empty(self.entity_name, filters, columns)
+
+    def entity_model_(self, name=None):
+        """
+        Gets entity model
+        :param name: Name of the entity
+        :type name: String
+        :return: Entity model
+        :rtype: DeclarativeMeta
+        """
+        entity = self._profile.entity(name)
+        return super(ServitudeViewerDataService, self).entity_model_(entity)
+
+
 def plot_viewer_data_service(import_type):
     """
     Returns plot viewier data service
@@ -696,7 +880,9 @@ def plot_viewer_data_service(import_type):
     :rtype: Service Object
     """
     data_service = {
-        "Plots": PlotViewerDataService
+        "Plots": PlotViewerDataService,
+        "Servitudes": ServitudeViewerDataService,
+        "Beacons": BeaconViewerDataService
     }
     return data_service[import_type]
 
@@ -738,7 +924,7 @@ class PlotImportFileDataService:
         return self._table_model_icons.icons
 
 
-class PlotPreviewDataService:
+class PlotPreviewDataService(DataService):
     """
     Scheme plot import preview data model service
     """
@@ -758,6 +944,27 @@ class PlotPreviewDataService:
         :rtype: List
         """
         return self._plot_config.columns
+
+    @property
+    def geom_srid(self):
+        """
+        Returns geometry Spatial Reference Identity (SRID)
+        :return srid: Spatial Reference Identity
+        :rtype srid: Integer
+        """
+        srid = self._column_type("Plot", "geom").srid
+        return srid
+
+    def _column_type(self, entity_name, column_name):
+        """
+        Returns entity column type
+        :param entity_name: Entity name
+        :type entity_name: String
+        :param column_name: Column name
+        :type column_name: String
+        """
+        model = self.entity_model_(entity_name)
+        return _column_type(model, column_name)
 
     @property
     def vertical_header(self):
@@ -798,12 +1005,16 @@ class PlotPreviewDataService:
     def related_entities(self, entity_name=None):
         """
         Related entity name identified by foreign keys
-        :param entity_name:
+        :param entity_name: Entity name
         :type entity_name: String
-        :return: Related entity names
-        :rtype: List
         """
-        return False
+        pass
+
+    def run_query(self):
+        """
+        Run query on an entity
+        """
+        pass
 
     def _get_scheme(self):
         """
@@ -813,14 +1024,20 @@ class PlotPreviewDataService:
         """
         return self.filter_query_by("Scheme", {"id": self._scheme_id}).first()
 
-    def is_plot(self):
+    def scheme_plot_numbers(self):
         """
-        Checks if the scheme has a plot
-        :return: True
-        :return: Boolean
+        Returns Scheme plot numbers
+        :return plot_numbers: Scheme Relevant Authority record/row
+        :rtype plot_numbers: Entity
         """
-        if len(self._scheme.cb_plot_collection):
-            return True
+        filters = {"scheme_id": self._scheme_id}
+        model = self.entity_model_("Plot")
+        plot_numbers = self.filter_query_by(
+            "Plot",
+            filters,
+            [getattr(model, "plot_number")]
+        ).distinct()
+        return plot_numbers
 
     def scheme_relevant_authority(self):
         """
@@ -832,39 +1049,32 @@ class PlotPreviewDataService:
             "type_of_relevant_authority": self._scheme.relevant_authority,
             "region": self._scheme.region
         }
+        model = self.entity_model_("Relevant_authority")
         relevant_authority = self.filter_query_by(
-            "Relevant_authority", filters
+            "Relevant_authority",
+            filters,
+            [getattr(model, "au_code")]
         ).first()
         return relevant_authority
 
     @staticmethod
-    def filter_query_by(entity_name, filters):
+    def filter_query_by(entity_name, filters, columns=None):
         """
         Filters query result by a column value
         :param entity_name: Entity name
         :type entity_name: String
         :param filters: Column filters - column name and value
         :type filters: Dictionary
+        :type columns: Fields to select from
+        :type columns: List
         :return: Filter entity query object
         :rtype: Entity object
         """
         try:
             filter_by = FilterQueryBy()
-            return filter_by(entity_name, filters)
+            return filter_by(entity_name, filters, columns)
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
-
-    def max_plot_number(self):
-        """
-        Returns maximum Scheme Plot Number
-        :return plot_number: Max Plot Number
-        :rtype plot_number: Unicode
-        """
-        model = self.entity_model_("Plot")
-        entity_object = model()
-        plot_number = entity_object.queryObject([func.max(model.plot_number)]).\
-            filter(model.scheme_id == self._scheme_id).scalar()
-        return plot_number
 
     def entity_model_(self, name=None):
         """
@@ -875,18 +1085,15 @@ class PlotPreviewDataService:
         :rtype: DeclarativeMeta
         """
         entity = self._profile.entity(name)
-        try:
-            model = entity_model(entity)
-            return model
-        except AttributeError as e:
-            raise e
+        return super(PlotPreviewDataService, self).entity_model_(entity)
 
 
-class ServitudePreviewDataService:
+class ServitudePreviewDataService(DataService):
     """
     Scheme servitude import preview data model service
     """
     def __init__(self, current_profile, scheme_id):
+        self._profile = current_profile
         self._servitude_config = ServitudeImportPreviewConfig()
         self._table_model_icons = TableModelIcons()
 
@@ -901,6 +1108,27 @@ class ServitudePreviewDataService:
         return self._servitude_config.columns
 
     @property
+    def geom_srid(self):
+        """
+        Returns geometry Spatial Reference Identity (SRID)
+        :return srid: Spatial Reference Identity
+        :rtype srid: Integer
+        """
+        srid = self._column_type("Plot", "geom").srid
+        return srid
+
+    def _column_type(self, entity_name, column_name):
+        """
+        Returns entity column type
+        :param entity_name: Entity name
+        :type entity_name: String
+        :param column_name: Column name
+        :type column_name: String
+        """
+        model = self.entity_model_(entity_name)
+        return _column_type(model, column_name)
+
+    @property
     def vertical_header(self):
         """
         Scheme table view vertical orientation
@@ -918,12 +1146,56 @@ class ServitudePreviewDataService:
         """
         return self._table_model_icons.icons
 
+    @property
+    def save_columns(self):
+        """
+        Servitude import save column options
+        :return: Save column values
+        :rtype: List
+        """
+        return self._servitude_config.servitude_save_columns
 
-class BeaconPreviewDataService:
+    @property
+    def collections(self):
+        """
+        Related entity collection names
+        :return: Related entity collection names
+        :rtype: List
+        """
+        return False
+
+    def related_entities(self, entity_name=None):
+        """
+        Related entity name identified by foreign keys
+        :param entity_name: Entity name
+        :type entity_name: String
+        """
+        pass
+
+    def run_query(self):
+        """
+        Run query on an entity
+        """
+        pass
+
+    def entity_model_(self, name=None):
+        """
+        Gets entity model
+        :param name: Name of the entity
+        :type name: String
+        :return: Entity model
+        :rtype: DeclarativeMeta
+        """
+        entity = self._profile.entity(name)
+        return super(ServitudePreviewDataService, self).entity_model_(entity)
+
+
+class BeaconPreviewDataService(DataService):
     """
     Scheme beacon import preview data model service
     """
     def __init__(self, current_profile, scheme_id):
+        self._profile = current_profile
         self._beacon_config = BeaconImportPreviewConfig()
         self._table_model_icons = TableModelIcons()
 
@@ -938,6 +1210,27 @@ class BeaconPreviewDataService:
         return self._beacon_config.columns
 
     @property
+    def geom_srid(self):
+        """
+        Returns geometry Spatial Reference Identity (SRID)
+        :return srid: Spatial Reference Identity
+        :rtype srid: Integer
+        """
+        srid = self._column_type("Plot", "geom").srid
+        return srid
+
+    def _column_type(self, entity_name, column_name):
+        """
+        Returns entity column type
+        :param entity_name: Entity name
+        :type entity_name: String
+        :param column_name: Column name
+        :type column_name: String
+        """
+        model = self.entity_model_(entity_name)
+        return _column_type(model, column_name)
+
+    @property
     def vertical_header(self):
         """
         Scheme table view vertical orientation
@@ -954,6 +1247,49 @@ class BeaconPreviewDataService:
         :rtype: Dictionary
         """
         return self._table_model_icons.icons
+
+    @property
+    def save_columns(self):
+        """
+        Beacon import save column options
+        :return: Save column values
+        :rtype: List
+        """
+        return self._beacon_config.beacon_save_columns
+
+    @property
+    def collections(self):
+        """
+        Related entity collection names
+        :return: Related entity collection names
+        :rtype: List
+        """
+        return False
+
+    def related_entities(self, entity_name=None):
+        """
+        Related entity name identified by foreign keys
+        :param entity_name: Entity name
+        :type entity_name: String
+        """
+        pass
+
+    def run_query(self):
+        """
+        Run query on an entity
+        """
+        pass
+
+    def entity_model_(self, name=None):
+        """
+        Gets entity model
+        :param name: Name of the entity
+        :type name: String
+        :return: Entity model
+        :rtype: DeclarativeMeta
+        """
+        entity = self._profile.entity(name)
+        return super(BeaconPreviewDataService, self).entity_model_(entity)
 
 
 def plot_data_service(import_type):
@@ -971,3 +1307,155 @@ def plot_data_service(import_type):
         "Beacons": BeaconPreviewDataService
     }
     return data_service[import_type]
+
+
+class PlotSTRDataService:
+    """
+    Scheme plot Social Tenure Relationship (STR) data model service
+    """
+    def __init__(self, current_profile, scheme_id):
+        self._profile = current_profile
+        self._scheme_id = scheme_id
+        self._plot_str_config = PlotSTRConfig()
+
+    @property
+    def save_columns(self):
+        """
+        Plot STR save column options
+        :return: Save column values
+        :rtype: List
+        """
+        return self._plot_str_config.str_save_columns
+
+    @property
+    def collections(self):
+        """
+        Related entity collection names
+        :return: Related entity collection names
+        :rtype: List
+        """
+        return False
+
+    def related_entities(self, entity_name=None):
+        """
+        Related entity name identified by foreign keys
+        :param entity_name: Entity name
+        :type entity_name: String
+        """
+        pass
+
+    def plot_ids(self, plot_numbers):
+        """
+        Returns plot identifiers - primary keys
+        :param plot_numbers: Plot identifiers
+        :type plot_numbers: Plot identifiers
+        :return: Plot identifiers
+        :rtype: Dictionary
+        """
+        columns = ["plot_number", "id"]
+        filters = {
+            "scheme_id": [self._scheme_id],
+            "plot_number": plot_numbers
+        }
+        return self.filter_in("Plot", filters, columns).all()
+
+    def holder_ids(self, plot_numbers):
+        """
+        Returns holder identifiers - primary keys
+        :return: Holder identifiers
+        :rtype: Dictionary
+        """
+        filters = {"plot_number": plot_numbers}
+        return self.filter_in("Holder", filters).all()
+
+    def filter_in(self, entity_name, filters, columns=None):
+        """
+        Return query objects as a collection of filter using in_ operator
+        :param entity_name: Name of entity to be queried
+        :type entity_name: String
+        :param filters: Query filter columns and values
+        :type filters: Dictionary
+        :param columns: Fields to select from
+        :type columns: List
+        :return: Query object results
+        :rtype: Query
+        """
+        columns = columns if isinstance(columns, list) else []
+        model = self.entity_model_(entity_name)
+        entity_object = model()
+        try:
+            filters = [
+                getattr(model, key).in_(value) for key, value in filters.iteritems()
+            ]
+            if len(columns) == 0:
+                return entity_object.queryObject().filter(*filters)
+            else:
+                columns = [getattr(model, column) for column in columns]
+                return entity_object.queryObject(columns).filter(*filters)
+        except (AttributeError, exc.SQLAlchemyError, Exception) as e:
+            raise e
+
+    def entity_model_(self, name=None):
+        """
+        Gets entity model
+        :param name: Name of the entity
+        :type name: String
+        :return: Entity model
+        :rtype: DeclarativeMeta
+        """
+        try:
+            entity = self._profile.entity(name)
+            model = entity_model(entity)
+            return model
+        except AttributeError as e:
+            raise e
+
+
+def _column_type(model, column_name):
+    """
+    Returns entity column type
+    :param model: Entity name
+    :type model: DeclarativeMeta
+    :param column_name: Column name
+    :type column_name: String
+    """
+    for name, column in model.__table__.c.items():
+        if name == column_name:
+            return column.type
+
+
+def is_entity_empty(entity_name, filters=None, columns=None):
+    """
+    Checks if entity is empty
+    :param entity_name: Entity name
+    :type entity_name: String
+    :param filters: Column filters - column name and value
+    :type filters: Dictionary
+    :type columns: Fields to select from
+    :type columns: List
+    :return: True on empty entity
+    :rtype: Boolean
+    """
+    record = filter_query_by(entity_name, filters, columns).first()
+    if record:
+        return False
+    return True
+
+
+def filter_query_by(entity_name, filters=None, columns=None):
+    """
+    Filters query result by a column value
+    :param entity_name: Entity name
+    :type entity_name: String
+    :param filters: Column filters - column name and value
+    :type filters: Dictionary
+    :type columns: Fields to select from
+    :type columns: List
+    :return: Filter entity query object
+    :rtype: Entity object
+    """
+    try:
+        filter_by = FilterQueryBy()
+        return filter_by(entity_name, filters, columns)
+    except (AttributeError, exc.SQLAlchemyError, Exception) as e:
+        raise e
