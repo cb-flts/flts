@@ -6,7 +6,6 @@ SELECT cb_plot.id,
     concat(cb_holder.holder_first_name, ' ', cb_holder.holder_surname) AS full_name,
     cb_holder.holder_identifier AS holder_id,
     cb_check_lht_marital_status.value AS marital_status,
---     cb_check_lht_nature_of_marriage.value AS nature_of_marriage,
     cb_plot.plot_number,
     cb_plot.upi,
     cb_plot.geom AS plot_geom,
@@ -22,7 +21,6 @@ SELECT cb_plot.id,
      JOIN cb_check_lht_land_rights_office ON cb_scheme.land_rights_office = cb_check_lht_land_rights_office.id
      JOIN cb_holder ON cb_social_tenure_relationship.holder_id = cb_holder.id
      JOIN cb_check_lht_marital_status ON cb_check_lht_marital_status.id = cb_holder.marital_status
---      JOIN cb_check_lht_nature_of_marriage ON cb_check_lht_nature_of_marriage.id = cb_holder.nature_of_marriage
      JOIN cb_check_lht_relevant_authority ON cb_check_lht_relevant_authority.id = cb_scheme.relevant_authority
      JOIN cb_relevant_authority ON cb_relevant_authority.id = cb_scheme.relevant_authority
      JOIN cb_check_lht_reg_division ON cb_check_lht_reg_division.id = cb_scheme.registration_division
