@@ -358,7 +358,7 @@ class STDMQGISLoader(object):
                 return
 
             # try:
-            self.show_change_log()
+            # self.show_change_log()
             # Set current profile
             self.current_profile = current_profile()
             self._user_logged_in = True
