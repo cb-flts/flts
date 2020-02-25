@@ -1,7 +1,7 @@
 """
 /***************************************************************************
-Name                 : STDM QGIS Loader
-Description          : STDM QGIS Loader
+Name                 : FLTS QGIS Loader
+Description          : FLTS QGIS Loader
 Date                 : 04-01-2015
 copyright            : (C) 2015 by UN-Habitat and implementing partners.
                        See the accompanying file CONTRIBUTORS.txt in the root
@@ -167,7 +167,7 @@ class STDMQGISLoader(object):
         self.current_profile = None
         # Profile status label showing the current profile
         self.profile_status_label = None
-        LOGGER.debug('STDM plugin has been initialized.')
+        LOGGER.debug('FLTS plugin has been initialized.')
         self.entity_browser = None
         # Load configuration file
         self.config_path = QDesktopServices.storageLocation(
@@ -214,6 +214,7 @@ class STDMQGISLoader(object):
         self.helpAct.triggered.connect(self.help_contents)
         self.initToolbar()
         self.initMenuItems()
+        self.login()
 
     def _menu_items(self):
         # Create menu and menu items on the menu bar
@@ -291,9 +292,9 @@ class STDMQGISLoader(object):
         self.logoutCleanUp()
 
     def login(self):
-        '''
+        """
         Show login dialog
-        '''
+        """
         frmLogin = loginDlg(self.iface.mainWindow())
         retstatus = frmLogin.exec_()
 
@@ -310,8 +311,8 @@ class STDMQGISLoader(object):
                     create_postgis()
                 else:
                     err_msg = QApplication.translate(
-                        "STDM",
-                        "STDM cannot be loaded because the system has "
+                        "FLTS",
+                        "FLTS cannot be loaded because the system has "
                         "detected that the PostGIS extension is missing "
                         "in '{0}' database.\nCheck that PostGIS has been "
                         "installed. Please contact the system "
@@ -321,7 +322,7 @@ class STDMQGISLoader(object):
                     QMessageBox.critical(
                         self.iface.mainWindow(),
                         QApplication.translate(
-                            "STDM", "Spatial Extension Error"
+                            "FLTS", "Spatial Extension Error"
                         ),
                         err_msg
                     )
@@ -744,7 +745,7 @@ class STDMQGISLoader(object):
         :rtype: bool
         """
         self.progress = STDMProgressDialog(parent)
-        self.progress.overall_progress('Upgrading STDM Configuration...')
+        self.progress.overall_progress('Upgrading FLTS Configuration...')
 
         home = QDesktopServices.storageLocation(QDesktopServices.HomeLocation)
 
@@ -1084,7 +1085,7 @@ class STDMQGISLoader(object):
         # self.details_tree_view = DetailsTreeView(self.iface, self, dock_widget)
         #
         # # Add current profiles to profiles combobox
-        self.load_profiles_combobox()
+        # self.load_profiles_combobox()
 
         # FLTS
         self.schemeLodgementAct = QAction(
@@ -1793,7 +1794,7 @@ class STDMQGISLoader(object):
         )
         message = QApplication.translate(
             'STDMPlugin',
-            'Current STDM Profile: {}'.format(
+            'Current FLTS Profile: {}'.format(
                 profile_name
             )
         )
