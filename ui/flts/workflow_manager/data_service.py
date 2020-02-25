@@ -17,6 +17,7 @@ copyright            : (C) 2019
  *                                                                         *
  ***************************************************************************/
 """
+from collections import OrderedDict
 from abc import ABCMeta, abstractmethod
 from sqlalchemy import (
     exc,
@@ -276,15 +277,23 @@ class SchemeDataService(DataService):
         """
         Returns workflow IDs
         :return workflow_ids: Workflow record ID
-        :rtype workflow_ids: List
+        :rtype workflow_ids: Dictionary
         """
-        workflow_ids = [
-            self.lookups.schemeLodgement(),
-            self.lookups.schemeEstablishment(),
-            self.lookups.firstExamination(),
-            self.lookups.secondExamination(),
-            self.lookups.thirdExamination()
-        ]
+        scheme_lodgement = self.lookups.schemeLodgement()
+        scheme_establishment = self.lookups.schemeEstablishment()
+        import_plot = self.lookups.importPlot()
+        first_examination = self.lookups.firstExamination()
+        second_examination = self.lookups.secondExamination()
+        third_examination = self.lookups.thirdExamination()
+
+        workflow_ids = OrderedDict((
+            (scheme_lodgement, [[scheme_lodgement], [scheme_establishment, import_plot]]),
+            (scheme_establishment, [[scheme_lodgement], [first_examination]]),
+            (import_plot, [[scheme_lodgement], [third_examination]]),
+            (first_examination, [[scheme_establishment], [second_examination]]),
+            (second_examination, [[first_examination], [third_examination]]),
+            (third_examination, [[import_plot, second_examination], [third_examination]])
+        ))
         return workflow_ids
 
 
