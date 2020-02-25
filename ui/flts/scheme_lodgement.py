@@ -1216,13 +1216,17 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             1,
             self.lnedit_schm_num.text()
         )
+        self.tr_summary.scm_desc.setText(
+            1,
+            self.lnedit_scheme_description.text()
+        )
         self.tr_summary.scm_name.setText(
             1,
             self.lnedit_schm_nam.text()
         )
-        self.tr_summary.scm_sg_num.setText(
+        self.tr_summary.scm_title_deed_num.setText(
             1,
-            self.lnedit_sg_num.text()
+            self.lnedit_title_deed_num.text()
         )
         self.tr_summary.scm_date_apprv.setText(
             1,
@@ -1251,6 +1255,10 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         self.tr_summary.scm_reg_div.setText(
             1,
             self.cbx_reg_div.currentText()
+        )
+        self.tr_summary.scm_numplots.setText(
+            1,
+            self.dbl_spinbx_num_plots.text()
         )
         self.tr_summary.scm_blk_area.setText(
             1, self.dbl_spinbx_block_area.text()
