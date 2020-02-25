@@ -379,6 +379,21 @@ class STDMQGISLoader(object):
             if not shortcut_dlg_status:
                 return
 
+        if retstatus != QDialog.Accepted:
+            warn_msg = QApplication.translate("STDMQGISLoader",
+                                              "You must login to use the"
+                                              " application.")
+            QMessageBox.warning(
+                self.iface.mainWindow(),
+                QApplication.translate(
+                    "STDMQGISLoader", "Login Warning"
+                ),
+                warn_msg
+            )
+
+            # Close QGIS application
+            #self.iface.actionExit().trigger()
+
     def create_custom_tenure_dummy_col(self):
         """
         Creates custom tenure entity dummy column if it does not exist.
