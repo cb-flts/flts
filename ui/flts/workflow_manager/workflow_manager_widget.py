@@ -646,11 +646,13 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
         :type title: String
         """
         self._approve.set_check_ids(self._checked_ids)
-        items, scheme_numbers = self._approve.approve_items(status)
-        items = (items,) + self._approve.next_approval_items(items)
+        approvals, scheme_numbers = self._approve.workflow_approvals(status)
+        self._approve.next_workflow_approvals(approvals)
+        items = (approvals,) + (self._approve.next_workflows_updates, )
+        items = items + (self._approve.new_workflows_data, )
         num_records = len(scheme_numbers["valid"])
         if scheme_numbers["invalid"]:
-            self._invalid_approval_msg(scheme_numbers)
+            self._set_invalid_approval_msg(scheme_numbers)
         scheme_numbers = (num_records, scheme_numbers["valid"])
         self._approval_comment(items, title, scheme_numbers)
 
@@ -667,31 +669,102 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
         scheme_numbers = (len(scheme_numbers), scheme_numbers)
         self._approval_comment(items, title, scheme_numbers)
 
-    def _invalid_approval_msg(self, scheme_numbers):
+    def _set_invalid_approval_msg(self, scheme_numbers):
         """
         Return Scheme message for invalid approval
-        :param scheme_numbers: Scheme number
-        :type scheme_numbers: String
+        :param scheme_numbers: Scheme numbers
+        :type scheme_numbers: List
         :return: Formatted scheme numbers
         :return: Dictionary
         """
-        msg = []
-        column = "id"
+
         invalid_schemes = scheme_numbers["invalid"]
-        numbers, workflow_ids, approval_ids = zip(*invalid_schemes)
-        workflow_query = self._filter_in(
-            self._lookup.WORKFLOW, {column: set(workflow_ids)}
+        numbers, approval_ids = zip(*invalid_schemes)
+        workflows = self._query_workflow(approval_ids)
+        approvals = self._query_approval(approval_ids)
+        messages = self._invalid_approval_msg(invalid_schemes, approvals, workflows)
+        scheme_numbers["valid"].extend(messages)
+
+    def _invalid_approval_msg(self, invalid_schemes, approvals, workflows):
+        """
+        Returns invalid scheme approval messages
+        :param invalid_schemes: Invalid approval scheme
+        :type invalid_schemes: List
+        :param approvals: Approval query results
+        :param approvals: InstrumentedList
+        :param workflows: Workflow query results
+        :param workflows: InstrumentedList
+        :return msg: Invalid scheme approval messages
+        :rtype msg: List
+        """
+        messages = []
+        column = "id"
+        for scheme_number, approval_ids in invalid_schemes:
+            for workflow_id, approval_id in approval_ids.items():
+                approval = self._get_valid_query(approvals, column, approval_id)
+                workflow = self._get_valid_query(workflows, column, workflow_id)
+                messages.append("\n{0} - {1} in {2}".format(
+                    scheme_number, approval.value, workflow.value
+                ))
+        return messages
+
+    def _query_workflow(self, workflow_ids):
+        """
+        Returns workflow query results
+        :param workflow_ids: Workflow IDs
+        :type workflow_ids: Tuple
+        :return results: Workflow query results
+        :rtype results: InstrumentedList
+        """
+        workflow_ids = self._workflow_ids(workflow_ids)
+        results = self._filter_in(
+            self._lookup.WORKFLOW,
+            {"id": set(workflow_ids)}
         )
-        approval_query = self._filter_in(
-            self._lookup.APPROVAL_STATUS, {column: set(approval_ids)}
+        return results
+
+    def _query_approval(self, approval_ids):
+        """
+        Returns approval query results
+        :param approval_ids: Approval IDs
+        :type approval_ids: Tuple
+        :return results: Approval query results
+        :rtype results: InstrumentedList
+        """
+        approval_ids = self._approval_ids(approval_ids)
+        results = self._filter_in(
+            self._lookup.APPROVAL_STATUS,
+            {"id": set(approval_ids)}
         )
-        for scheme_number, workflow_id, approval_id in invalid_schemes:
-            approval = self._get_valid_query(approval_query, column, approval_id)
-            workflow = self._get_valid_query(workflow_query, column, workflow_id)
-            msg.append("\n{0} - {1} in {2}".format(
-                scheme_number, approval.value, workflow.value
-            ))
-        return scheme_numbers["valid"].extend(msg)
+        return results
+
+    @staticmethod
+    def _workflow_ids(ids):
+        """
+        Returns workflow IDs
+        :param ids: Approval IDs
+        :type ids: Tuple
+        :return workflow_ids: Workflow IDs
+        :rtype workflow_ids: List
+        """
+        workflow_ids = []
+        for id_ in ids:
+            workflow_ids.extend(id_.keys())
+        return workflow_ids
+
+    @staticmethod
+    def _approval_ids(ids):
+        """
+        Returns approval IDs
+        :param ids: Approval IDs
+        :type ids: Tuple
+        :return approval_ids: Approval IDs
+        :rtype approval_ids: List
+        """
+        approval_ids = []
+        for id_ in ids:
+            approval_ids.extend(id_.values())
+        return approval_ids
 
     def _filter_in(self, entity_name, filters):
         """

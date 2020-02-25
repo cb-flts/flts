@@ -168,6 +168,24 @@ class DataRoutine(object):
         }
         return item_filter
 
+    @staticmethod
+    def row_items(row_items):
+        """
+        Returns row items as list
+        :param row_items: Row items
+        :type row_items: Dictionary
+        :return row: Row index
+        :rtype row: Integer
+        :return: Row items as list
+        :rtype: List
+        """
+        for row, items in row_items.iteritems():
+            if not isinstance(items, tuple):
+                yield row, items
+            else:
+                for items_ in items:
+                    yield row, items_
+
 
 class Load(DataRoutine):
     """
@@ -375,10 +393,10 @@ class Update(DataRoutine):
         try:
             count = 0
             query_obj = None
-            for row_idx, columns in self._updates.iteritems():
+            for row, update_items in self.row_items(self._updates):
                 updated = None
-                query_obj = self._model_items[row_idx].get("data")
-                for column, new_value, collection_filter in columns:
+                query_obj = self._model_items[row].get("data")
+                for column, new_value, collection_filter in update_items:
                     if isinstance(column, dict):
                         fk_name = column.keys()[0]
                         if fk_name in self._fk_entity_name and hasattr(query_obj, fk_name):
@@ -549,6 +567,8 @@ class Save(DataRoutine):
         :return: True if valid otherwise False
         :rtype: Boolean
         """
+        if not items:
+            return False
         valid = all(
             isinstance(k, str) or isinstance(k, unicode)
             for k in items.keys()
@@ -562,9 +582,9 @@ class Save(DataRoutine):
         Sets valid save items; entity names, column name and values
         """
         try:
-            for row_idx, columns in self._save_items.iteritems():
-                query_obj = self._model_items[row_idx].get("data")
-                for column, new_value, entity in columns:
+            for row, save_items in self.row_items(self._save_items):
+                query_obj = self._model_items[row].get("data")
+                for column, new_value, entity in save_items:
                     if isinstance(column, dict):
                         fk_name = column.keys()[0]
                         if fk_name in self._fk_entity_name:
@@ -593,7 +613,6 @@ class Save(DataRoutine):
         if query_obj:
             if hasattr(query_obj, column):
                 return self._query_entity_name(query_obj)
-        # return column.entity
         return entity
 
     def _set_collection_items(self, query_obj, column, value):
