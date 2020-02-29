@@ -1836,8 +1836,8 @@ class STDMQGISLoader(object):
         if self.toolbarLoader is not None:
             self.toolbarLoader.unloadContent()
             # Clear current profile combobox
-            self.profiles_combobox.deleteLater()
-            self.profiles_combobox = None
+            # self.profiles_combobox.deleteLater()
+            # self.profiles_combobox = None
 
         if self.menubarLoader is not None:
             self.menubarLoader.unloadContent()

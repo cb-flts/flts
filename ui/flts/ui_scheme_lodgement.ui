@@ -348,7 +348,7 @@
        <item row="1" column="1" colspan="2">
         <widget class="QDoubleSpinBox" name="dbl_spinbx_block_area">
          <property name="decimals">
-          <number>0</number>
+          <number>4</number>
          </property>
          <property name="maximum">
           <double>10000000.000000000000000</double>

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_scheme_lodgement.ui'
 #
-# Created: Tue Feb 25 08:48:40 2020
+# Created: Tue Feb 25 22:58:30 2020
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -177,7 +177,7 @@ class Ui_ldg_wzd(object):
         self.radio_sq_meters.setObjectName(_fromUtf8("radio_sq_meters"))
         self.gridLayout_2.addWidget(self.radio_sq_meters, 0, 1, 1, 1)
         self.dbl_spinbx_block_area = QtGui.QDoubleSpinBox(self.gbx_block_area)
-        self.dbl_spinbx_block_area.setDecimals(0)
+        self.dbl_spinbx_block_area.setDecimals(4)
         self.dbl_spinbx_block_area.setMaximum(10000000.0)
         self.dbl_spinbx_block_area.setObjectName(_fromUtf8("dbl_spinbx_block_area"))
         self.gridLayout_2.addWidget(self.dbl_spinbx_block_area, 1, 1, 1, 2)
