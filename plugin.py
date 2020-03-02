@@ -44,6 +44,7 @@ from stdm.data.configuration.column_updaters import varchar_updater
 from stdm.ui.change_pwd_dlg import changePwdDlg
 from stdm.ui.doc_generator_dlg import (
     DocumentGeneratorDialogWrapper,
+    ReportGeneratorDialogWrapper,
     EntityConfig
 )
 from stdm.data.database import alchemy_table
@@ -1066,6 +1067,10 @@ class STDMQGISLoader(object):
         self.docGeneratorAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_document_generator.png"), \
                                        QApplication.translate("DocumentGeneratorAction", "Document Generator"),
                                        self.iface.mainWindow())
+
+        self.reportGeneratorAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_report.png"), \
+                                       QApplication.translate("ReportGeneratorAction", "Report Generator"),
+                                       self.iface.mainWindow())
         #
         # # Spatial Layer Manager
         # self.spatialLayerManager = QAction(QIcon(":/plugins/stdm/images/icons/spatial_unit_manager.png"), \
@@ -1213,6 +1218,7 @@ class STDMQGISLoader(object):
         self.options_act.triggered.connect(self.on_sys_options)
         self.docDesignerAct.triggered.connect(self.onDocumentDesigner)
         self.docGeneratorAct.triggered.connect(self.onDocumentGenerator)
+        self.reportGeneratorAct.triggered.connect(self.onReportGenerator)
         self.wzdAct.triggered.connect(self.load_config_wizard)
         # self.viewSTRAct.triggered.connect(self.onViewSTR)
         # flts
@@ -1260,6 +1266,9 @@ class STDMQGISLoader(object):
 
         documentGeneratorCnt = ContentGroup.contentItemFromQAction(self.docGeneratorAct)
         documentGeneratorCnt.code = "4C0C7EF2-5914-4FDE-96CB-089D44EDDA5A"
+
+        reportGeneratorCnt = ContentGroup.contentItemFromQAction(self.reportGeneratorAct)
+        reportGeneratorCnt.code = "8F5DB287-4295-40F7-A826-EA2F5868196B"
 
         wzdConfigCnt = ContentGroup.contentItemFromQAction(self.wzdAct)
         wzdConfigCnt.code = "F16CA4AC-3E8C-49C8-BD3C-96111EA74206"
@@ -1404,6 +1413,10 @@ class STDMQGISLoader(object):
         self.docGeneratorCntGroup.addContentItem(documentGeneratorCnt)
         self.docGeneratorCntGroup.register()
 
+        self.reportGeneratorCntGroup = ContentGroup(username, self.reportGeneratorAct)
+        self.reportGeneratorCntGroup.addContentItem(reportGeneratorCnt)
+        self.reportGeneratorCntGroup.register()
+
         adminSettingsCntGroups = []
         adminSettingsCntGroups.append(self.contentAuthCntGroup)
         adminSettingsCntGroups.append(self.userRoleCntGroup)
@@ -1486,7 +1499,8 @@ class STDMQGISLoader(object):
         # self.fltsReportCntGroup.setContainerItem(self.reportAct)
         # self.fltsReportCntGroup.register()
 
-        searchReportCntgroups = []
+        reportCntgroups = []
+        reportCntgroups.append(self.reportGeneratorCntGroup)
         # searchReportCntgroups.append(self.fltsSearchCntGroup)
         # searchReportCntgroups.append(self.fltsReportCntGroup)
 
@@ -1538,6 +1552,7 @@ class STDMQGISLoader(object):
 
         self.toolbarLoader.addContent(self.docDesignerCntGroup)
         self.toolbarLoader.addContent(self.docGeneratorCntGroup)
+        self.toolbarLoader.addContent(self.reportGeneratorCntGroup)
         # self.toolbarLoader.addContent(self.STRCntGroup)
 
         # self.toolbarLoader.addContent(self.fltsNotificationCntGroup)
@@ -1551,7 +1566,7 @@ class STDMQGISLoader(object):
                                        [lhtAdminMenu, lhtAdminMenu]
                                        )
 
-        self.menubarLoader.addContents(searchReportCntgroups,
+        self.menubarLoader.addContents(reportCntgroups,
                                        [lhtAdminMenu, lhtAdminMenu]
                                        )
 
@@ -2000,6 +2015,23 @@ class STDMQGISLoader(object):
             plugin=self
         )
         doc_gen_wrapper.exec_()
+
+    def onReportGenerator(self):
+        """
+        Report generator for CB-FLTS
+        """
+        if self.current_profile is None:
+            self.default_profile()
+            return
+        if len(db_user_tables(self.current_profile)) < 1:
+            self.minimum_table_checker()
+            return
+        report_gen_wrapper = ReportGeneratorDialogWrapper(
+            self.iface,
+            self.iface.mainWindow(),
+            plugin=self
+        )
+        report_gen_wrapper.exec_()
 
     def onImportData(self):
         """
