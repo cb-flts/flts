@@ -145,7 +145,7 @@
        <string/>
       </property>
       <property name="text">
-       <string/>
+       <string>SG </string>
       </property>
       <property name="readOnly">
        <bool>false</bool>
@@ -253,6 +253,9 @@
     </item>
     <item row="12" column="1">
      <widget class="QLineEdit" name="lnedit_title_deed_num">
+      <property name="text">
+       <string>T</string>
+      </property>
       <property name="placeholderText">
        <string>Enter Title Deed Number</string>
       </property>
@@ -345,7 +348,7 @@
        <item row="1" column="1" colspan="2">
         <widget class="QDoubleSpinBox" name="dbl_spinbx_block_area">
          <property name="decimals">
-          <number>0</number>
+          <number>4</number>
          </property>
          <property name="maximum">
           <double>10000000.000000000000000</double>

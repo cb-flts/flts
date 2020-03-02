@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_scheme_lodgement.ui'
 #
-# Created: Fri Feb  7 17:16:36 2020
+# Created: Tue Feb 25 22:58:30 2020
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -96,7 +96,6 @@ class Ui_ldg_wzd(object):
         self.gridLayout_4.addWidget(self.label_sg_num, 7, 0, 1, 1)
         self.lnedit_sg_num = QtGui.QLineEdit(self.wizardPage1)
         self.lnedit_sg_num.setInputMask(_fromUtf8(""))
-        self.lnedit_sg_num.setText(_fromUtf8(""))
         self.lnedit_sg_num.setReadOnly(False)
         self.lnedit_sg_num.setObjectName(_fromUtf8("lnedit_sg_num"))
         self.gridLayout_4.addWidget(self.lnedit_sg_num, 7, 1, 1, 1)
@@ -178,8 +177,8 @@ class Ui_ldg_wzd(object):
         self.radio_sq_meters.setObjectName(_fromUtf8("radio_sq_meters"))
         self.gridLayout_2.addWidget(self.radio_sq_meters, 0, 1, 1, 1)
         self.dbl_spinbx_block_area = QtGui.QDoubleSpinBox(self.gbx_block_area)
-        self.dbl_spinbx_block_area.setDecimals(0)
-        self.dbl_spinbx_block_area.setMaximum(10000000)
+        self.dbl_spinbx_block_area.setDecimals(4)
+        self.dbl_spinbx_block_area.setMaximum(10000000.0)
         self.dbl_spinbx_block_area.setObjectName(_fromUtf8("dbl_spinbx_block_area"))
         self.gridLayout_2.addWidget(self.dbl_spinbx_block_area, 1, 1, 1, 2)
         self.gridLayout_4.addWidget(self.gbx_block_area, 16, 0, 1, 2)
@@ -232,7 +231,6 @@ class Ui_ldg_wzd(object):
         self.btn_upload_dir.setIconSize(QtCore.QSize(16, 16))
         self.btn_upload_dir.setObjectName(_fromUtf8("btn_upload_dir"))
         self.gridLayout.addWidget(self.btn_upload_dir, 3, 1, 1, 1)
-        self.btn_upload_dir.hide()
         ldg_wzd.addPage(self.wizardPage)
         self.wizardPage2 = QtGui.QWizardPage()
         self.wizardPage2.setObjectName(_fromUtf8("wizardPage2"))
@@ -317,6 +315,7 @@ class Ui_ldg_wzd(object):
         self.label_reg_div.setText(_translate("ldg_wzd", "<html><head/><body><p>Registration Division <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
         self.label_schm_num.setText(_translate("ldg_wzd", "<html><head/><body><p>Scheme Number <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
         self.label_sg_num.setText(_translate("ldg_wzd", "Surveyor General Number", None))
+        self.lnedit_sg_num.setText(_translate("ldg_wzd", "SG ", None))
         self.lnedit_sg_num.setPlaceholderText(_translate("ldg_wzd", "Enter Surveyor General Number", None))
         self.label_schm_name.setText(_translate("ldg_wzd", "<html><head/><body><p>Scheme Name <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
         self.lnedit_schm_nam.setPlaceholderText(_translate("ldg_wzd", "Enter name of the Scheme", None))
@@ -324,6 +323,7 @@ class Ui_ldg_wzd(object):
         self.label_date_establish.setText(_translate("ldg_wzd", "<html><head/><body><p>Date of Establishment (RoD) <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
         self.label_lro.setText(_translate("ldg_wzd", "<html><head/><body><p>Land Rights Office <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
         self.label_title_deed_num.setText(_translate("ldg_wzd", "<html><head/><body><p>Title Deed Number <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
+        self.lnedit_title_deed_num.setText(_translate("ldg_wzd", "T", None))
         self.lnedit_title_deed_num.setPlaceholderText(_translate("ldg_wzd", "Enter Title Deed Number", None))
         self.label_constitution_ref_num.setText(_translate("ldg_wzd", "<html><head/><body><p>Constitution Ref. Number</p></body></html>", None))
         self.lnedit_constitution_ref_num.setPlaceholderText(_translate("ldg_wzd", "Enter Consitution Reference Number", None))

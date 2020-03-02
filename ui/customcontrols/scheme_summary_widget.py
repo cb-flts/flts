@@ -59,11 +59,13 @@ class SchemeSummaryWidget(QTreeWidget):
         self.scm_date_est = QTreeWidgetItem()
         self.scm_ra_type = QTreeWidgetItem()
         self.scm_ra_name = QTreeWidgetItem()
-        self.scm_sg_num = QTreeWidgetItem()
+        # self.scm_sg_num = QTreeWidgetItem()
+        self.scm_title_deed_num = QTreeWidgetItem()
         self.scm_lro = QTreeWidgetItem()
         self.scm_region = QTreeWidgetItem()
-        self.scm_township = QTreeWidgetItem()
+        self.scm_desc = QTreeWidgetItem()
         self.scm_reg_div = QTreeWidgetItem()
+        self.scm_numplots = QTreeWidgetItem()
         self.scm_blk_area = QTreeWidgetItem()
 
         self._page_name = 'page_name'
@@ -98,11 +100,13 @@ class SchemeSummaryWidget(QTreeWidget):
              self.scm_date_est,
              self.scm_ra_type,
              self.scm_ra_name,
-             self.scm_sg_num,
+             # self.scm_sg_num,
+             self.scm_title_deed_num,
              self.scm_lro,
              self.scm_region,
-             self.scm_township,
+             self.scm_desc,
              self.scm_reg_div,
+             self.scm_numplots,
              self.scm_blk_area]
         )
 
@@ -121,9 +125,9 @@ class SchemeSummaryWidget(QTreeWidget):
         self.scm_ra_name.setText(0,
                                  self.tr('Name of Relevant Authority ')
                                  )
-        self.scm_sg_num.setText(0,
-                                self.tr('SG/General Plan Number ')
-                                )
+        self.scm_title_deed_num.setText(0,
+                                        self.tr('Title Deed Number ')
+                                        )
         self.scm_num.setText(0,
                              self.tr('Number of Scheme ')
                              )
@@ -139,12 +143,15 @@ class SchemeSummaryWidget(QTreeWidget):
         self.scm_lro.setText(0,
                              self.tr('Land Rights Office ')
                              )
-        self.scm_township.setText(0,
-                                  self.tr('Township ')
-                                  )
+        self.scm_desc.setText(0,
+                              self.tr('Scheme Description ')
+                              )
         self.scm_reg_div.setText(0,
                                  self.tr('Registration Division ')
                                  )
+        self.scm_numplots.setText(0,
+                                  self.tr('Number of Plots ')
+                                  )
         self.scm_blk_area.setText(0,
                                   self.tr('Block Area ')
                                   )
@@ -200,4 +207,3 @@ class SchemeSummaryWidget(QTreeWidget):
             return False
 
         return True
-

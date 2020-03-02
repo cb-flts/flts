@@ -212,9 +212,18 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
         # Block area
         self.radio_sq_meters.setChecked(True)
-        self.dbl_spinbx_block_area.setSuffix(" (Sq.m)")
 
-        self._on_area_check()
+        self.dbl_spinbx_block_area.setSuffix(" Sq.m")
+        self.dbl_spinbx_block_area.setDecimals(0)
+
+        # self._on_area_check()
+        self.radio_hectares.toggled.connect(
+            self._on_hectares_clicked
+        )
+
+        self.radio_sq_meters.toggled.connect(
+            self._on_sq_meters_clicked
+        )
 
         # Populate lookup combo boxes
         self._populate_lookups()
@@ -445,53 +454,74 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
         return scheme_code
 
-    def _on_area_check(self):
-        """
-        Signals for block area calculation
-        :return:
-        """
-        self.radio_sq_meters.clicked.connect(
-            self._on_meters_clicked
-        )
-        self.radio_hectares.clicked.connect(
-            self._on_hectares_clicked
-        )
-
-    def _on_meters_clicked(self):
-        """
-        Slot raised when the hectares radio button is checked
-        :return:
-        """
-        meters_suffix = self.tr(" (Sq.m)")
-        self.dbl_spinbx_block_area.setSuffix(meters_suffix)
-        self._to_meters()
-
     def _on_hectares_clicked(self):
         """
-        Slot raised when the hectares radio button is checked
-        :return:
+        When the hectares radio button is selected
         """
-        hectares_suffix = self.tr(" (Ha)")
-        self.dbl_spinbx_block_area.setSuffix(hectares_suffix)
-        self._to_hectares()
+        self.dbl_spinbx_block_area.setDecimals(4)
+        self.dbl_spinbx_block_area.setSuffix(" Ha")
+        initial_value = self.dbl_spinbx_block_area.value()
+        value = initial_value / 10000
+        self.dbl_spinbx_block_area.setValue(value)
 
-    def _to_meters(self):
+    def _on_sq_meters_clicked(self):
         """
-        Conversion of block area value to meters
-        :return:
+        When the area radio button is clicked
         """
-        initial_area = self.dbl_spinbx_block_area.value()
-        final_area = initial_area * 10000
-        self.dbl_spinbx_block_area.setValue(final_area)
+        self.dbl_spinbx_block_area.setDecimals(0)
+        self.dbl_spinbx_block_area.setSuffix(" Sq.m")
+        initial_value = self.dbl_spinbx_block_area.value()
+        value = initial_value * 10000
+        self.dbl_spinbx_block_area.setValue(value)
 
-    def _to_hectares(self):
-        """
-        Conversion of block area value to hectares
-        :return:
-        """
-        initial_area = self.dbl_spinbx_block_area.value()
-        final_area = initial_area / 10000
-        self.dbl_spinbx_block_area.setValue(final_area)
+            # def _on_area_check(self):
+
+    #     """
+    #     Signals for block area calculation
+    #     :return:
+    #     """
+    #     self.radio_sq_meters.clicked.connect(
+    #         self._on_meters_clicked
+    #     )
+    #     self.radio_hectares.clicked.connect(
+    #         self._on_hectares_clicked
+    #     )
+    #
+    # def _on_meters_clicked(self):
+    #     """
+    #     Slot raised when the hectares radio button is checked
+    #     :return:
+    #     """
+    #     meters_suffix = self.tr(" (Sq.m)")
+    #     self.dbl_spinbx_block_area.setSuffix(meters_suffix)
+    #     self._to_meters()
+    #
+    # def _on_hectares_clicked(self):
+    #     """
+    #     Slot raised when the hectares radio button is checked
+    #     :return:
+    #     """
+    #     hectares_suffix = self.tr(" (Ha)")
+    #     self.dbl_spinbx_block_area.setSuffix(hectares_suffix)
+    #     self._to_hectares()
+
+    # def _to_meters(self):
+    #     """
+    #     Conversion of block area value to meters
+    #     :return:
+    #     """
+    #     initial_area = self.dbl_spinbx_block_area.value()
+    #     final_area = initial_area * 10000
+    #     self.dbl_spinbx_block_area.setValue(final_area)
+    #
+    # def _to_hectares(self):
+    #     """
+    #     Conversion of block area value to hectares
+    #     :return:
+    #     """
+    #     initial_area = self.dbl_spinbx_block_area.value()
+    #     final_area = initial_area / 10000
+    #     self.dbl_spinbx_block_area.setValue(final_area)
 
     def validate_block_area(self):
         """
@@ -1216,13 +1246,17 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             1,
             self.lnedit_schm_num.text()
         )
+        self.tr_summary.scm_desc.setText(
+            1,
+            self.lnedit_scheme_description.text()
+        )
         self.tr_summary.scm_name.setText(
             1,
             self.lnedit_schm_nam.text()
         )
-        self.tr_summary.scm_sg_num.setText(
+        self.tr_summary.scm_title_deed_num.setText(
             1,
-            self.lnedit_sg_num.text()
+            self.lnedit_title_deed_num.text()
         )
         self.tr_summary.scm_date_apprv.setText(
             1,
@@ -1251,6 +1285,10 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         self.tr_summary.scm_reg_div.setText(
             1,
             self.cbx_reg_div.currentText()
+        )
+        self.tr_summary.scm_numplots.setText(
+            1,
+            self.dbl_spinbx_num_plots.text()
         )
         self.tr_summary.scm_blk_area.setText(
             1, self.dbl_spinbx_block_area.text()
@@ -1314,7 +1352,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         # Get scheme db object for manual saving to database.
         self.submit(True)
         scheme_obj = self.model()
-        scheme_obj.plot_status = 2    # TODO: Add plot status as foreign key
+        scheme_obj.plot_status = 2  # TODO: Add plot status as foreign key
         QgsApplication.processEvents()
 
         pg_dlg.setLabelText(self.tr(
