@@ -14,7 +14,7 @@ SELECT cb_plot.id,
     cb_relevant_authority.name_of_relevant_authority,
     cb_check_lht_reg_division.value AS registration_division,
     cb_check_lht_region.value AS region,
-    cb_scheme.area
+    cb_plot.area
    FROM cb_social_tenure_relationship
      JOIN cb_plot ON cb_social_tenure_relationship.plot_id = cb_plot.id
      JOIN cb_scheme ON cb_plot.scheme_id = cb_scheme.id
