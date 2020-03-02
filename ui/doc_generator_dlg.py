@@ -62,6 +62,7 @@ from .entity_browser import ForeignKeyBrowser
 from .foreign_key_mapper import ForeignKeyMapper
 from .notification import NotificationBar
 from .ui_doc_generator import Ui_DocumentGeneratorDialog
+from .ui_report_generator import Ui_ReportGeneratorDialog
 from .composer import TemplateDocumentSelector
 from .sourcedocument import source_document_location
 
@@ -238,24 +239,92 @@ class DocumentGeneratorDialogWrapper(object):
 
 class ReportGeneratorDialogWrapper(object):
     """
-        A utility class necessary for the generation of report sfrom tables in
-        flts profile.
+    A utility class that fetches the tables in the current profile
+    and creates corresponding Entity Configuration objects, which are then
+    added to the ReportGeneratorDialog.
     """
 
     def __init__(self, iface, parent=None, plugin=None):
         self._iface = iface
 
-        self._doc_gen_dlg = DocumentGeneratorDialog(self._iface, parent, plugin=plugin)
-        self._doc_gen_dlg.hide_show_record_selection(False)
-        self._doc_gen_dlg.setWindowTitle('LandHold Report Generator')
-        self._notif_bar = self._doc_gen_dlg.notification_bar()
+        self._report_gen_dlg = DocumentGeneratorDialog(self._iface, parent, plugin=plugin)
+        self._report_gen_dlg.hide_show_record_selection(False)
+        self._report_gen_dlg.setWindowTitle('FLTS Report Generator')
+        self._notif_bar = self._report_gen_dlg.notification_bar()
 
         self.curr_profile = current_profile()
+        # Load entity configurations
+        self._load_entity_configurations()
 
-        # TODO Add report generator configs
+    def _load_entity_configurations(self):
+        """
+        Uses tables' information in the current profile to create the
+        corresponding EntityConfig objects.
+        """
+        try:
+            entities = profile_entities(self.curr_profile)
+            self._report_gen_dlg.progress.setRange(0, len(entities) - 1)
+
+            for i, t in enumerate(entities):
+                QApplication.processEvents()
+                # TODO modify these to select table based on context/docuemnts
+                if t.name != 'cb_plot':
+                    continue
+                # Exclude custom tenure entities
+                if 'check' in t.name:
+                    continue
+                entity_cfg = self._entity_config_from_profile(
+                    str(t.name), t.short_name
+                )
+
+                if entity_cfg is not None:
+                    self._report_gen_dlg.add_entity_config(entity_cfg, i)
+            self._report_gen_dlg.progress.hide()
+        except Exception as pe:
+            self._notif_bar.clear()
+            self._notif_bar.insertErrorNotification(pe.message)
+
+    def _entity_config_from_profile(self, table_name, short_name):
+        """
+        Creates an EntityConfig object from the table name.
+        :param table_name: Name of the database table.
+        :type table_name: str
+        :return: Entity configuration object.
+        :rtype: EntityConfig
+        """
+        table_display_name = format_name(short_name)
+        self.ds_entity = self.curr_profile.entity_by_name(table_name)
+
+        model = entity_model(self.ds_entity)
+
+        if model is not None:
+            return EntityConfig(title=table_display_name,
+                                data_source=table_name,
+                                model=model,
+                                expression_builder=True,
+                                entity_selector=None)
+
+        else:
+            return None
+
+    def dialog(self):
+        """
+        :return: Returns an instance of the DocumentGeneratorDialog.
+        :rtype: DocumentGeneratorDialog
+        """
+        return self._report_gen_dlg
+
+    def exec_(self):
+        """
+        Show the dialog as a modal dialog.
+        :return: DialogCode result
+        :rtype: int
+        """
+        return self._report_gen_dlg.exec_()
 
 
-class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
+class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog,
+                              Ui_ReportGeneratorDialog):
     """
     Dialog that enables a user to generate documents by using configuration
     information for different entities. 
