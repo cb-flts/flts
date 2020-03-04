@@ -125,7 +125,18 @@ class loginDlg(QDialog, Ui_frmLogin):
         """
         Display a welcome message once the user has successfully logged in
         """
-        welcome_msg = QApplication.translate()
+        usr = self.txtUserName.text()
+        welcome_msg = QApplication.translate(
+            "FLTS",
+            "Welcome. You have successfully logged in as ".format(
+                str(self.User))
+        )
+        QMessageBox.information(self,
+                                QApplication.translate(
+                                    "FLTS", "Welcome"
+                                ),
+                                welcome_msg
+                                )
 
     def settingsDialog(self):
         """
@@ -150,9 +161,9 @@ class loginDlg(QDialog, Ui_frmLogin):
         return settings
 
     def acceptdlg(self):
-        '''
+        """
         On user clicking the login button
-        '''
+        """
         isValid = self.validateInput()
 
         if isValid:
@@ -205,3 +216,5 @@ class loginDlg(QDialog, Ui_frmLogin):
                     "LoginDialog", "Authentication Failed"), msg)
                 self.txtPassword.setFocus()
                 self.txtPassword.selectAll()
+
+        self.welcome_message()
