@@ -167,7 +167,8 @@ class STDMQGISLoader(object):
         self._user_logged_in = False
         self.current_profile = None
         # Profile status label showing the current profile
-        self.profile_status_label = None
+        # self.profile_status_label = None
+        self.flts_status_label = None
         LOGGER.debug('FLTS plugin has been initialized.')
         self.entity_browser = None
         # Load configuration file
@@ -1815,27 +1816,50 @@ class STDMQGISLoader(object):
         :return: None
         :rtype: NoneType
         """
+        # if self.current_profile is None:
+        #     return
+        # if self.profile_status_label is None:
+        #     self.profile_status_label = QLabel()
+        # profile_name = format_name(
+        #     self.current_profile.name
+        # )
+        # message = QApplication.translate(
+        #     'STDMPlugin',
+        #     'Current FLTS Profile: {}'.format(
+        #         profile_name
+        #     )
+        # )
+        #
+        # if self.profile_status_label.parent() is None:
+        #     self.iface.mainWindow().statusBar().insertPermanentWidget(
+        #         0,
+        #         self.profile_status_label,
+        #         10
+        #     )
+        # self.profile_status_label.setText(message)
+
         if self.current_profile is None:
             return
-        if self.profile_status_label is None:
-            self.profile_status_label = QLabel()
-        profile_name = format_name(
-            self.current_profile.name
+        if self.flts_status_label is None:
+            self.flts_status_label = QLabel()
+        # FOR NOW
+        current_user_name = format_name(
+            'current user'
         )
         message = QApplication.translate(
             'STDMPlugin',
-            'Current FLTS Profile: {}'.format(
-                profile_name
+            'Logged in as: {}'.format(
+                current_user_name.upper()
             )
         )
 
-        if self.profile_status_label.parent() is None:
+        if self.flts_status_label.parent() is None:
             self.iface.mainWindow().statusBar().insertPermanentWidget(
                 0,
-                self.profile_status_label,
+                self.flts_status_label,
                 10
             )
-        self.profile_status_label.setText(message)
+        self.flts_status_label.setText(message)
 
     def reload_plugin(self, sel_profile, load_from_stc=False):
         """
