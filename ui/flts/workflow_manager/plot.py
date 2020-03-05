@@ -540,9 +540,6 @@ class UniqueParcelIdentifier:
     """
     Unique Parcel Identifier (UPI) object
     """
-
-    rems = ["REM", "ACCES", "POS"]
-
     def __init__(self, data_service, prefix):
         self._data_service = data_service
         self._prefix = prefix
@@ -587,8 +584,6 @@ class UniqueParcelIdentifier:
         :rtype: String
         """
         plot_id = str(plot_id)
-        if self._is_id_remainder(plot_id):
-            return plot_id
         plot_number = self._extract_plot_number(plot_id)
         if plot_number:
             plot_number = self._generate_plot_number(plot_number)
@@ -607,19 +602,6 @@ class UniqueParcelIdentifier:
         suffix = str(num)
         prefix = prefix[:-len(suffix)]
         return prefix + suffix
-
-    def _is_id_remainder(self, plot_id):
-        """
-        Checks if the WKT plot ID is the remainder
-        :param plot_id: Plot ID
-        :param plot_id: String
-        :return: True or False
-        :return: Boolean
-        """
-        for rem in self.rems:
-            if plot_id.find(rem) != -1:
-                return True
-        return False
 
     @staticmethod
     def _extract_plot_number(plot_id):
