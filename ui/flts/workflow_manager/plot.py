@@ -559,6 +559,16 @@ class UniqueParcelIdentifier:
         plot_numbers = [num for num, in plot_numbers]
         return plot_numbers
 
+    def plot_upis(self):
+        """
+        Returns the plot universal parcel identifiers (UPIs)
+        :return upis: Plot universal parcel identifiers
+        :rtype upis: List
+        """
+        upis = self._data_service.plot_upis()
+        upis = [upi for upi, in upis]
+        return upis
+
     def aucode(self):
         """
         Returns the Scheme AUCODE
@@ -835,6 +845,7 @@ class PlotPreview(Plot):
         results = []
         upi = UniqueParcelIdentifier(self._data_service, "W")
         scheme_plot_numbers = upi.scheme_plot_numbers()
+        plot_upis = upi.plot_upis()
         aucode = upi.aucode()
         area_attribute = False
         for row, data in enumerate(csv_reader):
@@ -847,9 +858,11 @@ class PlotPreview(Plot):
                 value = self._get_value(data, field_options, PARCEL_NUM)
                 plot_number = self._plot_number(value, upi, scheme_plot_numbers)
                 contents[PARCEL_NUM] = unicode(plot_number)
-                if plot_number != WARNING:
-                    plot_number = unicode(upi.upi(aucode, plot_number))
-                contents[UPI_NUM] = self._on_empty_value(UPI_NUM, plot_number)
+                # if plot_number != WARNING:
+                #     plot_number = unicode(upi.upi(aucode, plot_number))
+                # contents[UPI_NUM] = self._on_empty_value(UPI_NUM, plot_number)
+                value = self._plot_upi(aucode, plot_number, upi, plot_upis)
+                contents[UPI_NUM] = unicode(value)
                 contents[AREA] = ""
                 attributes = self._layer_attributes(contents)
                 self._create_layer(contents[GEOMETRY], attributes)
@@ -871,7 +884,7 @@ class PlotPreview(Plot):
         :param upi: Unique Parcel Identifier
         :param upi: UniqueParcelIdentifier
         :param scheme_plot_numbers: Existing scheme plot numbers
-        :param scheme_plot_numbers: String
+        :param scheme_plot_numbers: List
         :return value: Plot number
         :return value: String
         """
@@ -882,15 +895,39 @@ class PlotPreview(Plot):
             self._set_invalid_tip(PARCEL_NUM, "Invalid identifier")
         elif plot_number in upi.wkt_plot_numbers:
             self._set_invalid_tip(PARCEL_NUM, "Duplicate WKT identifier")
-        elif plot_number in scheme_plot_numbers:
+        elif plot_number in scheme_plot_numbers:  # TODO: For speed use binary search instead
             value = plot_number
             tip = "Scheme plot number exist in the database"
-            self._set_invalid_tips({PARCEL_NUM: tip, UPI_NUM: tip})
+            # self._set_invalid_tips({PARCEL_NUM: tip, UPI_NUM: tip})
+            self._set_invalid_tips({PARCEL_NUM: tip})
         else:
             value = plot_number
             upi.store_wkt_plot_number(plot_number)
             self._plot_numbers[self._settings.fpath] = upi.wkt_plot_numbers
         return value
+
+    def _plot_upi(self, aucode, plot_number, upi, plot_upis):
+        """
+        Returns the plot universal parcel number (UPI)
+        :param aucode: Scheme AUCODE
+        :param aucode: Unicode
+        :param plot_number: Plot number
+        :param plot_number: String
+        :param upi: Unique Parcel Identifier
+        :param upi: UniqueParcelIdentifier
+        :param plot_upis: Existing UPIs
+        :param plot_upis: List
+        :return plot_upi: Plot UPI
+        :return plot_upi: String
+        """
+        plot_upi = plot_number
+        if plot_upi != WARNING:
+            plot_upi = upi.upi(aucode, plot_upi)
+            if plot_upi in plot_upis:  # TODO: For speed use binary search instead
+                tip = "Plot UPI exist in the database"
+                self._set_invalid_tips({UPI_NUM: tip})
+        plot_upi = self._on_empty_value(UPI_NUM, plot_upi)
+        return plot_upi
 
     def _plot_area(self):
         """

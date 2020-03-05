@@ -1050,7 +1050,7 @@ class PlotPreviewDataService(DataService):
 
     def scheme_relevant_authority(self):
         """
-        Returns Scheme Relevant Authority record/row
+        Returns the Scheme Relevant Authority record/row
         :return relevant_authority: Scheme Relevant Authority record/row
         :rtype relevant_authority: Entity
         """
@@ -1066,8 +1066,21 @@ class PlotPreviewDataService(DataService):
         ).first()
         return relevant_authority
 
+    def plot_upis(self):
+        """
+        Returns the plot universal parcel identifiers (UPIs)
+        :return upis: Plot universal parcel identifiers
+        :rtype upis: Entity
+        """
+        model = self.entity_model_("Plot")
+        upis = self.filter_query_by(
+            "Plot",
+            columns=[getattr(model, "upi")]
+        ).distinct()
+        return upis
+
     @staticmethod
-    def filter_query_by(entity_name, filters, columns=None):
+    def filter_query_by(entity_name, filters=None, columns=None):
         """
         Filters query result by a column value
         :param entity_name: Entity name
