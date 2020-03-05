@@ -858,9 +858,6 @@ class PlotPreview(Plot):
                 value = self._get_value(data, field_options, PARCEL_NUM)
                 plot_number = self._plot_number(value, upi, scheme_plot_numbers)
                 contents[PARCEL_NUM] = unicode(plot_number)
-                # if plot_number != WARNING:
-                #     plot_number = unicode(upi.upi(aucode, plot_number))
-                # contents[UPI_NUM] = self._on_empty_value(UPI_NUM, plot_number)
                 value = self._plot_upi(aucode, plot_number, upi, plot_upis)
                 contents[UPI_NUM] = unicode(value)
                 contents[AREA] = ""
@@ -898,7 +895,6 @@ class PlotPreview(Plot):
         elif plot_number in scheme_plot_numbers:  # TODO: For speed use binary search instead
             value = plot_number
             tip = "Scheme plot number exist in the database"
-            # self._set_invalid_tips({PARCEL_NUM: tip, UPI_NUM: tip})
             self._set_invalid_tips({PARCEL_NUM: tip})
         else:
             value = plot_number
