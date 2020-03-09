@@ -214,7 +214,6 @@ class STDMQGISLoader(object):
         self.helpAct.triggered.connect(self.help_contents)
         self.initToolbar()
         self.initMenuItems()
-        self.login()
 
     def _menu_items(self):
         # Create menu and menu items on the menu bar
