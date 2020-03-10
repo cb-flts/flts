@@ -22,6 +22,7 @@ import logging
 import os.path
 import platform
 import shutil
+import stdm.data
 from collections import OrderedDict
 
 from PyQt4.QtCore import *
@@ -53,7 +54,6 @@ from stdm.ui.manage_accounts_dlg import manageAccountsDlg
 from stdm.ui.content_auth_dlg import contentAuthDlg
 from stdm.ui.options_base import OptionsDialog
 
-# flts
 from ui.flts.user_shortcut_dlg import UserShortcutDialog
 from ui.flts.scheme_lodgement import LodgementWizard
 from ui.flts.workflow_manager.dock_widget_factory import DockWidgetFactory
@@ -1222,9 +1222,7 @@ class STDMQGISLoader(object):
         adminSettingsCntGroups.append(self.options_content_group)
         adminSettingsCntGroups.append(self.wzdConfigCntGroup)
 
-        # FLTS
         # Create content groups and add items
-
         self.schemeLodgementCntGroup = ContentGroup(username)
         self.schemeLodgementCntGroup.addContentItem(schemeLodgementCnt)
         self.schemeLodgementCntGroup.setContainerItem(self.schemeLodgementAct)
@@ -1320,9 +1318,7 @@ class STDMQGISLoader(object):
         self.toolbarLoader.loadContent()
         self.menubarLoader.loadContent()
 
-        # self.create_spatial_unit_manager()
-
-        self.profile_status_message()
+        self.current_user_status_message()
 
     def grant_privilege_base_tables(self, username):
         roles = []
@@ -1551,46 +1547,25 @@ class STDMQGISLoader(object):
 
         opt_dlg.exec_()
 
-    def profile_status_message(self):
+    def current_user_status_message(self):
         """
-        Shows the name of the loaded profile in QGIS status bar.
+        Shows the name of the current user who is logged in
+        QGIS status bar.
         :return: None
         :rtype: NoneType
         """
-        # if self.current_profile is None:
-        #     return
-        # if self.profile_status_label is None:
-        #     self.profile_status_label = QLabel()
-        # profile_name = format_name(
-        #     self.current_profile.name
-        # )
-        # message = QApplication.translate(
-        #     'STDMPlugin',
-        #     'Current FLTS Profile: {}'.format(
-        #         profile_name
-        #     )
-        # )
-        #
-        # if self.profile_status_label.parent() is None:
-        #     self.iface.mainWindow().statusBar().insertPermanentWidget(
-        #         0,
-        #         self.profile_status_label,
-        #         10
-        #     )
-        # self.profile_status_label.setText(message)
-
         if self.current_profile is None:
             return
         if self.flts_status_label is None:
             self.flts_status_label = QLabel()
         # FOR NOW
         current_user_name = format_name(
-            'current user'
+            stdm.data.app_dbconn.User.UserName
         )
         message = QApplication.translate(
             'STDMPlugin',
-            'Logged in as: {}'.format(
-                current_user_name.upper()
+            'Logged in as {}'.format(
+                current_user_name
             )
         )
 
@@ -1987,8 +1962,6 @@ class STDMQGISLoader(object):
             self.stdmInitToolbar.removeAction(self.options_act)
             self.stdmInitToolbar.removeAction(self.docDesignerAct)
             self.stdmInitToolbar.removeAction(self.docGeneratorAct)
-
-            # flts
             self.stdmInitToolbar.removeAction(self.schemeLodgementAct)
             self.stdmInitToolbar.removeAction(self.schemeEstablishmentAct)
             self.stdmInitToolbar.removeAction(self.schemeRevisionAct)
@@ -1999,6 +1972,8 @@ class STDMQGISLoader(object):
             self.stdmInitToolbar.removeAction(self.scanCertificateAct)
             self.stdmInitToolbar.removeAction(self.searchAct)
             self.stdmInitToolbar.removeAction(self.reportAct)
+            # Clear current user name from statusbar
+            self.flts_status_label.clear()
 
             if self.toolbarLoader is not None:
                 self.toolbarLoader.unloadContent()
