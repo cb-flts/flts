@@ -216,5 +216,3 @@ class loginDlg(QDialog, Ui_frmLogin):
                     "LoginDialog", "Authentication Failed"), msg)
                 self.txtPassword.setFocus()
                 self.txtPassword.selectAll()
-
-        self.welcome_message()
