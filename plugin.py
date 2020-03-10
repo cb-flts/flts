@@ -216,7 +216,6 @@ class STDMQGISLoader(object):
         self.helpAct.triggered.connect(self.help_contents)
         self.initToolbar()
         self.initMenuItems()
-        # self.login()
 
     def _menu_items(self):
         # Create menu and menu items on the menu bar
@@ -1230,10 +1229,6 @@ class STDMQGISLoader(object):
         self.thirdExaminationAct.triggered.connect(self.third_examination)
         self.importPlotsAct.triggered.connect(self.import_plots)
         self.schemeRevisionAct.triggered.connect(self.revise_scheme)
-        self.printCertificateAct.triggered.connect(self.print_certificate)
-        self.scanCertificateAct.triggered.connect(self.scan_certificate)
-        self.searchAct.triggered.connect(self.flts_search)
-        self.reportAct.triggered.connect(self.flts_report)
 
         # self.manageAdminUnitsAct.triggered.connect(self.onManageAdminUnits)
         # self.exportAct.triggered.connect(self.onExportData)
@@ -1299,21 +1294,6 @@ class STDMQGISLoader(object):
 
         importPlotsCnt = ContentGroup.contentItemFromQAction(self.importPlotsAct)
         importPlotsCnt.code = "FEC81DCE-FF7E-4253-B6CE-30D0504D4G16"
-
-        # printCertificateCnt = ContentGroup.contentItemFromQAction(self.printCertificateAct)
-        # printCertificateCnt.code = "E59F7CC1-0D0E-4EA2-9996-89DACBD07A83"
-
-        # scanCertificateCnt = ContentGroup.contentItemFromQAction(self.scanCertificateAct)
-        # scanCertificateCnt.code = "0CC4FB8F-70BA-4DE8-8599-FD344A564EB5"
-        #
-        # fltsSearchCnt = ContentGroup.contentItemFromQAction(self.searchAct)
-        # fltsSearchCnt.code = "1520B989-03BA-4B05-BC50-A4C3EC7D79B6"
-        #
-        # fltsReportCnt = ContentGroup.contentItemFromQAction(self.reportAct)
-        # fltsReportCnt.code = "DABD3A8A-3A8B-4215-90B0-27F40DAFF2F1"
-
-        # fltsNotificationCnt = ContentGroup.contentItemFromQAction(self.notificationAct)
-        # fltsNotificationCnt.code = "fab81cce-ff7e-4443-a5be-30c9493d3f05"
 
         # adminUnitsCnt = ContentGroup.contentItemFromQAction(self.manageAdminUnitsAct)
         # adminUnitsCnt.code = "770EAC75-2BEC-492E-8703-34674054C246"
@@ -1473,16 +1453,6 @@ class STDMQGISLoader(object):
         schemeSettingsCntGroups.append(self.importPlotsCntGroup)
         schemeSettingsCntGroups.append(self.schemeRevisionCntGroup)
 
-        # self.printCertCntGroup = ContentGroup(username)
-        # self.printCertCntGroup.addContentItem(printCertificateCnt)
-        # self.printCertCntGroup.setContainerItem(self.printCertificateAct)
-        # self.printCertCntGroup.register()
-
-        # self.scanCertCntGroup = ContentGroup(username)
-        # self.scanCertCntGroup.addContentItem(scanCertificateCnt)
-        # self.scanCertCntGroup.setContainerItem(self.scanCertificateAct)
-        # self.scanCertCntGroup.register()
-
         certSettingsCntGroups = []
         # certSettingsCntGroups.append(self.printCertCntGroup)
         # certSettingsCntGroups.append(self.scanCertCntGroup)
@@ -1499,16 +1469,6 @@ class STDMQGISLoader(object):
         # self.fltsReportCntGroup.addContentItem(fltsReportCnt)
         # self.fltsReportCntGroup.setContainerItem(self.reportAct)
         # self.fltsReportCntGroup.register()
-
-        reportCntgroups = []
-        reportCntgroups.append(self.reportGeneratorCntGroup)
-        # searchReportCntgroups.append(self.fltsSearchCntGroup)
-        # searchReportCntgroups.append(self.fltsReportCntGroup)
-
-        # self.fltsNotificationCntGroup = ContentGroup(username, self.notificationAct)
-        # self.fltsNotificationCntGroup.addContentItem(fltsNotificationCnt)
-        # self.fltsNotificationCntGroup.setContainerItem(self.notificationAct)
-        # self.fltsNotificationCntGroup.register()
 
         # flts toolbar items
 
@@ -1538,16 +1498,7 @@ class STDMQGISLoader(object):
 
         self.toolbarLoader.addContent(self._action_separator())
 
-        # self.toolbarLoader.addContent(self.printCertCntGroup)
-        # self.toolbarLoader.addContent(self.scanCertCntGroup)
-
-        self.toolbarLoader.addContent(self._action_separator())
-
         # self.toolbarLoader.addContent(self.fltsSearchCntGroup)
-
-        self.toolbarLoader.addContent(self._action_separator())
-
-        # self.toolbarLoader.addContent(self.fltsReportCntGroup)
 
         self.toolbarLoader.addContent(self._action_separator())
 
@@ -1555,8 +1506,6 @@ class STDMQGISLoader(object):
         self.toolbarLoader.addContent(self.docGeneratorCntGroup)
         self.toolbarLoader.addContent(self.reportGeneratorCntGroup)
         # self.toolbarLoader.addContent(self.STRCntGroup)
-
-        # self.toolbarLoader.addContent(self.fltsNotificationCntGroup)
 
         # menubar items
         self.menubarLoader.addContents(schemeSettingsCntGroups,
@@ -1567,13 +1516,9 @@ class STDMQGISLoader(object):
                                        [lhtAdminMenu, lhtAdminMenu]
                                        )
 
-        self.menubarLoader.addContents(reportCntgroups,
-                                       [lhtAdminMenu, lhtAdminMenu]
-                                       )
-
-        # self.menubarLoader.addContent(self.fltsNotificationCntGroup,
-        #                               [lhtAdminMenu, lhtAdminMenu]
-        #                               )
+        # self.menubarLoader.addContents(reportCntgroups,
+        #                                [lhtAdminMenu, lhtAdminMenu]
+        #                                )
 
         # Load all the content in the container
         self.toolbarLoader.loadContent()
@@ -2262,7 +2207,6 @@ class STDMQGISLoader(object):
             self.stdmInitToolbar.removeAction(self.firstExaminationAct)
             self.stdmInitToolbar.removeAction(self.secondExaminationAct)
             self.stdmInitToolbar.removeAction(self.thirdExaminationAct)
-            # self.stdmInitToolbar.removeAction(self.notificationAct)
             self.stdmInitToolbar.removeAction(self.printCertificateAct)
             self.stdmInitToolbar.removeAction(self.scanCertificateAct)
             self.stdmInitToolbar.removeAction(self.searchAct)
@@ -2489,16 +2433,6 @@ class STDMQGISLoader(object):
                 self.third_examination()
             elif action_code == 'PLT_SCM':
                 self.import_plots()
-            elif action_code == 'P_CRT':
-                self.print_certificate()
-            elif action_code == 'S_CRT':
-                self.scan_certificate()
-            # elif action_code == 'NTF':
-            #     self.flts_notification()
-            elif action_code == 'SRC':
-                self.flts_search()
-            elif action_code == 'RPT':
-                self.flts_report()
             return True
         else:
             return False
@@ -2570,13 +2504,6 @@ class STDMQGISLoader(object):
         self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         self.dock_widget.show_dock_widget()
 
-    def scan_certificate(self):
-        """
-        Load the dialog for scanning of certificate.
-        """
-        scan_cert = ScanCertificateDialog(self.iface.mainWindow())
-        scan_cert.exec_()
-
     def import_plots(self):
         """
         Docks Import Plot workflow manager widget
@@ -2588,29 +2515,3 @@ class STDMQGISLoader(object):
         )
         self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         self.dock_widget.show_dock_widget()
-
-    def print_certificate(self):
-        """Load the dialog for printing of certificate."""
-        print_cert = PrintCertificateDialog(self.iface.mainWindow())
-        print_cert.exec_()
-
-    def flts_search(self):
-        """
-        Load the dialog for searching in flts.
-        """
-        search_dialog = SearchDialog(self.iface.mainWindow())
-        search_dialog.exec_()
-
-    def flts_report(self):
-        """
-        Load the dialog for reporting in flts
-        """
-        report_dialog = ReportDialog(self.iface.mainWindow())
-        report_dialog.exec_()
-
-    # def flts_notification(self):
-    #     """
-    #     Load the dialog for notifications in flts
-    #     """
-    #     notification_dialog = NotificationDialog(self.iface.mainWindow())
-    #     notification_dialog.exec_()
