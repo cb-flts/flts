@@ -50,7 +50,8 @@ from stdm.utils.util import (
     format_name,
     entity_display_columns,
     enable_drag_sort,
-    profile_entities
+    profile_entities,
+    documentTemplates
 )
 
 from stdm.settings.registryconfig import (
@@ -62,7 +63,6 @@ from .entity_browser import ForeignKeyBrowser
 from .foreign_key_mapper import ForeignKeyMapper
 from .notification import NotificationBar
 from .ui_doc_generator import Ui_DocumentGeneratorDialog
-from .ui_report_generator import Ui_ReportGeneratorDialog
 from .composer import TemplateDocumentSelector
 from .sourcedocument import source_document_location
 
@@ -151,11 +151,11 @@ class EntityConfig(object):
         self._link_field = field
 
 
-class DocumentGeneratorDialogWrapper(object):
+class CertificateGeneratorDialogWrapper(object):
     """
-    A utility class that fetches the tables in the active profile
+    A wrapper class that fetches the tables in the active profile
     and creates the corresponding EntityConfig objects, which are then
-    added to the DocumentGeneratorDialog.
+    added to the CertificateGeneratorDialog.
     """
 
     def __init__(self, iface, parent=None, plugin=None):
@@ -164,11 +164,15 @@ class DocumentGeneratorDialogWrapper(object):
         self._doc_gen_dlg = DocumentGeneratorDialog(self._iface, parent, plugin=plugin)
         self._doc_gen_dlg.hide_show_record_selection(False)
         self._doc_gen_dlg.setWindowTitle('LandHold Title Generator')
+        self._doc_gen_dlg.rbExpPDF.setChecked(True)
+        self._doc_gen_dlg.groupBox_2.setVisible(False)
         self._notif_bar = self._doc_gen_dlg.notification_bar()
-
         self.curr_profile = current_profile()
+
         # Load entity configurations
         self._load_entity_configurations()
+
+        self._doc_gen_dlg.preload_template('Land Hold Title Certificate')
 
     def _load_entity_configurations(self):
         """
@@ -239,20 +243,23 @@ class DocumentGeneratorDialogWrapper(object):
 
 class ReportGeneratorDialogWrapper(object):
     """
-    A utility class that fetches the tables in the current profile
-    and creates corresponding Entity Configuration objects, which are then
-    added to the ReportGeneratorDialog.
+    A wrapper class that fetches the tables in the active profile
+    and creates the corresponding EntityConfig objects, which are then
+    added to the CertificateGeneratorDialog.
     """
 
     def __init__(self, iface, parent=None, plugin=None):
         self._iface = iface
 
         self._report_gen_dlg = DocumentGeneratorDialog(self._iface, parent, plugin=plugin)
-        self._report_gen_dlg.hide_show_record_selection(False)
-        self._report_gen_dlg.setWindowTitle('FLTS Report Generator')
+        self._report_gen_dlg.hide_show_record_selection(True)
+        self._report_gen_dlg.setWindowTitle('Report Generator')
+        self._report_gen_dlg.rbExpPDF.setChecked(True)
+        self._report_gen_dlg.groupBox_2.setVisible(False)
         self._notif_bar = self._report_gen_dlg.notification_bar()
 
         self.curr_profile = current_profile()
+
         # Load entity configurations
         self._load_entity_configurations()
 
@@ -268,7 +275,7 @@ class ReportGeneratorDialogWrapper(object):
             for i, t in enumerate(entities):
                 QApplication.processEvents()
                 # TODO modify these to select table based on context/docuemnts
-                if t.name != 'cb_plot':
+                if t.name != 'cb_scheme':
                     continue
                 # Exclude custom tenure entities
                 if 'check' in t.name:
@@ -323,8 +330,7 @@ class ReportGeneratorDialogWrapper(object):
         return self._report_gen_dlg.exec_()
 
 
-class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog,
-                              Ui_ReportGeneratorDialog):
+class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
     """
     Dialog that enables a user to generate documents by using configuration
     information for different entities. 
@@ -535,7 +541,7 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog,
         filter_table = current_config.data_source()
         templateSelector = TemplateDocumentSelector(
             self,
-            filter_data_source=filter_table
+            filter_data_source=filter_table,
         )
 
         if templateSelector.exec_() == QDialog.Accepted:
@@ -543,6 +549,20 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog,
 
             self.lblTemplateName.setText(docName)
             self._docTemplatePath = docPath
+            if filter_table != self.last_data_source:
+                # Load template data source fields
+                self._load_template_datasource_fields()
+
+    def preload_template(self, template_name):
+        # Load the template
+        doc_templates = documentTemplates()
+
+        if template_name in doc_templates:
+            self.groupBox.setVisible(False)
+            template_path = doc_templates[template_name]
+            self._docTemplatePath = template_path
+            filter_table = self.current_config().data_source()
+
             if filter_table != self.last_data_source:
                 # Load template data source fields
                 self._load_template_datasource_fields()
