@@ -90,7 +90,7 @@ class HoldersSheetView(QTableWidget):
         self._vl = None
 
         # Default ISO format for the date
-        self._date_format = '%d-%m-%Y'
+        self._date_format = '%d/%m/%Y'
 
         # Init default view
         self._init_ui()
@@ -163,7 +163,10 @@ class HoldersSheetView(QTableWidget):
                 # Format string representation
                 # Date
                 if fi.type() == QVariant.Date:
-                    val = attr.strftime(self._date_format)
+                    try:
+                        val = attr.strftime(self._date_format)
+                    except AttributeError:
+                        val = ''
                 else:
                     val = unicode(attr)
 

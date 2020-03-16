@@ -44,7 +44,7 @@ from stdm.data.configuration.column_updaters import varchar_updater
 
 from stdm.ui.change_pwd_dlg import changePwdDlg
 from stdm.ui.doc_generator_dlg import (
-    DocumentGeneratorDialogWrapper,
+    CertificateGeneratorDialogWrapper,
     ReportGeneratorDialogWrapper,
     EntityConfig
 )
@@ -990,7 +990,7 @@ class STDMQGISLoader(object):
                                       self.iface.mainWindow())
 
         self.docGeneratorAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_document_generator.png"), \
-                                       QApplication.translate("DocumentGeneratorAction", "Document Generator"),
+                                       QApplication.translate("DocumentGeneratorAction", "Certificate Generator"),
                                        self.iface.mainWindow())
 
         self.reportGeneratorAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_report.png"), \
@@ -1749,7 +1749,7 @@ class STDMQGISLoader(object):
         if len(db_user_tables(self.current_profile)) < 1:
             self.minimum_table_checker()
             return
-        doc_gen_wrapper = DocumentGeneratorDialogWrapper(
+        doc_gen_wrapper = CertificateGeneratorDialogWrapper(
             self.iface,
             self.iface.mainWindow(),
             plugin=self

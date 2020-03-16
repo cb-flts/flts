@@ -41,10 +41,16 @@ from PyQt4.QtCore import (
     QTimer
 )
 
+from qgis.core import QgsApplication
+
 from stdm.settings import current_profile
 from stdm.data.configuration import entity_model
 from stdm.composer.document_generator import DocumentGenerator
 from stdm.ui.progress_dialog import STDMProgressDialog
+from stdm.ui.flts.doc_generate_utils import (
+    certificate_preprocess,
+    certificate_postprocess
+)
 from stdm.utils.util import (
     getIndex,
     format_name,
@@ -173,6 +179,8 @@ class CertificateGeneratorDialogWrapper(object):
         self._load_entity_configurations()
 
         self._doc_gen_dlg.preload_template('Land Hold Title Certificate')
+        self._doc_gen_dlg.record_process_func = certificate_preprocess
+        self._doc_gen_dlg.record_post_process_func = certificate_postprocess
 
     def _load_entity_configurations(self):
         """
@@ -336,7 +344,10 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
     information for different entities. 
     """
 
-    def __init__(self, iface, parent=None, plugin=None):
+    def __init__(self, iface, parent=None, plugin=None,
+                 pre_generate_func=None, record_process_func=None,
+                 post_generate_func=None,
+                 record_post_process_func=None):
         QDialog.__init__(self, parent)
         self.setupUi(self)
 
@@ -378,6 +389,11 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         self.chk_template_datasource.stateChanged.connect(self.on_use_template_datasource)
 
         self.btnShowOutputFolder.clicked.connect(self.onShowOutputFolder)
+
+        self.pre_generate_func = pre_generate_func
+        self.record_process_func = record_process_func
+        self.post_generate_func = post_generate_func
+        self.record_post_process_func = record_post_process_func
 
     def hide_show_record_selection(self, state):
         self.chk_template_datasource.setVisible(state)
@@ -737,6 +753,9 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         try:
             QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
 
+            if self.pre_generate_func:
+                self.pre_generate_func()
+
             for i, record in enumerate(records):
                 progressDlg.setValue(i)
 
@@ -744,14 +763,19 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
                     success_status = False
                     break
 
+                should_continue = True
+                if self.record_process_func:
+                    should_continue = self.record_process_func(record, records)
+                    QgsApplication.processEvents()
+                if not should_continue:
+                    continue
+
                 # User-defined location
                 if self.chkUseOutputFolder.checkState() == Qt.Unchecked:
                     status, msg = self._doc_generator.run(self._docTemplatePath, entity_field_name,
                                                           record.id, outputMode,
                                                           filePath=self._outputFilePath)
                     self._doc_generator.clear_temporary_layers()
-                    # Generate certificate number on document generation
-                    # self._doc_generator.gen_certificate_number()
 
                 # Output folder location using custom naming
                 else:
@@ -763,7 +787,9 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
                                                           data_source=self.ds_entity.name)
                     self._doc_generator.clear_temporary_layers()
 
-                    # FLTS certificate number
+                if status:
+                    if self.record_post_process_func:
+                        self.record_post_process_func(record, records)
 
                 if not status:
                     result = QMessageBox.warning(self,
@@ -794,6 +820,9 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
                     progressDlg.setValue(len(records))
 
             QApplication.restoreOverrideCursor()
+
+            if self.post_generate_func:
+                self.post_generate_func()
 
             QMessageBox.information(self,
                                     QApplication.translate("DocumentGeneratorDialog",

@@ -42,6 +42,7 @@ from PyQt4.QtCore import (
 from PyQt4.QtXml import QDomDocument
 
 from qgis.core import (
+    QgsApplication,
     QgsComposerLabel,
     QgsComposerMap,
     QgsComposerPicture,
@@ -66,6 +67,7 @@ from sqlalchemy.schema import (
     MetaData
 )
 
+from stdm import STYLES_DIR
 from stdm.settings.registryconfig import RegistryConfig
 from stdm.data.pg_utils import (
     geometryType,
@@ -92,6 +94,7 @@ from .qr_code_configuration import QRCodeConfigurationCollection
 from .table_configuration import TableConfigurationCollection
 
 LOGGER = logging.getLogger('stdm')
+ANNOTATION_FILE = '{0}/plot_annotation.qml'.format(STYLES_DIR)
 
 
 class DocumentGenerator(QObject):
@@ -253,6 +256,12 @@ class DocumentGenerator(QObject):
         row values will be used to name output files if the options has been
         specified by the user.
         """
+        # Update layers in map settings
+        current_layers = QgsMapLayerRegistry.instance().mapLayers().keys()
+        self._map_settings.setLayers(current_layers)
+        self._iface.mapCanvas().refresh()
+        QgsApplication.processEvents()
+
         templatePath = args[0]
         entityFieldName = args[1]
         entityFieldValue = args[2]
@@ -403,6 +412,7 @@ class DocumentGenerator(QObject):
                             Add layer to map and ensure its always added at the top
                             '''
                             self.map_registry.addMapLayer(ref_layer)
+                            self._annotate_ref_layer(ref_layer)
                             self._iface.mapCanvas().setExtent(bbox)
                             self._iface.mapCanvas().refresh()
                             # Add layer to map memory layer list
@@ -456,6 +466,11 @@ class DocumentGenerator(QObject):
 
     def _random_feature_layer_name(self, sp_field):
         return u"{0}-{1}".format(sp_field, str(uuid.uuid4())[0:8])
+
+    def _annotate_ref_layer(self, layer):
+        if QFile.exists(ANNOTATION_FILE):
+            layer.loadNamedStyle(ANNOTATION_FILE)
+            layer.triggerRepaint()
 
     def _refresh_map_item(self, map_item):
         """
