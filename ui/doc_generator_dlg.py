@@ -41,16 +41,23 @@ from PyQt4.QtCore import (
     QTimer
 )
 
+from qgis.core import QgsApplication
+
 from stdm.settings import current_profile
 from stdm.data.configuration import entity_model
 from stdm.composer.document_generator import DocumentGenerator
 from stdm.ui.progress_dialog import STDMProgressDialog
+from stdm.ui.flts.doc_generate_utils import (
+    certificate_preprocess,
+    certificate_postprocess
+)
 from stdm.utils.util import (
     getIndex,
     format_name,
     entity_display_columns,
     enable_drag_sort,
-    profile_entities
+    profile_entities,
+    documentTemplates
 )
 
 from stdm.settings.registryconfig import (
@@ -150,11 +157,11 @@ class EntityConfig(object):
         self._link_field = field
 
 
-class DocumentGeneratorDialogWrapper(object):
+class CertificateGeneratorDialogWrapper(object):
     """
-    A utility class that fetches the tables in the active profile
+    A wrapper class that fetches the tables in the active profile
     and creates the corresponding EntityConfig objects, which are then
-    added to the DocumentGeneratorDialog.
+    added to the CertificateGeneratorDialog.
     """
 
     def __init__(self, iface, parent=None, plugin=None):
@@ -163,11 +170,17 @@ class DocumentGeneratorDialogWrapper(object):
         self._doc_gen_dlg = DocumentGeneratorDialog(self._iface, parent, plugin=plugin)
         self._doc_gen_dlg.hide_show_record_selection(False)
         self._doc_gen_dlg.setWindowTitle('LandHold Title Generator')
+        self._doc_gen_dlg.rbExpPDF.setChecked(True)
+        self._doc_gen_dlg.groupBox_2.setVisible(False)
         self._notif_bar = self._doc_gen_dlg.notification_bar()
-
         self.curr_profile = current_profile()
+
         # Load entity configurations
         self._load_entity_configurations()
+
+        self._doc_gen_dlg.preload_template('Land Hold Title Certificate')
+        self._doc_gen_dlg.record_process_func = certificate_preprocess
+        self._doc_gen_dlg.record_post_process_func = certificate_postprocess
 
     def _load_entity_configurations(self):
         """
@@ -238,21 +251,91 @@ class DocumentGeneratorDialogWrapper(object):
 
 class ReportGeneratorDialogWrapper(object):
     """
-        A utility class necessary for the generation of report sfrom tables in
-        flts profile.
+    A wrapper class that fetches the tables in the active profile
+    and creates the corresponding EntityConfig objects, which are then
+    added to the CertificateGeneratorDialog.
     """
 
     def __init__(self, iface, parent=None, plugin=None):
         self._iface = iface
 
-        self._doc_gen_dlg = DocumentGeneratorDialog(self._iface, parent, plugin=plugin)
-        self._doc_gen_dlg.hide_show_record_selection(False)
-        self._doc_gen_dlg.setWindowTitle('LandHold Report Generator')
-        self._notif_bar = self._doc_gen_dlg.notification_bar()
+        self._report_gen_dlg = DocumentGeneratorDialog(self._iface, parent, plugin=plugin)
+        self._report_gen_dlg.hide_show_record_selection(True)
+        self._report_gen_dlg.setWindowTitle('Report Generator')
+        self._report_gen_dlg.rbExpPDF.setChecked(True)
+        self._report_gen_dlg.groupBox_2.setVisible(False)
+        self._notif_bar = self._report_gen_dlg.notification_bar()
 
         self.curr_profile = current_profile()
 
-        # TODO Add report generator configs
+        # Load entity configurations
+        self._load_entity_configurations()
+
+    def _load_entity_configurations(self):
+        """
+        Uses tables' information in the current profile to create the
+        corresponding EntityConfig objects.
+        """
+        try:
+            entities = profile_entities(self.curr_profile)
+            self._report_gen_dlg.progress.setRange(0, len(entities) - 1)
+
+            for i, t in enumerate(entities):
+                QApplication.processEvents()
+                # TODO modify these to select table based on context/docuemnts
+                if t.name != 'cb_scheme':
+                    continue
+                # Exclude custom tenure entities
+                if 'check' in t.name:
+                    continue
+                entity_cfg = self._entity_config_from_profile(
+                    str(t.name), t.short_name
+                )
+
+                if entity_cfg is not None:
+                    self._report_gen_dlg.add_entity_config(entity_cfg, i)
+            self._report_gen_dlg.progress.hide()
+        except Exception as pe:
+            self._notif_bar.clear()
+            self._notif_bar.insertErrorNotification(pe.message)
+
+    def _entity_config_from_profile(self, table_name, short_name):
+        """
+        Creates an EntityConfig object from the table name.
+        :param table_name: Name of the database table.
+        :type table_name: str
+        :return: Entity configuration object.
+        :rtype: EntityConfig
+        """
+        table_display_name = format_name(short_name)
+        self.ds_entity = self.curr_profile.entity_by_name(table_name)
+
+        model = entity_model(self.ds_entity)
+
+        if model is not None:
+            return EntityConfig(title=table_display_name,
+                                data_source=table_name,
+                                model=model,
+                                expression_builder=True,
+                                entity_selector=None)
+
+        else:
+            return None
+
+    def dialog(self):
+        """
+        :return: Returns an instance of the DocumentGeneratorDialog.
+        :rtype: DocumentGeneratorDialog
+        """
+        return self._report_gen_dlg
+
+    def exec_(self):
+        """
+        Show the dialog as a modal dialog.
+        :return: DialogCode result
+        :rtype: int
+        """
+        return self._report_gen_dlg.exec_()
 
 
 class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
@@ -261,7 +344,10 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
     information for different entities. 
     """
 
-    def __init__(self, iface, parent=None, plugin=None):
+    def __init__(self, iface, parent=None, plugin=None,
+                 pre_generate_func=None, record_process_func=None,
+                 post_generate_func=None,
+                 record_post_process_func=None):
         QDialog.__init__(self, parent)
         self.setupUi(self)
 
@@ -303,6 +389,11 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         self.chk_template_datasource.stateChanged.connect(self.on_use_template_datasource)
 
         self.btnShowOutputFolder.clicked.connect(self.onShowOutputFolder)
+
+        self.pre_generate_func = pre_generate_func
+        self.record_process_func = record_process_func
+        self.post_generate_func = post_generate_func
+        self.record_post_process_func = record_post_process_func
 
     def hide_show_record_selection(self, state):
         self.chk_template_datasource.setVisible(state)
@@ -466,7 +557,7 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         filter_table = current_config.data_source()
         templateSelector = TemplateDocumentSelector(
             self,
-            filter_data_source=filter_table
+            filter_data_source=filter_table,
         )
 
         if templateSelector.exec_() == QDialog.Accepted:
@@ -474,6 +565,20 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
 
             self.lblTemplateName.setText(docName)
             self._docTemplatePath = docPath
+            if filter_table != self.last_data_source:
+                # Load template data source fields
+                self._load_template_datasource_fields()
+
+    def preload_template(self, template_name):
+        # Load the template
+        doc_templates = documentTemplates()
+
+        if template_name in doc_templates:
+            self.groupBox.setVisible(False)
+            template_path = doc_templates[template_name]
+            self._docTemplatePath = template_path
+            filter_table = self.current_config().data_source()
+
             if filter_table != self.last_data_source:
                 # Load template data source fields
                 self._load_template_datasource_fields()
@@ -648,6 +753,9 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         try:
             QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
 
+            if self.pre_generate_func:
+                self.pre_generate_func()
+
             for i, record in enumerate(records):
                 progressDlg.setValue(i)
 
@@ -655,14 +763,19 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
                     success_status = False
                     break
 
+                should_continue = True
+                if self.record_process_func:
+                    should_continue = self.record_process_func(record, records)
+                    QgsApplication.processEvents()
+                if not should_continue:
+                    continue
+
                 # User-defined location
                 if self.chkUseOutputFolder.checkState() == Qt.Unchecked:
                     status, msg = self._doc_generator.run(self._docTemplatePath, entity_field_name,
                                                           record.id, outputMode,
                                                           filePath=self._outputFilePath)
                     self._doc_generator.clear_temporary_layers()
-                    # Generate certificate number on document generation
-                    # self._doc_generator.gen_certificate_number()
 
                 # Output folder location using custom naming
                 else:
@@ -674,7 +787,9 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
                                                           data_source=self.ds_entity.name)
                     self._doc_generator.clear_temporary_layers()
 
-                    # FLTS certificate number
+                if status:
+                    if self.record_post_process_func:
+                        self.record_post_process_func(record, records)
 
                 if not status:
                     result = QMessageBox.warning(self,
@@ -705,6 +820,9 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
                     progressDlg.setValue(len(records))
 
             QApplication.restoreOverrideCursor()
+
+            if self.post_generate_func:
+                self.post_generate_func()
 
             QMessageBox.information(self,
                                     QApplication.translate("DocumentGeneratorDialog",

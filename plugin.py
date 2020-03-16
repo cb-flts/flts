@@ -22,6 +22,7 @@ import logging
 import os.path
 import platform
 import shutil
+import stdm.data
 from collections import OrderedDict
 
 from PyQt4.QtCore import *
@@ -43,7 +44,8 @@ from stdm.data.configuration.column_updaters import varchar_updater
 
 from stdm.ui.change_pwd_dlg import changePwdDlg
 from stdm.ui.doc_generator_dlg import (
-    DocumentGeneratorDialogWrapper,
+    CertificateGeneratorDialogWrapper,
+    ReportGeneratorDialogWrapper,
     EntityConfig
 )
 from stdm.data.database import alchemy_table
@@ -52,7 +54,6 @@ from stdm.ui.manage_accounts_dlg import manageAccountsDlg
 from stdm.ui.content_auth_dlg import contentAuthDlg
 from stdm.ui.options_base import OptionsDialog
 
-# flts
 from ui.flts.user_shortcut_dlg import UserShortcutDialog
 from ui.flts.scheme_lodgement import LodgementWizard
 from ui.flts.workflow_manager.dock_widget_factory import DockWidgetFactory
@@ -166,7 +167,8 @@ class STDMQGISLoader(object):
         self._user_logged_in = False
         self.current_profile = None
         # Profile status label showing the current profile
-        self.profile_status_label = None
+        # self.profile_status_label = None
+        self.flts_status_label = None
         LOGGER.debug('FLTS plugin has been initialized.')
         self.entity_browser = None
         # Load configuration file
@@ -389,9 +391,6 @@ class STDMQGISLoader(object):
                 ),
                 warn_msg
             )
-
-            # Close QGIS application
-            #self.iface.actionExit().trigger()
 
     def create_custom_tenure_dummy_col(self):
         """
@@ -877,44 +876,6 @@ class STDMQGISLoader(object):
         fltsAdminMenu.setObjectName("FLTSAdminSettings")
         fltsAdminMenu.setTitle(QApplication.translate("ToolbarLhtSettings", "Admin Settings"))
 
-        # Create content menu container
-        # contentBtn = QToolButton()
-        #
-        # contentObjName = QApplication.translate("ToolbarAdminSettings", "Entities")
-        # # Required by module loader for those widgets that need to be inserted into the container
-        # contentBtn.setObjectName(contentObjName)
-        # contentBtn.setToolTip(contentObjName)
-        # contentBtn.setIcon(QIcon(":/plugins/stdm/images/icons/entity_management.png"))
-        # contentBtn.setPopupMode(QToolButton.InstantPopup)
-        #
-        # contentMenu = QMenu(contentBtn)
-        # contentBtn.setMenu(contentMenu)
-        #
-        # stdmEntityMenu = QMenu(self.stdmMenu)
-        # stdmEntityMenu.setObjectName("STDMEntityMenu")
-        # stdmEntityMenu.setIcon(QIcon(":/plugins/stdm/images/icons/entity_management.png"))
-        # stdmEntityMenu.setTitle(QApplication.translate("STDMEntityMenu", "Entities"))
-        #
-        # # Mobile menu container
-        # # Mobile content menu container
-        # geoodk_mobile_dataMenu = QMenu(self.stdmMenu)
-        # geoodk_mobile_dataMenu.setObjectName("MobileMenu")
-        # geoodk_mobile_dataMenu.setIcon(QIcon(":/plugins/stdm/images/icons/mobile_data_management.png"))
-        # geoodk_mobile_dataMenu.setTitle(QApplication.translate("GeoODKMobileSettings", "Mobile Settings"))
-        #
-        # geoodkBtn = QToolButton()
-        # adminObjName = QApplication.translate("MobileToolbarSettings", "Mobile Settings")
-        # # Required by module loader for those widgets that need to be inserted into the container
-        # geoodkBtn.setObjectName(adminObjName)
-        # geoodkBtn.setToolTip(adminObjName)
-        # geoodkBtn.setIcon(QIcon(":/plugins/stdm/images/icons/mobile_data_management.png"))
-        # geoodkBtn.setPopupMode(QToolButton.InstantPopup)
-        #
-        # geoodkMenu = QMenu(geoodkBtn)
-        # geoodkBtn.setMenu(geoodkMenu)
-
-        # FLTS
-
         # Define containers for grouping actions
         lhtBtn = QToolButton()
         lhtObjName = QApplication.translate("ToolbarLhtSettings", "Land Hold Title")
@@ -1005,24 +966,6 @@ class STDMQGISLoader(object):
         fltsReportMenu.setObjectName("FLTSReportSettings")
         fltsReportMenu.setTitle(QApplication.translate("ToolbarReportSettings", "Report Settings"))
 
-        # Notification
-        # notifBtn = QToolButton()
-        # notifObjName = QApplication.translate("ToolbarNotificationSettings", "Notification")
-        # # Required by module loader for those widgets that need to be inserted into the container
-        # notifBtn.setObjectName(notifObjName)
-        # notifBtn.setToolTip(notifObjName)
-        # notifBtn.setIcon(QIcon(":/plugins/stdm/images/icons/flts_notification.png"))
-        # notifBtn.setPopupMode(QToolButton.InstantPopup)
-        #
-        # notifMenu = QMenu(notifBtn)
-        # notifBtn.setMenu(notifMenu)
-
-        # Settings menu container in STDM's QGIS menu
-        # fltsNotifMenu = QMenu(self.stdmMenu)
-        # fltsNotifMenu.setIcon(QIcon(":/plugins/stdm/images/icons/flts_notification.png"))
-        # fltsNotifMenu.setObjectName("FLTSReportSettings")
-        # fltsNotifMenu.setTitle(QApplication.translate("ToolbarNotificationSettings", "Notification"))
-
         # Define actions
 
         self.contentAuthAct = QAction(
@@ -1042,63 +985,23 @@ class STDMQGISLoader(object):
                                    QApplication.translate("OptionsToolbarAction", "Options"),
                                    self.iface.mainWindow())
 
-        # self.manageAdminUnitsAct = QAction(
-        #     QIcon(":/plugins/stdm/images/icons/manage_admin_units.png"),
-        #     QApplication.translate(
-        #         "ManageAdminUnitsToolbarAction",
-        #         "Manage Administrative Units"
-        #     ),
-        #     self.iface.mainWindow()
-        # )
-        #
-        # self.importAct = QAction(QIcon(":/plugins/stdm/images/icons/import.png"), \
-        #                          QApplication.translate("ImportAction", "Import Data"), self.iface.mainWindow())
-        #
-        # self.exportAct = QAction(QIcon(":/plugins/stdm/images/icons/export.png"), \
-        #                          QApplication.translate("ReportBuilderAction", "Export Data"),
-        #                          self.iface.mainWindow())
-        #
         self.docDesignerAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_document_designer.png"), \
                                       QApplication.translate("DocumentDesignerAction", "Document Designer"),
                                       self.iface.mainWindow())
 
         self.docGeneratorAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_document_generator.png"), \
-                                       QApplication.translate("DocumentGeneratorAction", "Document Generator"),
+                                       QApplication.translate("DocumentGeneratorAction", "Certificate Generator"),
                                        self.iface.mainWindow())
-        #
-        # # Spatial Layer Manager
-        # self.spatialLayerManager = QAction(QIcon(":/plugins/stdm/images/icons/spatial_unit_manager.png"), \
-        #                                    QApplication.translate("SpatialEditorAction", "Spatial Unit Manager"),
-        #                                    self.iface.mainWindow())
-        # self.spatialLayerManager.setCheckable(True)
-        #
-        # # Spatial Layer Manager
-        # self.feature_details_act = QAction(QIcon(":/plugins/stdm/images/icons/feature_details.png"), \
-        #                                    QApplication.translate("SpatialEditorAction", "Spatial Entity Details"),
-        #                                    self.iface.mainWindow())
-        # self.feature_details_act.setCheckable(True)
-        #
-        # self.viewSTRAct = QAction(QIcon(":/plugins/stdm/images/icons/view_str.png"), \
-        #                           QApplication.translate("ViewSTRToolbarAction", "View Social Tenure Relationship"),
-        #                           self.iface.mainWindow())
-        #
+
+        self.reportGeneratorAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_report.png"), \
+                                       QApplication.translate("ReportGeneratorAction", "Report Generator"),
+                                       self.iface.mainWindow())
+
         self.wzdAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_database_designer.png"), \
                               QApplication.translate("ConfigWizard", "Configuration Wizard"), self.iface.mainWindow())
         self.wzdAct.setShortcut(Qt.Key_F7)
-        # self.ModuleAct = QAction(QIcon(":/plugins/stdm/images/icons/table_designer.png"), \
-        #                          QApplication.translate("WorkspaceConfig", "Entities"), self.iface.mainWindow())
-        #
-        # self.mobile_form_act = QAction(QIcon(":/plugins/stdm/images/icons/mobile_collect.png"), \
-        #                                QApplication.translate("MobileFormGenerator", "Generate Mobile Form"),
-        #                                self.iface.mainWindow())
-        # self.mobile_form_import = QAction(QIcon(":/plugins/stdm/images/icons/mobile_import.png"), \
-        #                                   QApplication.translate("MobileFormGenerator", "Import Mobile Data"),
-        #                                   self.iface.mainWindow())
 
-        # dock_widget = DetailsDockWidget(self.iface, self)
-        # self.details_tree_view = DetailsTreeView(self.iface, self, dock_widget)
-        #
-        # # Add current profiles to profiles combobox
+        # Add current profiles to profiles combobox
         # self.load_profiles_combobox()
 
         # FLTS
@@ -1197,24 +1100,14 @@ class STDMQGISLoader(object):
             self.iface.mainWindow()
         )
 
-        # self.notificationAct = QAction(
-        #     QIcon(":/plugins/stdm/images/icons/flts_notification.png"),
-        #     QApplication.translate(
-        #         "NotificationToolbarAction",
-        #         "Notification"
-        #     ),
-        #     self.iface.mainWindow()
-        # )
-
         # Connect the slots for the actions above
         self.contentAuthAct.triggered.connect(self.contentAuthorization)
         self.usersAct.triggered.connect(self.manageAccounts)
         self.options_act.triggered.connect(self.on_sys_options)
         self.docDesignerAct.triggered.connect(self.onDocumentDesigner)
         self.docGeneratorAct.triggered.connect(self.onDocumentGenerator)
+        self.reportGeneratorAct.triggered.connect(self.onReportGenerator)
         self.wzdAct.triggered.connect(self.load_config_wizard)
-        # self.viewSTRAct.triggered.connect(self.onViewSTR)
-        # flts
         self.schemeLodgementAct.triggered.connect(self.lodge_scheme)
         self.schemeEstablishmentAct.triggered.connect(self.establish_scheme)
         self.firstExaminationAct.triggered.connect(self.first_examination)
@@ -1222,29 +1115,8 @@ class STDMQGISLoader(object):
         self.thirdExaminationAct.triggered.connect(self.third_examination)
         self.importPlotsAct.triggered.connect(self.import_plots)
         self.schemeRevisionAct.triggered.connect(self.revise_scheme)
-        self.printCertificateAct.triggered.connect(self.print_certificate)
-        self.scanCertificateAct.triggered.connect(self.scan_certificate)
-        self.searchAct.triggered.connect(self.flts_search)
-        self.reportAct.triggered.connect(self.flts_report)
-
-        # self.manageAdminUnitsAct.triggered.connect(self.onManageAdminUnits)
-        # self.exportAct.triggered.connect(self.onExportData)
-        # self.importAct.triggered.connect(self.onImportData)
-        # self.spatialLayerManager.triggered.connect(self.spatialLayerMangerActivate)
-
-        # self.feature_details_act.triggered.connect(self.details_tree_view.activate_feature_details)
-        #
-        # self.mobile_form_act.triggered.connect(self.mobile_form_generator)
-        # self.mobile_form_import.triggered.connect(self.mobile_form_importer)
-        #
-        # self.iface.mapCanvas().currentLayerChanged.connect(
-        #     lambda: self.details_tree_view.activate_feature_details(False)
-        # )
-        # contentMenu.triggered.connect(self.widgetLoader)
-        # self.notificationAct.triggered.connect(self.flts_notification)
 
         # Create content items
-        # STDM
         contentAuthCnt = ContentGroup.contentItemFromQAction(self.contentAuthAct)
         contentAuthCnt.code = "E59F7CC1-0D0E-4EA2-9996-89DACBD07A83"
 
@@ -1260,13 +1132,11 @@ class STDMQGISLoader(object):
         documentGeneratorCnt = ContentGroup.contentItemFromQAction(self.docGeneratorAct)
         documentGeneratorCnt.code = "4C0C7EF2-5914-4FDE-96CB-089D44EDDA5A"
 
+        reportGeneratorCnt = ContentGroup.contentItemFromQAction(self.reportGeneratorAct)
+        reportGeneratorCnt.code = "8F5DB287-4295-40F7-A826-EA2F5868196B"
+
         wzdConfigCnt = ContentGroup.contentItemFromQAction(self.wzdAct)
         wzdConfigCnt.code = "F16CA4AC-3E8C-49C8-BD3C-96111EA74206"
-        #
-        # strViewCnt = ContentGroup.contentItemFromQAction(self.viewSTRAct)
-        # strViewCnt.code = "D13B0415-30B4-4497-B471-D98CA98CD841"
-
-        # FLTS
 
         schemeLodgementCnt = ContentGroup.contentItemFromQAction(self.schemeLodgementAct)
         schemeLodgementCnt.code = "97EB2313-AA9C-4478-83F8-896E30E8FA78"
@@ -1288,42 +1158,6 @@ class STDMQGISLoader(object):
 
         importPlotsCnt = ContentGroup.contentItemFromQAction(self.importPlotsAct)
         importPlotsCnt.code = "FEC81DCE-FF7E-4253-B6CE-30D0504D4G16"
-
-        # printCertificateCnt = ContentGroup.contentItemFromQAction(self.printCertificateAct)
-        # printCertificateCnt.code = "E59F7CC1-0D0E-4EA2-9996-89DACBD07A83"
-
-        # scanCertificateCnt = ContentGroup.contentItemFromQAction(self.scanCertificateAct)
-        # scanCertificateCnt.code = "0CC4FB8F-70BA-4DE8-8599-FD344A564EB5"
-        #
-        # fltsSearchCnt = ContentGroup.contentItemFromQAction(self.searchAct)
-        # fltsSearchCnt.code = "1520B989-03BA-4B05-BC50-A4C3EC7D79B6"
-        #
-        # fltsReportCnt = ContentGroup.contentItemFromQAction(self.reportAct)
-        # fltsReportCnt.code = "DABD3A8A-3A8B-4215-90B0-27F40DAFF2F1"
-
-        # fltsNotificationCnt = ContentGroup.contentItemFromQAction(self.notificationAct)
-        # fltsNotificationCnt.code = "fab81cce-ff7e-4443-a5be-30c9493d3f05"
-
-        # adminUnitsCnt = ContentGroup.contentItemFromQAction(self.manageAdminUnitsAct)
-        # adminUnitsCnt.code = "770EAC75-2BEC-492E-8703-34674054C246"
-        #
-        # importCnt = ContentGroup.contentItemFromQAction(self.importAct)
-        # importCnt.code = "3BBD6347-4A37-45D0-9B41-36D68D2CA4DB"
-        #
-        # exportCnt = ContentGroup.contentItemFromQAction(self.exportAct)
-        # exportCnt.code = "D0C34436-619D-434E-928C-2CBBDA79C060"
-        #
-        # spatialLayerManagerCnt = ContentGroup.contentItemFromQAction(self.spatialLayerManager)
-        # spatialLayerManagerCnt.code = "4E945EE7-D6F9-4E1C-X4AA-0C7F1BC67224"
-        #
-        # feature_details_cnt = ContentGroup.contentItemFromQAction(self.feature_details_act)
-        # feature_details_cnt.code = '2adff3f8-bda9-49f9-b37d-caeed9889ab6'
-        #
-        # mobileFormgeneratorCnt = ContentGroup.contentItemFromQAction(self.mobile_form_act)
-        # mobileFormgeneratorCnt.code = "d93981ef-dec4-4597-8495-2941ec2e9a52"
-        #
-        # mobileFormImportCnt = ContentGroup.contentItemFromQAction(self.mobile_form_import)
-        # mobileFormImportCnt.code = "1394547d-fb6c-4f6e-80d2-53407cf7b7d4"
 
         username = data.app_dbconn.User.UserName
 
@@ -1348,22 +1182,6 @@ class STDMQGISLoader(object):
         # create a separator
         tbSeparator = QAction(self.iface.mainWindow())
         tbSeparator.setSeparator(True)
-        # if not self.current_profile is None:
-        #     if pg_table_exists(self.current_profile.social_tenure.name):
-        #         # add separator to menu
-        #         separator_group = TableContentGroup(username, 'separator', tbSeparator)
-        #         # separator_group.register()
-        #         self.moduleContentGroups.append(separator_group)
-        #
-        #         moduleCntGroup = self._create_table_content_group(
-        #             QApplication.translate(
-        #                 'STDMQGISLoader',
-        #                 'New Social Tenure Relationship'
-        #             ),
-        #             username,
-        #             'new_str.png'
-        #         )
-        #         self.moduleContentGroups.append(moduleCntGroup)
 
         # Create content groups and add items
 
@@ -1386,15 +1204,6 @@ class STDMQGISLoader(object):
         self.wzdConfigCntGroup.addContentItem(wzdConfigCnt)
         self.wzdConfigCntGroup.register()
 
-        # self.STRCntGroup = TableContentGroup(username,
-        #                                      self.viewSTRAct.text(),
-        #                                      self.viewSTRAct)
-        # self.STRCntGroup.createContentItem().code = "71EC2ED8-5D7F-4A27-8514-CFFE94E1294F"
-        # self.STRCntGroup.readContentItem().code = "ED607F24-11A2-427C-B395-2E2A3EBA4EBD"
-        # self.STRCntGroup.updateContentItem().code = "5D45A49D-F640-4A48-94D9-A10F502655F5"
-        # self.STRCntGroup.deleteContentItem().code = "15E27A59-28F7-42B4-858F-C070E2C3AE10"
-        # self.STRCntGroup.register()
-
         self.docDesignerCntGroup = ContentGroup(username, self.docDesignerAct)
         self.docDesignerCntGroup.addContentItem(documentDesignerCnt)
         self.docDesignerCntGroup.register()
@@ -1403,15 +1212,17 @@ class STDMQGISLoader(object):
         self.docGeneratorCntGroup.addContentItem(documentGeneratorCnt)
         self.docGeneratorCntGroup.register()
 
+        self.reportGeneratorCntGroup = ContentGroup(username, self.reportGeneratorAct)
+        self.reportGeneratorCntGroup.addContentItem(reportGeneratorCnt)
+        self.reportGeneratorCntGroup.register()
+
         adminSettingsCntGroups = []
         adminSettingsCntGroups.append(self.contentAuthCntGroup)
         adminSettingsCntGroups.append(self.userRoleCntGroup)
         adminSettingsCntGroups.append(self.options_content_group)
         adminSettingsCntGroups.append(self.wzdConfigCntGroup)
 
-        # FLTS
         # Create content groups and add items
-
         self.schemeLodgementCntGroup = ContentGroup(username)
         self.schemeLodgementCntGroup.addContentItem(schemeLodgementCnt)
         self.schemeLodgementCntGroup.setContainerItem(self.schemeLodgementAct)
@@ -1458,43 +1269,11 @@ class STDMQGISLoader(object):
         schemeSettingsCntGroups.append(self.importPlotsCntGroup)
         schemeSettingsCntGroups.append(self.schemeRevisionCntGroup)
 
-        # self.printCertCntGroup = ContentGroup(username)
-        # self.printCertCntGroup.addContentItem(printCertificateCnt)
-        # self.printCertCntGroup.setContainerItem(self.printCertificateAct)
-        # self.printCertCntGroup.register()
-
-        # self.scanCertCntGroup = ContentGroup(username)
-        # self.scanCertCntGroup.addContentItem(scanCertificateCnt)
-        # self.scanCertCntGroup.setContainerItem(self.scanCertificateAct)
-        # self.scanCertCntGroup.register()
-
         certSettingsCntGroups = []
-        # certSettingsCntGroups.append(self.printCertCntGroup)
-        # certSettingsCntGroups.append(self.scanCertCntGroup)
         certSettingsCntGroups.append(self.docGeneratorCntGroup)
         certSettingsCntGroups.append(self.docDesignerCntGroup)
-        # certSettingsCntGroups.append(self.STRCntGroup)
 
-        # self.fltsSearchCntGroup = ContentGroup(username, self.searchAct)
-        # self.fltsSearchCntGroup.addContentItem(fltsSearchCnt)
-        # self.fltsSearchCntGroup.setContainerItem(self.searchAct)
-        # self.fltsSearchCntGroup.register()
-
-        # self.fltsReportCntGroup = ContentGroup(username, self.reportAct)
-        # self.fltsReportCntGroup.addContentItem(fltsReportCnt)
-        # self.fltsReportCntGroup.setContainerItem(self.reportAct)
-        # self.fltsReportCntGroup.register()
-
-        searchReportCntgroups = []
-        # searchReportCntgroups.append(self.fltsSearchCntGroup)
-        # searchReportCntgroups.append(self.fltsReportCntGroup)
-
-        # self.fltsNotificationCntGroup = ContentGroup(username, self.notificationAct)
-        # self.fltsNotificationCntGroup.addContentItem(fltsNotificationCnt)
-        # self.fltsNotificationCntGroup.setContainerItem(self.notificationAct)
-        # self.fltsNotificationCntGroup.register()
-
-        # flts toolbar items
+        # toolbar items
 
         self.toolbarLoader.addContent(self.wzdConfigCntGroup,
                                       [adminMenu, adminBtn]
@@ -1522,24 +1301,9 @@ class STDMQGISLoader(object):
 
         self.toolbarLoader.addContent(self._action_separator())
 
-        # self.toolbarLoader.addContent(self.printCertCntGroup)
-        # self.toolbarLoader.addContent(self.scanCertCntGroup)
-
-        self.toolbarLoader.addContent(self._action_separator())
-
-        # self.toolbarLoader.addContent(self.fltsSearchCntGroup)
-
-        self.toolbarLoader.addContent(self._action_separator())
-
-        # self.toolbarLoader.addContent(self.fltsReportCntGroup)
-
-        self.toolbarLoader.addContent(self._action_separator())
-
         self.toolbarLoader.addContent(self.docDesignerCntGroup)
         self.toolbarLoader.addContent(self.docGeneratorCntGroup)
-        # self.toolbarLoader.addContent(self.STRCntGroup)
-
-        # self.toolbarLoader.addContent(self.fltsNotificationCntGroup)
+        self.toolbarLoader.addContent(self.reportGeneratorCntGroup)
 
         # menubar items
         self.menubarLoader.addContents(schemeSettingsCntGroups,
@@ -1550,21 +1314,11 @@ class STDMQGISLoader(object):
                                        [lhtAdminMenu, lhtAdminMenu]
                                        )
 
-        self.menubarLoader.addContents(searchReportCntgroups,
-                                       [lhtAdminMenu, lhtAdminMenu]
-                                       )
-
-        # self.menubarLoader.addContent(self.fltsNotificationCntGroup,
-        #                               [lhtAdminMenu, lhtAdminMenu]
-        #                               )
-
         # Load all the content in the container
         self.toolbarLoader.loadContent()
         self.menubarLoader.loadContent()
 
-        # self.create_spatial_unit_manager()
-
-        self.profile_status_message()
+        self.current_user_status_message()
 
     def grant_privilege_base_tables(self, username):
         roles = []
@@ -1793,33 +1547,35 @@ class STDMQGISLoader(object):
 
         opt_dlg.exec_()
 
-    def profile_status_message(self):
+    def current_user_status_message(self):
         """
-        Shows the name of the loaded profile in QGIS status bar.
+        Shows the name of the current user who is logged in
+        QGIS status bar.
         :return: None
         :rtype: NoneType
         """
         if self.current_profile is None:
             return
-        if self.profile_status_label is None:
-            self.profile_status_label = QLabel()
-        profile_name = format_name(
-            self.current_profile.name
+        if self.flts_status_label is None:
+            self.flts_status_label = QLabel()
+        # FOR NOW
+        current_user_name = format_name(
+            stdm.data.app_dbconn.User.UserName
         )
         message = QApplication.translate(
             'STDMPlugin',
-            'Current FLTS Profile: {}'.format(
-                profile_name
+            'Logged in as {}'.format(
+                current_user_name
             )
         )
 
-        if self.profile_status_label.parent() is None:
+        if self.flts_status_label.parent() is None:
             self.iface.mainWindow().statusBar().insertPermanentWidget(
                 0,
-                self.profile_status_label,
+                self.flts_status_label,
                 10
             )
-        self.profile_status_label.setText(message)
+        self.flts_status_label.setText(message)
 
     def reload_plugin(self, sel_profile, load_from_stc=False):
         """
@@ -1993,12 +1749,29 @@ class STDMQGISLoader(object):
         if len(db_user_tables(self.current_profile)) < 1:
             self.minimum_table_checker()
             return
-        doc_gen_wrapper = DocumentGeneratorDialogWrapper(
+        doc_gen_wrapper = CertificateGeneratorDialogWrapper(
             self.iface,
             self.iface.mainWindow(),
             plugin=self
         )
         doc_gen_wrapper.exec_()
+
+    def onReportGenerator(self):
+        """
+        Report generator for CB-FLTS
+        """
+        if self.current_profile is None:
+            self.default_profile()
+            return
+        if len(db_user_tables(self.current_profile)) < 1:
+            self.minimum_table_checker()
+            return
+        report_gen_wrapper = ReportGeneratorDialogWrapper(
+            self.iface,
+            self.iface.mainWindow(),
+            plugin=self
+        )
+        report_gen_wrapper.exec_()
 
     def onImportData(self):
         """
@@ -2185,31 +1958,22 @@ class STDMQGISLoader(object):
             self.stdmInitToolbar.removeAction(self.logoutAct)
             self.stdmInitToolbar.removeAction(self.changePasswordAct)
             self.stdmInitToolbar.removeAction(self.wzdAct)
-            # self.stdmInitToolbar.removeAction(self.spatialLayerManager)
-            # self.feature_details_act.setChecked(False)
-            # self.stdmInitToolbar.removeAction(self.feature_details_act)
             self.stdmInitToolbar.removeAction(self.contentAuthAct)
-            # self.stdmInitToolbar.removeAction(self.usersAct)
             self.stdmInitToolbar.removeAction(self.options_act)
-            # self.stdmInitToolbar.removeAction(self.manageAdminUnitsAct)
-            # self.stdmInitToolbar.removeAction(self.importAct)
-            # self.stdmInitToolbar.removeAction(self.exportAct)
             self.stdmInitToolbar.removeAction(self.docDesignerAct)
             self.stdmInitToolbar.removeAction(self.docGeneratorAct)
-            # self.stdmInitToolbar.removeAction(self.viewSTRAct)
-
-            # flts
             self.stdmInitToolbar.removeAction(self.schemeLodgementAct)
             self.stdmInitToolbar.removeAction(self.schemeEstablishmentAct)
             self.stdmInitToolbar.removeAction(self.schemeRevisionAct)
             self.stdmInitToolbar.removeAction(self.firstExaminationAct)
             self.stdmInitToolbar.removeAction(self.secondExaminationAct)
             self.stdmInitToolbar.removeAction(self.thirdExaminationAct)
-            # self.stdmInitToolbar.removeAction(self.notificationAct)
             self.stdmInitToolbar.removeAction(self.printCertificateAct)
             self.stdmInitToolbar.removeAction(self.scanCertificateAct)
             self.stdmInitToolbar.removeAction(self.searchAct)
             self.stdmInitToolbar.removeAction(self.reportAct)
+            # Clear current user name from statusbar
+            self.flts_status_label.clear()
 
             if self.toolbarLoader is not None:
                 self.toolbarLoader.unloadContent()
@@ -2432,16 +2196,6 @@ class STDMQGISLoader(object):
                 self.third_examination()
             elif action_code == 'PLT_SCM':
                 self.import_plots()
-            elif action_code == 'P_CRT':
-                self.print_certificate()
-            elif action_code == 'S_CRT':
-                self.scan_certificate()
-            # elif action_code == 'NTF':
-            #     self.flts_notification()
-            elif action_code == 'SRC':
-                self.flts_search()
-            elif action_code == 'RPT':
-                self.flts_report()
             return True
         else:
             return False
@@ -2513,13 +2267,6 @@ class STDMQGISLoader(object):
         self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         self.dock_widget.show_dock_widget()
 
-    def scan_certificate(self):
-        """
-        Load the dialog for scanning of certificate.
-        """
-        scan_cert = ScanCertificateDialog(self.iface.mainWindow())
-        scan_cert.exec_()
-
     def import_plots(self):
         """
         Docks Import Plot workflow manager widget
@@ -2531,29 +2278,3 @@ class STDMQGISLoader(object):
         )
         self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         self.dock_widget.show_dock_widget()
-
-    def print_certificate(self):
-        """Load the dialog for printing of certificate."""
-        print_cert = PrintCertificateDialog(self.iface.mainWindow())
-        print_cert.exec_()
-
-    def flts_search(self):
-        """
-        Load the dialog for searching in flts.
-        """
-        search_dialog = SearchDialog(self.iface.mainWindow())
-        search_dialog.exec_()
-
-    def flts_report(self):
-        """
-        Load the dialog for reporting in flts
-        """
-        report_dialog = ReportDialog(self.iface.mainWindow())
-        report_dialog.exec_()
-
-    # def flts_notification(self):
-    #     """
-    #     Load the dialog for notifications in flts
-    #     """
-    #     notification_dialog = NotificationDialog(self.iface.mainWindow())
-    #     notification_dialog.exec_()

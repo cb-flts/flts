@@ -268,7 +268,7 @@ def csv_vector_layer(csv_path, **kwargs):
     csv_fi = QFileInfo(csv_path)
     layer_name = csv_fi.completeBaseName()
 
-    delimiter = kwargs.pop('delimiter', ';')
+    delimiter = kwargs.pop('delimiter', ',')
 
     # Construct URL with CSV provider query items
     url = QUrl.fromLocalFile(csv_path)
