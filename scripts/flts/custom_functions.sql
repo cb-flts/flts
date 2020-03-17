@@ -1,16 +1,15 @@
---- Appends and to spouse name where spouse name exists
 CREATE OR REPLACE FUNCTION "public"."flts_append_and_to_spouse_name"("holder_row" "public"."cb_holder")
   RETURNS "pg_catalog"."text" AS $BODY$BEGIN
-	IF holder_row.marital_status = 4 THEN
+	IF holder_row.marital_status = 1 THEN
 		RETURN 'and';
 	ELSE
 		RETURN '';
 	END IF;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100;
+  COST 100
 
---- Generates a new certificate number when a certificate is created
+
 CREATE OR REPLACE FUNCTION "public"."flts_gen_cert_number"()
   RETURNS "pg_catalog"."text" AS $BODY$DECLARE
 cert_num TEXT;
@@ -26,28 +25,28 @@ BEGIN
 	RETURN 'LH'|| lpad(current_num::TEXT, 5, '0') || '/' || current_year;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100;
+  COST 100
 
---- Checks the nature of marriage if holder is married
+
 CREATE OR REPLACE FUNCTION "public"."flts_get_holder_nature_of_marriage"("holder_row" "public"."cb_holder")
   RETURNS "pg_catalog"."text" AS $BODY$DECLARE
 	nature_of_marriage text;
 BEGIN
-	IF holder_row.marital_status = 4 THEN
+	IF holder_row.marital_status = 1 THEN
 		SELECT value INTO nature_of_marriage FROM cb_check_lht_nature_of_marriage WHERE id = holder_row.nature_of_marriage;
-		RETURN 'who are married, ' || lower(nature_of_marriage);
+		RETURN 'Married, which marriage does not have the legal consequences of a marriage ' || lower(nature_of_marriage) || ', by virtue of a provision Proclamation 15 of 1928.';
 	ELSE
-		RETURN '';
+		RETURN 'Unmarried';
 	END IF;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100;
+  COST 100
 
---- Generates a string text if the scheme has imposing conditions
+
 CREATE OR REPLACE FUNCTION "public"."flts_get_scheme_imposing_condition"("scheme_row" "public"."cb_scheme")
   RETURNS "pg_catalog"."text" AS $BODY$DECLARE
 	doc_row cb_scheme_supporting_document%ROWTYPE;
-	condition_txt TEXT := 'Subject to the conditions imposed by Municipality of Windhoek in terms of section 13(6) of the Flexible Land Tenure Act, 2012 (Act No. 4 of 2012) registered in the Land Rights Office, Reference No: FK.';
+	condition_txt TEXT := 'Subject to the conditions imposed by Oshakati Town Council in terms of section 13(6) of the Flexible Land Tenure Act, 2012 (Act No. 4 of 2012) registered in the Land Rights Office - Reference No: FK.';
 BEGIN
 	SELECT * INTO doc_row FROM cb_scheme_supporting_document WHERE (cb_scheme_supporting_document.scheme_id = scheme_row.id AND cb_scheme_supporting_document.document_type = 7);
 	IF doc_row IS NULL THEN
@@ -57,33 +56,33 @@ BEGIN
 	END IF;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100;
+  COST 100
 
---- Gets the ID number of the spouse if the holder is married
+
 CREATE OR REPLACE FUNCTION "public"."flts_get_spouse_document_identifier"("holder_row" "public"."cb_holder")
   RETURNS "pg_catalog"."text" AS $BODY$BEGIN
-	IF holder_row.marital_status = 4 THEN
+	IF holder_row.marital_status = 1 THEN
 		RETURN 'Identity Number ' || holder_row.spouse_identifier;
 	ELSE
 		RETURN '';
 	END IF;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100;
+  COST 100
 
---- Gets the spouse name if the holder is married
+
 CREATE OR REPLACE FUNCTION "public"."flts_get_spouse_name"("holder_row" "public"."cb_holder")
   RETURNS "pg_catalog"."text" AS $BODY$BEGIN
-	IF holder_row.marital_status = 4 THEN
+	IF holder_row.marital_status = 1 THEN
 		RETURN holder_row.spouse_first_name || ' ' || holder_row.spouse_surname;
 	ELSE
 		RETURN '';
 	END IF;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100;
+  COST 100
 
---- Converts area value to words
+
 CREATE OR REPLACE FUNCTION "public"."flts_integer_to_text"(int4)
   RETURNS "pg_catalog"."text" AS $BODY$SELECT CASE WHEN $1<1 THEN NULL
               WHEN $1=1 THEN 'One'
@@ -133,9 +132,9 @@ CREATE OR REPLACE FUNCTION "public"."flts_integer_to_text"(int4)
               ELSE NULL
          END$BODY$
   LANGUAGE sql IMMUTABLE STRICT
-  COST 100;
+  COST 100
 
---- Appends text to the area value in text
+
 CREATE OR REPLACE FUNCTION "public"."flts_plot_area_to_text"("area" numeric)
   RETURNS "pg_catalog"."text" AS $BODY$DECLARE
 	units VARCHAR(15);
@@ -151,9 +150,7 @@ BEGIN
 		units := 'Hectares';
 	END IF;
 
-	RETURN rounded_area::TEXT || ' (' || flts_integer_to_text(rounded_area) || ') ' || units || measurement_txt;
+	RETURN rounded_area::TEXT || 'm² (' || flts_integer_to_text(rounded_area) || ') ' || units || measurement_txt;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100;
-
-
+  COST 100
