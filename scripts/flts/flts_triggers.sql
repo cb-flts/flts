@@ -1,9 +1,11 @@
+--- LOG TABLES
 -- ----------------------------
 -- Scheme Log
 -- ----------------------------
 
-DROP TABLE IF EXISTS "public"."cb_scheme_log";
-CREATE TABLE "public"."cb_scheme_log" (
+DROP TABLE IF EXISTS cb_scheme_log, cb_holder_log, cb_plot_log;
+
+CREATE TABLE cb_scheme_log (
   "operation" varchar(1),
   "stamp" timestamp(6),
   "user_id" text,
@@ -31,8 +33,8 @@ CREATE TABLE "public"."cb_scheme_log" (
 -- ----------------------------
 -- Holder Log
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."cb_holder_log";
-CREATE TABLE "public"."cb_holder_log" (
+
+CREATE TABLE cb_holder_log (
   "operation" varchar(1),
   "stamp" timestamp(6),
   "user_id" text,
@@ -65,8 +67,7 @@ CREATE TABLE "public"."cb_holder_log" (
 -- Plot Log
 -- ----------------------------
 
-DROP TABLE IF EXISTS "public"."cb_plot_log";
-CREATE TABLE "public"."cb_plot_log" (
+CREATE TABLE cb_plot_log (
   "operation" varchar(1),
   "stamp" timestamp(6),
   "user_id" text,
@@ -81,11 +82,12 @@ CREATE TABLE "public"."cb_plot_log" (
 ;
 
 --  TRIGGER FUNCTIONS
+------ Scheme Log
 
 CREATE OR REPLACE FUNCTION cb_scheme_log() RETURNS TRIGGER AS $cb_scheme_log$
     BEGIN
         --
-        -- Create a row in lht_approval_log to reflect the operation performed on cb_scheme,
+        -- Create a row in lht_scheme_log to reflect the operation performed on cb_scheme,
         -- make use of the special variable TG_OP to work out the operation.
         --
         IF (TG_OP = 'DELETE') THEN
@@ -102,11 +104,12 @@ CREATE OR REPLACE FUNCTION cb_scheme_log() RETURNS TRIGGER AS $cb_scheme_log$
     END;
 $cb_scheme_log$ LANGUAGE plpgsql;
 
+------ Holder Log
 
 CREATE OR REPLACE FUNCTION cb_holder_log() RETURNS TRIGGER AS $cb_holder_log$
     BEGIN
         --
-        -- Create a row in lht_approval_log to reflect the operation performed on cb_holder,
+        -- Create a row in lht_holder_log to reflect the operation performed on cb_holder,
         -- make use of the special variable TG_OP to work out the operation.
         --
         IF (TG_OP = 'DELETE') THEN
@@ -124,15 +127,33 @@ CREATE OR REPLACE FUNCTION cb_holder_log() RETURNS TRIGGER AS $cb_holder_log$
 $cb_holder_log$ LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION cb_plot_log() RETURNS TRIGGER AS $cb_plot_log$
+    BEGIN
+        --
+        -- Create a row in lht_holder_log to reflect the operation performed on cb_holder,
+        -- make use of the special variable TG_OP to work out the operation.
+        --
+        IF (TG_OP = 'DELETE') THEN
+            INSERT INTO cb_plot_log SELECT 'D', now(), user, OLD.*;
+            RETURN OLD;
+        ELSIF (TG_OP = 'UPDATE') THEN
+            INSERT INTO cb_plot_log SELECT 'U', now(), user, NEW.*;
+            RETURN NEW;
+        ELSIF (TG_OP = 'INSERT') THEN
+            INSERT INTO cb_plot_log SELECT 'I', now(), user, NEW.*;
+            RETURN NEW;
+        END IF;
+        RETURN NULL; -- result is ignored since this is an AFTER trigger
+    END;
+$cb_plot_log$ LANGUAGE plpgsql;
 
-
--- CREATE OR REPLACE FUNCTION comment_user_timestamp() RETURNS TRIGGER AS $comment_user_timestamp$
+-- CREATE OR REPLACE FUNCTION cb_plot_num_drop_zeros() RETURNS TRIGGER AS $cb_plot_num_drop_zeros$
 --     BEGIN
---         NEW.user_id = (SELECT cb_user."id" FROM cb_user WHERE cb_user.user_name = "session_user"());
--- 		RETURN NEW;
+--
 --     END;
--- $comment_user_timestamp$ LANGUAGE plpgsql;
+-- $cb_plot_num_drop_zeros$ LANGUAGE plppgsql;
 
+------ Timestamp
 
 CREATE OR REPLACE FUNCTION insert_timestamp() RETURNS TRIGGER AS $insert_timestamp$
     BEGIN
@@ -144,25 +165,21 @@ $insert_timestamp$ LANGUAGE plpgsql;
 
 --- TRIGGERS
 
--- CREATE TRIGGER cb_scheme_log
--- AFTER INSERT OR UPDATE OR DELETE ON cb_scheme
---     FOR EACH ROW EXECUTE PROCEDURE cb_scheme_log();
---
--- CREATE TRIGGER cb_holder_log
--- AFTER INSERT OR UPDATE OR DELETE ON cb_holder
---     FOR EACH ROW EXECUTE PROCEDURE cb_holder_log();
+CREATE TRIGGER cb_scheme_log
+AFTER INSERT OR UPDATE OR DELETE ON cb_scheme
+    FOR EACH ROW EXECUTE PROCEDURE cb_scheme_log();
 
--- CREATE TRIGGER insert_plots
--- AFTER INSERT ON cb_lis_plot
---     FOR EACH ROW EXECUTE PROCEDURE insert_plots();
+CREATE TRIGGER cb_holder_log
+AFTER INSERT OR UPDATE OR DELETE ON cb_holder
+    FOR EACH ROW EXECUTE PROCEDURE cb_holder_log();
+
+CREATE TRIGGER cb_plot_log
+AFTER INSERT ON cb_plot
+    FOR EACH ROW EXECUTE PROCEDURE cb_plot_log();
 
 CREATE TRIGGER comment_timestamp
 BEFORE INSERT OR UPDATE ON cb_comment
     FOR EACH ROW EXECUTE PROCEDURE insert_timestamp();
-
--- CREATE TRIGGER comment_user_timestamp
--- BEFORE INSERT OR UPDATE ON cb_comment
---     FOR EACH ROW EXECUTE PROCEDURE comment_user_timestamp();
 
 CREATE TRIGGER insert_workflow_timestamp
 BEFORE INSERT OR UPDATE ON cb_scheme_workflow

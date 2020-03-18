@@ -1,3 +1,7 @@
+----------------------------------------------------------------------
+----------------CUSTOM FUNCTIONS FOR CB-FLTS DATABASE-----------------
+
+---Appends 'and' to the certificate preceding the spouse name
 CREATE OR REPLACE FUNCTION "public"."flts_append_and_to_spouse_name"("holder_row" "public"."cb_holder")
   RETURNS "pg_catalog"."text" AS $BODY$BEGIN
 	IF holder_row.marital_status = 1 THEN
@@ -7,9 +11,9 @@ CREATE OR REPLACE FUNCTION "public"."flts_append_and_to_spouse_name"("holder_row
 	END IF;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100
+  COST 100;
 
-
+---Creates or populates certificate number when a certificate is generated
 CREATE OR REPLACE FUNCTION "public"."flts_gen_cert_number"()
   RETURNS "pg_catalog"."text" AS $BODY$DECLARE
 cert_num TEXT;
@@ -25,9 +29,9 @@ BEGIN
 	RETURN 'LH'|| lpad(current_num::TEXT, 5, '0') || '/' || current_year;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100
+  COST 100;
 
-
+---Checks the nature of marriage for married holder
 CREATE OR REPLACE FUNCTION "public"."flts_get_holder_nature_of_marriage"("holder_row" "public"."cb_holder")
   RETURNS "pg_catalog"."text" AS $BODY$DECLARE
 	nature_of_marriage text;
@@ -40,9 +44,9 @@ BEGIN
 	END IF;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100
+  COST 100;
 
-
+-- Checks if scheme contains document imposing conditions and appends text in certificate
 CREATE OR REPLACE FUNCTION "public"."flts_get_scheme_imposing_condition"("scheme_row" "public"."cb_scheme")
   RETURNS "pg_catalog"."text" AS $BODY$DECLARE
 	doc_row cb_scheme_supporting_document%ROWTYPE;
@@ -56,9 +60,9 @@ BEGIN
 	END IF;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100
+  COST 100;
 
-
+--- Gets spouse national ID number from the database
 CREATE OR REPLACE FUNCTION "public"."flts_get_spouse_document_identifier"("holder_row" "public"."cb_holder")
   RETURNS "pg_catalog"."text" AS $BODY$BEGIN
 	IF holder_row.marital_status = 1 THEN
@@ -68,9 +72,9 @@ CREATE OR REPLACE FUNCTION "public"."flts_get_spouse_document_identifier"("holde
 	END IF;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100
+  COST 100;
 
-
+--- Gets spouse name from the database
 CREATE OR REPLACE FUNCTION "public"."flts_get_spouse_name"("holder_row" "public"."cb_holder")
   RETURNS "pg_catalog"."text" AS $BODY$BEGIN
 	IF holder_row.marital_status = 1 THEN
@@ -80,9 +84,9 @@ CREATE OR REPLACE FUNCTION "public"."flts_get_spouse_name"("holder_row" "public"
 	END IF;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100
+  COST 100;
 
-
+--- Converts integer values to text
 CREATE OR REPLACE FUNCTION "public"."flts_integer_to_text"(int4)
   RETURNS "pg_catalog"."text" AS $BODY$SELECT CASE WHEN $1<1 THEN NULL
               WHEN $1=1 THEN 'One'
@@ -132,9 +136,9 @@ CREATE OR REPLACE FUNCTION "public"."flts_integer_to_text"(int4)
               ELSE NULL
          END$BODY$
   LANGUAGE sql IMMUTABLE STRICT
-  COST 100
+  COST 100;
 
-
+--- Converts plot area value to text in the certificate
 CREATE OR REPLACE FUNCTION "public"."flts_plot_area_to_text"("area" numeric)
   RETURNS "pg_catalog"."text" AS $BODY$DECLARE
 	units VARCHAR(15);
@@ -153,4 +157,6 @@ BEGIN
 	RETURN rounded_area::TEXT || 'm² (' || flts_integer_to_text(rounded_area) || ') ' || units || measurement_txt;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100
+  COST 100;
+
+---------END--------------------
