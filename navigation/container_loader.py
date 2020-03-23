@@ -101,7 +101,15 @@ class QtContainerLoader(QObject):
                         #if there is no parent then add directly to container after asserting permissions
                         self._addItemtoContainer(k.containerItem())
                     else:
-                        v[0].addAction(k.containerItem())
+                        if isinstance(v[0], list):
+                            k.containerItem().addActions(v[0])
+                            # Set the first action as the default
+                            if len(v[0]) > 0:
+                                def_action = v[0][0]
+                                k.containerItem().setDefaultAction(def_action)
+                        else:
+                            v[0].addAction(k.containerItem())
+
                         self._insertWidgettoContainer(v[1])
                     
                     '''
