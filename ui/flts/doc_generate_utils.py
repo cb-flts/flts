@@ -72,6 +72,7 @@ def certificate_preprocess(plot, plots):
     scheme_symbol_layer = scheme_rule.symbol().symbolLayer(0)
     scheme_symbol_layer.setFillColor(Qt.yellow)
     scheme_symbol_layer.setOutlineColor(Qt.black)
+    scheme_symbol_layer.setBorderWidth(0.5)
     root_rule.appendChild(scheme_rule)
 
     # Rule for other plots
