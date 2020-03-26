@@ -149,9 +149,10 @@ $cb_plot_log$ LANGUAGE plpgsql;
 
 -- CREATE OR REPLACE FUNCTION cb_plot_num_drop_zeros() RETURNS TRIGGER AS $cb_plot_num_drop_zeros$
 --     BEGIN
---
+--         NEW.plot_number=(NEW.plot_number::INTEGER)::TEXT;
+--         RETURN NEW;
 --     END;
--- $cb_plot_num_drop_zeros$ LANGUAGE plppgsql;
+-- $cb_plot_num_drop_zeros$ LANGUAGE plpgsql;
 
 ------ Timestamp
 
@@ -172,6 +173,10 @@ AFTER INSERT OR UPDATE OR DELETE ON cb_scheme
 CREATE TRIGGER cb_holder_log
 AFTER INSERT OR UPDATE OR DELETE ON cb_holder
     FOR EACH ROW EXECUTE PROCEDURE cb_holder_log();
+
+-- CREATE TRIGGER cb_plot_num_drop_zeros
+-- BEFORE INSERT OR UPDATE ON cb_plot
+--     FOR EACH ROW EXECUTE PROCEDURE cb_plot_num_drop_zeros();
 
 CREATE TRIGGER cb_plot_log
 AFTER INSERT ON cb_plot
