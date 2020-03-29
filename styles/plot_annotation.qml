@@ -8,27 +8,14 @@
   <renderer-v2 forceraster="0" symbollevels="0" type="singleSymbol" enableorderby="0">
     <symbols>
       <symbol alpha="1" clip_to_extent="1" type="fill" name="0">
-        <layer pass="0" class="SimpleFill" locked="0">
-          <prop k="border_width_map_unit_scale" v="0,0,0,0,0,0"/>
-          <prop k="color" v="255,255,0,255"/>
-          <prop k="joinstyle" v="bevel"/>
-          <prop k="offset" v="0,0"/>
-          <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
-          <prop k="offset_unit" v="MM"/>
-          <prop k="outline_color" v="0,0,0,255"/>
-          <prop k="outline_style" v="solid"/>
-          <prop k="outline_width" v="0.26"/>
-          <prop k="outline_width_unit" v="MM"/>
-          <prop k="style" v="solid"/>
-        </layer>
         <layer pass="0" class="GeometryGenerator" locked="0">
           <prop k="SymbolType" v="Marker"/>
           <prop k="geometryModifier" v="nodes_to_points($geometry)"/>
-          <symbol alpha="1" clip_to_extent="1" type="marker" name="@0@1">
+          <symbol alpha="1" clip_to_extent="1" type="marker" name="@0@0">
             <layer pass="0" class="GeometryGenerator" locked="0">
               <prop k="SymbolType" v="Line"/>
               <prop k="geometryModifier" v="make_line( point_n( $geometry,(@geometry_part_num)),point_n( $geometry,(@geometry_part_num+1)))"/>
-              <symbol alpha="1" clip_to_extent="1" type="line" name="@@0@1@0">
+              <symbol alpha="1" clip_to_extent="1" type="line" name="@@0@0@0">
                 <layer pass="0" class="MarkerLine" locked="0">
                   <prop k="interval" v="3"/>
                   <prop k="interval_map_unit_scale" v="0,0,0,0,0,0"/>
@@ -41,7 +28,7 @@
                   <prop k="offset_unit" v="MM"/>
                   <prop k="placement" v="centralpoint"/>
                   <prop k="rotate" v="1"/>
-                  <symbol alpha="1" clip_to_extent="1" type="marker" name="@@@0@1@0@0">
+                  <symbol alpha="1" clip_to_extent="1" type="marker" name="@@@0@0@0@0">
                     <layer pass="0" class="FontMarker" locked="0">
                       <prop k="angle" v="0"/>
                       <prop k="char_dd_active" v="1"/>
@@ -82,7 +69,7 @@
               <prop k="joinstyle" v="miter"/>
               <prop k="offset" v="-2,-1.99999999999999756"/>
               <prop k="offset_dd_active" v="1"/>
-              <prop k="offset_dd_expression" v="CASE WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 90 THEN '4.0000, -4.3000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 180 THEN '4.0000, 7.5000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 270 THEN '-4.0000, 7.5000'&#xd;&#xa;ELSE&#xd;&#xa;&#x9;'-4.0000, -4.3000'&#xd;&#xa;END"/>
+              <prop k="offset_dd_expression" v="CASE WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 90 THEN '2.5000, -2.8000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 180 THEN '2.5000, 6.0000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 270 THEN '-2.5000, 6.0000'&#xd;&#xa;ELSE&#xd;&#xa;&#x9;'-2.5000, -2.8000'&#xd;&#xa;END"/>
               <prop k="offset_dd_field" v=""/>
               <prop k="offset_dd_useexpr" v="1"/>
               <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
@@ -91,66 +78,10 @@
               <prop k="outline_width" v="0"/>
               <prop k="outline_width_map_unit_scale" v="0,0,0,0,0,0"/>
               <prop k="outline_width_unit" v="MM"/>
-              <prop k="size" v="2.4"/>
+              <prop k="size" v="3"/>
               <prop k="size_map_unit_scale" v="0,0,0,0,0,0"/>
               <prop k="size_unit" v="MM"/>
               <prop k="vertical_anchor_point" v="1"/>
-              <effect enabled="1" type="effectStack">
-                <effect type="dropShadow">
-                  <prop k="blend_mode" v="13"/>
-                  <prop k="blur_level" v="10"/>
-                  <prop k="color" v="0,0,0,255"/>
-                  <prop k="draw_mode" v="2"/>
-                  <prop k="enabled" v="0"/>
-                  <prop k="offset_angle" v="135"/>
-                  <prop k="offset_distance" v="2"/>
-                  <prop k="offset_unit" v="MM"/>
-                  <prop k="offset_unit_scale" v="0,0,0,0,0,0"/>
-                  <prop k="transparency" v="0"/>
-                </effect>
-                <effect type="outerGlow">
-                  <prop k="blend_mode" v="0"/>
-                  <prop k="blur_level" v="1"/>
-                  <prop k="color_type" v="0"/>
-                  <prop k="draw_mode" v="2"/>
-                  <prop k="enabled" v="1"/>
-                  <prop k="single_color" v="255,255,255,255"/>
-                  <prop k="spread" v="1"/>
-                  <prop k="spread_unit" v="MM"/>
-                  <prop k="spread_unit_scale" v="0,0,0,0,0,0"/>
-                  <prop k="transparency" v="0"/>
-                </effect>
-                <effect type="drawSource">
-                  <prop k="blend_mode" v="0"/>
-                  <prop k="draw_mode" v="2"/>
-                  <prop k="enabled" v="1"/>
-                  <prop k="transparency" v="0"/>
-                </effect>
-                <effect type="innerShadow">
-                  <prop k="blend_mode" v="13"/>
-                  <prop k="blur_level" v="10"/>
-                  <prop k="color" v="0,0,0,255"/>
-                  <prop k="draw_mode" v="2"/>
-                  <prop k="enabled" v="0"/>
-                  <prop k="offset_angle" v="135"/>
-                  <prop k="offset_distance" v="2"/>
-                  <prop k="offset_unit" v="MM"/>
-                  <prop k="offset_unit_scale" v="0,0,0,0,0,0"/>
-                  <prop k="transparency" v="0"/>
-                </effect>
-                <effect type="innerGlow">
-                  <prop k="blend_mode" v="0"/>
-                  <prop k="blur_level" v="3"/>
-                  <prop k="color_type" v="0"/>
-                  <prop k="draw_mode" v="2"/>
-                  <prop k="enabled" v="0"/>
-                  <prop k="single_color" v="255,255,255,255"/>
-                  <prop k="spread" v="2"/>
-                  <prop k="spread_unit" v="MM"/>
-                  <prop k="spread_unit_scale" v="0,0,0,0,0,0"/>
-                  <prop k="transparency" v="0.5"/>
-                </effect>
-              </effect>
             </layer>
             <layer pass="0" class="FontMarker" locked="0">
               <prop k="angle" v="0"/>
@@ -165,7 +96,7 @@
               <prop k="joinstyle" v="bevel"/>
               <prop k="offset" v="-1.99999999999999978,0"/>
               <prop k="offset_dd_active" v="1"/>
-              <prop k="offset_dd_expression" v="CASE WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 90 THEN '4.0000, -7.5000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 180 THEN '4.0000, 4.3000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 270 THEN '-4.0000, 4.3000'&#xd;&#xa;ELSE&#xd;&#xa;&#x9;'-4.0000, -7.5000'&#xd;&#xa;END"/>
+              <prop k="offset_dd_expression" v="CASE WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 90 THEN '2.5000, -6.0000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 180 THEN '2.5000, 2.8000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 270 THEN '-2.5000, 2.8000'&#xd;&#xa;ELSE&#xd;&#xa;&#x9;'-2.5000, -6.0000'&#xd;&#xa;END"/>
               <prop k="offset_dd_field" v=""/>
               <prop k="offset_dd_useexpr" v="1"/>
               <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
@@ -174,7 +105,7 @@
               <prop k="outline_width" v="0"/>
               <prop k="outline_width_map_unit_scale" v="0,0,0,0,0,0"/>
               <prop k="outline_width_unit" v="MM"/>
-              <prop k="size" v="2.4"/>
+              <prop k="size" v="3"/>
               <prop k="size_map_unit_scale" v="0,0,0,0,0,0"/>
               <prop k="size_unit" v="MM"/>
               <prop k="vertical_anchor_point" v="1"/>
@@ -193,15 +124,15 @@
                 </effect>
                 <effect type="outerGlow">
                   <prop k="blend_mode" v="0"/>
-                  <prop k="blur_level" v="1"/>
+                  <prop k="blur_level" v="0"/>
                   <prop k="color1" v="255,255,255,255"/>
                   <prop k="color2" v="207,209,213,255"/>
                   <prop k="color_type" v="0"/>
                   <prop k="discrete" v="0"/>
                   <prop k="draw_mode" v="2"/>
                   <prop k="enabled" v="1"/>
-                  <prop k="single_color" v="255,255,255,255"/>
-                  <prop k="spread" v="1"/>
+                  <prop k="single_color" v="230,220,25,255"/>
+                  <prop k="spread" v="2"/>
                   <prop k="spread_unit" v="MM"/>
                   <prop k="spread_unit_scale" v="0,0,0,0,0,0"/>
                   <prop k="transparency" v="0"/>
@@ -239,6 +170,19 @@
               </effect>
             </layer>
           </symbol>
+        </layer>
+        <layer pass="0" class="SimpleFill" locked="0">
+          <prop k="border_width_map_unit_scale" v="0,0,0,0,0,0"/>
+          <prop k="color" v="255,255,0,255"/>
+          <prop k="joinstyle" v="bevel"/>
+          <prop k="offset" v="0,0"/>
+          <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
+          <prop k="offset_unit" v="MM"/>
+          <prop k="outline_color" v="0,0,0,255"/>
+          <prop k="outline_style" v="solid"/>
+          <prop k="outline_width" v="0.26"/>
+          <prop k="outline_width_unit" v="MM"/>
+          <prop k="style" v="solid"/>
         </layer>
       </symbol>
     </symbols>
