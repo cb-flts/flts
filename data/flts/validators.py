@@ -43,7 +43,7 @@ from stdm.utils.reverse_dict import ReverseDict
 from stdm.data.configuration import entity_model
 
 CONFIG_COL_MAPPING_SECTION = 'ColumnMapping'
-DATE_FORMAT = '%d-%m-%Y'
+DATE_FORMAT = '%d/%m/%Y'
 
 # Validation result
 SUCCESS, WARNING, ERROR, UNDEFINED = range(4)
@@ -481,7 +481,7 @@ class LookupValidator(AbstractColumnValidator):
 
     def validate(self, value, messages=None):
         if value:
-            value = unicode(value)
+            value = unicode(value).strip()
             if value.lower() in self._lookup_values:
                 v_msg = self._create_validation_message(SUCCESS, '')
                 self.add_validation_message(v_msg)

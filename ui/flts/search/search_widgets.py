@@ -39,8 +39,8 @@ from ui_flts_search_widget import Ui_FltsSearchWidget
 
 class FltsSearchDockWidget(QDockWidget):
     """
-    Dock widget for showing search widgets based on the search
-    configuration.
+    Dock widget for showing search widgets with each widget corresponding to
+    a search configuration.
     """
     def __init__(self, *args, **kwargs):
         super(FltsSearchDockWidget, self).__init__(*args, **kwargs)

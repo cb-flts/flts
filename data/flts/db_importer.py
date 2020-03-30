@@ -106,7 +106,7 @@ class LookupValueTranslator(AbstractValueTranslator):
 
     def transform(self, value):
         # Check if the value exists in the lookup values. If not return None.
-        return self._lookup_values.get(value.lower(), None)
+        return self._lookup_values.get(value.lower().strip(), None)
 
 
 class DateValueTranslator(AbstractValueTranslator):

@@ -996,8 +996,13 @@ class CmisEntityDocumentMapper(object):
         if text_idx != -1:
             read_mode = 'r'
 
-        # TODO: mime_type should be set automatically
-        mime_type = 'application/pdf'
+        if not mime_type:
+            msg = 'MIME type could not be determined.'
+            raise CmisDocumentMapperException(msg)
+
+        # Manually set the valid MIME type for PDF
+        if mime_type == 'pdf':
+            mime_type = 'application/pdf'
 
         cmis_doc = None
         with open(path, read_mode) as f:

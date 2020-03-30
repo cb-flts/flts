@@ -55,8 +55,6 @@ from qgis.core import (
     QgsMapLayer,
     QgsMapLayerRegistry,
     QgsProject,
-    QgsRuleBasedRendererV2,
-    QgsSymbolV2,
     QgsVectorLayer
 )
 from qgis.utils import (
@@ -71,6 +69,7 @@ from sqlalchemy.schema import (
     MetaData
 )
 
+from stdm import STYLES_DIR
 from stdm.settings.registryconfig import RegistryConfig
 from stdm.data.pg_utils import (
     geometryType,
@@ -97,6 +96,7 @@ from .qr_code_configuration import QRCodeConfigurationCollection
 from .table_configuration import TableConfigurationCollection
 
 LOGGER = logging.getLogger('stdm')
+ANNOTATION_FILE = '{0}/plot_annotation.qml'.format(STYLES_DIR)
 
 
 class DocumentGenerator(QObject):
@@ -258,54 +258,11 @@ class DocumentGenerator(QObject):
         row values will be used to name output files if the options has been
         specified by the user.
         """
-        vl = vector_layer('cb_plot', geom_column='geom', layer_name='Temp Plot')
-        QgsMapLayerRegistry.instance().addMapLayer(vl)
-
-        self._map_settings.setLayers([vl.id()])
-        # vl.loadNamedStyle('D:/Downloads/QGIS/Styles/scheme_plots_label.qml')
-
-        # Style reference plot
-        plot_id = '3'
-        filter_exp = '"id" = ' + plot_id
-        scheme_symbol = QgsSymbolV2.defaultSymbol(
-            vl.geometryType()
-        )
-        rule_renderer = QgsRuleBasedRendererV2(scheme_symbol)
-        root_rule = rule_renderer.rootRule()
-
-        # Rule for highlighting reference plot
-        scheme_rule = root_rule.children()[0].clone()
-        scheme_rule.setLabel('Reference Plot')
-        scheme_rule.setFilterExpression(filter_exp)
-        scheme_symbol_layer = scheme_rule.symbol().symbolLayer(0)
-        scheme_symbol_layer.setFillColor(Qt.yellow)
-        scheme_symbol_layer.setOutlineColor(Qt.black)
-        root_rule.appendChild(scheme_rule)
-
-        # Rule for all 'other' plots
-        def_rule = root_rule.children()[0].clone()
-        def_rule.setLabel('Plots')
-        def_rule.setIsElse(True)
-        def_symbol_layer = def_rule.symbol().symbolLayer(0)
-        def_symbol_layer.setFillColor(Qt.transparent)
-        def_symbol_layer.setOutlineColor(Qt.black)
-        root_rule.appendChild(def_rule)
-
-        # Remove default rule
-        root_rule.removeChildAt(0)
-
-        # Set renderer
-        vl.setRendererV2(rule_renderer)
-
-        # Enable labeling
-        vl.setCustomProperty("labeling", "pal")
-        vl.setCustomProperty("labeling/enabled", "true")
-        vl.setCustomProperty("labeling/fontFamily", "Arial")
-        vl.setCustomProperty("labeling/fontSize", "8")
-        vl.setCustomProperty("labeling/fieldName", "plot_number")
-        vl.setCustomProperty("labeling/placement", "0")
-
-        vl.triggerRepaint()
+        # Update layers in map settings
+        current_layers = QgsMapLayerRegistry.instance().mapLayers().keys()
+        self._map_settings.setLayers(current_layers)
+        self._iface.mapCanvas().refresh()
+        QgsApplication.processEvents()
 
         templatePath = args[0]
         entityFieldName = args[1]
@@ -457,6 +414,7 @@ class DocumentGenerator(QObject):
                             Add layer to map and ensure its always added at the top
                             '''
                             self.map_registry.addMapLayer(ref_layer)
+                            self._annotate_ref_layer(ref_layer)
                             self._iface.mapCanvas().setExtent(bbox)
                             self._iface.mapCanvas().refresh()
                             # Add layer to map memory layer list
@@ -510,6 +468,11 @@ class DocumentGenerator(QObject):
 
     def _random_feature_layer_name(self, sp_field):
         return u"{0}-{1}".format(sp_field, str(uuid.uuid4())[0:8])
+
+    def _annotate_ref_layer(self, layer):
+        if QFile.exists(ANNOTATION_FILE):
+            layer.loadNamedStyle(ANNOTATION_FILE)
+            layer.triggerRepaint()
 
     def _refresh_map_item(self, map_item):
         """

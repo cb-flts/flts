@@ -19,10 +19,12 @@ docs/_build
 *.swp
 *.chm
 
+# Log files
+*.log
+
 # My scripts
 ui.make.bat
 
-*.chm
 .branch
 
 #sample form extension file

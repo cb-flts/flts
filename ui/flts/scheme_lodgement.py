@@ -474,55 +474,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         value = initial_value * 10000
         self.dbl_spinbx_block_area.setValue(value)
 
-            # def _on_area_check(self):
-
-    #     """
-    #     Signals for block area calculation
-    #     :return:
-    #     """
-    #     self.radio_sq_meters.clicked.connect(
-    #         self._on_meters_clicked
-    #     )
-    #     self.radio_hectares.clicked.connect(
-    #         self._on_hectares_clicked
-    #     )
-    #
-    # def _on_meters_clicked(self):
-    #     """
-    #     Slot raised when the hectares radio button is checked
-    #     :return:
-    #     """
-    #     meters_suffix = self.tr(" (Sq.m)")
-    #     self.dbl_spinbx_block_area.setSuffix(meters_suffix)
-    #     self._to_meters()
-    #
-    # def _on_hectares_clicked(self):
-    #     """
-    #     Slot raised when the hectares radio button is checked
-    #     :return:
-    #     """
-    #     hectares_suffix = self.tr(" (Ha)")
-    #     self.dbl_spinbx_block_area.setSuffix(hectares_suffix)
-    #     self._to_hectares()
-
-    # def _to_meters(self):
-    #     """
-    #     Conversion of block area value to meters
-    #     :return:
-    #     """
-    #     initial_area = self.dbl_spinbx_block_area.value()
-    #     final_area = initial_area * 10000
-    #     self.dbl_spinbx_block_area.setValue(final_area)
-    #
-    # def _to_hectares(self):
-    #     """
-    #     Conversion of block area value to hectares
-    #     :return:
-    #     """
-    #     initial_area = self.dbl_spinbx_block_area.value()
-    #     final_area = initial_area / 10000
-    #     self.dbl_spinbx_block_area.setValue(final_area)
-
     def validate_block_area(self):
         """
         Check whether the block area value is zero
@@ -1018,6 +969,11 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             pseudoname='Scheme Number'
         )
         self.addMapping(
+            'land_hold_plan_number',
+            self.lnedit_landhold_num,
+            pseudoname='Land Hold Plan Number'
+        )
+        self.addMapping(
             'sg_number',
             self.lnedit_sg_num,
             pseudoname='Surveyor General Number'
@@ -1277,6 +1233,14 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         self.tr_summary.scm_ra_name.setText(
             1,
             self.cbx_relv_auth_name.currentText()
+        )
+        self.tr_summary.scm_land_hold_num.setText(
+            1,
+            self.lnedit_landhold_num.text()
+        )
+        self.tr_summary.scm_sg_num.setText(
+            1,
+            self.lnedit_sg_num.text()
         )
         self.tr_summary.scm_lro.setText(
             1,
@@ -1554,6 +1518,37 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         # Filter the lookup IDs based on values
         workflow_res = chk_workflow_obj.queryObject().filter(
             self._workflow_lookup_model.value == 'Import Plot'
+        ).one()
+
+        approval_res = chk_approval_obj.queryObject().filter(
+            self._approval_lookup_model.value == 'Pending'
+        ).one()
+
+        # Save details
+        scheme_workflow_obj.scheme_id = scheme_res.id
+        scheme_workflow_obj.workflow_id = workflow_res.id
+        scheme_workflow_obj.approval_id = approval_res.id
+        scheme_workflow_obj.save()
+
+    def populate_third_workflow(self):
+        """
+        Update the workflow link table with import plot as unapproved.
+        :return: None
+        """
+        # Entity objects
+        scheme_obj = self.schm_model()
+        chk_workflow_obj = self._workflow_lookup_model()
+        chk_approval_obj = self._approval_lookup_model()
+        scheme_workflow_obj = self._sch_workflow_model()
+        # Get last lodged scheme ID
+
+        scheme_res = scheme_obj.queryObject().order_by(
+            self.schm_model.id.desc()
+        ).first()
+
+        # Filter the lookup IDs based on values
+        workflow_res = chk_workflow_obj.queryObject().filter(
+            self._workflow_lookup_model.value == 'Third Assessment'
         ).one()
 
         approval_res = chk_approval_obj.queryObject().filter(

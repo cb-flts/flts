@@ -59,7 +59,8 @@ class SchemeSummaryWidget(QTreeWidget):
         self.scm_date_est = QTreeWidgetItem()
         self.scm_ra_type = QTreeWidgetItem()
         self.scm_ra_name = QTreeWidgetItem()
-        # self.scm_sg_num = QTreeWidgetItem()
+        self.scm_land_hold_num = QTreeWidgetItem()
+        self.scm_sg_num = QTreeWidgetItem()
         self.scm_title_deed_num = QTreeWidgetItem()
         self.scm_lro = QTreeWidgetItem()
         self.scm_region = QTreeWidgetItem()
@@ -100,7 +101,8 @@ class SchemeSummaryWidget(QTreeWidget):
              self.scm_date_est,
              self.scm_ra_type,
              self.scm_ra_name,
-             # self.scm_sg_num,
+             self.scm_land_hold_num,
+             self.scm_sg_num,
              self.scm_title_deed_num,
              self.scm_lro,
              self.scm_region,
@@ -125,6 +127,12 @@ class SchemeSummaryWidget(QTreeWidget):
         self.scm_ra_name.setText(0,
                                  self.tr('Name of Relevant Authority ')
                                  )
+        self.scm_land_hold_num.setText(0,
+                                       self.tr('Land Hold Plan Number ')
+                                       )
+        self.scm_sg_num.setText(0,
+                                self.tr('Surveyor General Number ')
+                                )
         self.scm_title_deed_num.setText(0,
                                         self.tr('Title Deed Number ')
                                         )

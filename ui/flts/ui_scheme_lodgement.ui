@@ -52,7 +52,7 @@
   </property>
   <widget class="QWizardPage" name="wizardPage1">
    <layout class="QGridLayout" name="gridLayout_4">
-    <item row="0" column="0" colspan="2">
+    <item row="0" column="0">
      <layout class="QVBoxLayout" name="vlNotification">
       <property name="bottomMargin">
        <number>10</number>
@@ -133,13 +133,36 @@
      </widget>
     </item>
     <item row="7" column="0">
-     <widget class="QLabel" name="label_sg_num">
+     <widget class="QLabel" name="label_landhold_num">
       <property name="text">
-       <string>Surveyor General Number</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Land Hold Plan Number &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
     <item row="7" column="1">
+     <widget class="QLineEdit" name="lnedit_landhold_num">
+      <property name="inputMask">
+       <string/>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
+       <bool>false</bool>
+      </property>
+      <property name="placeholderText">
+       <string>Enter the Land Hold Plan number</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="0">
+     <widget class="QLabel" name="label_sg_num">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Surveyor General Number &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="1">
      <widget class="QLineEdit" name="lnedit_sg_num">
       <property name="inputMask">
        <string/>
@@ -155,14 +178,14 @@
       </property>
      </widget>
     </item>
-    <item row="8" column="0">
+    <item row="9" column="0">
      <widget class="QLabel" name="label_schm_name">
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scheme Name &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
-    <item row="8" column="1">
+    <item row="9" column="1">
      <widget class="QLineEdit" name="lnedit_schm_nam">
       <property name="text">
        <string/>
@@ -172,14 +195,14 @@
       </property>
      </widget>
     </item>
-    <item row="9" column="0">
+    <item row="10" column="0">
      <widget class="QLabel" name="label_date_apprv">
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Date of Approval (RA) &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
-    <item row="9" column="1">
+    <item row="10" column="1">
      <widget class="QDateEdit" name="date_apprv">
       <property name="minimumDateTime">
        <datetime>
@@ -203,14 +226,14 @@
       </property>
      </widget>
     </item>
-    <item row="10" column="0">
+    <item row="11" column="0">
      <widget class="QLabel" name="label_date_establish">
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Date of Establishment (RoD) &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
-    <item row="10" column="1">
+    <item row="11" column="1">
      <widget class="QDateEdit" name="date_establish">
       <property name="minimumDateTime">
        <datetime>
@@ -234,24 +257,24 @@
       </property>
      </widget>
     </item>
-    <item row="11" column="0">
+    <item row="12" column="0">
      <widget class="QLabel" name="label_lro">
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Land Rights Office &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
-    <item row="11" column="1">
+    <item row="12" column="1">
      <widget class="QComboBox" name="cbx_lro"/>
     </item>
-    <item row="12" column="0">
+    <item row="13" column="0">
      <widget class="QLabel" name="label_title_deed_num">
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Title Deed Number &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
-    <item row="12" column="1">
+    <item row="13" column="1">
      <widget class="QLineEdit" name="lnedit_title_deed_num">
       <property name="text">
        <string>T</string>
@@ -261,14 +284,14 @@
       </property>
      </widget>
     </item>
-    <item row="13" column="0">
+    <item row="14" column="0">
      <widget class="QLabel" name="label_constitution_ref_num">
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Constitution Ref. Number&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
-    <item row="13" column="1">
+    <item row="14" column="1">
      <widget class="QLineEdit" name="lnedit_constitution_ref_num">
       <property name="text">
        <string/>
@@ -278,14 +301,14 @@
       </property>
      </widget>
     </item>
-    <item row="14" column="0">
+    <item row="15" column="0">
      <widget class="QLabel" name="label_scheme_description">
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scheme Description &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
-    <item row="14" column="1">
+    <item row="15" column="1">
      <widget class="QLineEdit" name="lnedit_scheme_description">
       <property name="text">
        <string/>
@@ -295,14 +318,14 @@
       </property>
      </widget>
     </item>
-    <item row="15" column="0">
+    <item row="16" column="0">
      <widget class="QLabel" name="label_num_plots">
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of Plots &lt;span style=&quot; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
-    <item row="15" column="1">
+    <item row="16" column="1">
      <widget class="QDoubleSpinBox" name="dbl_spinbx_num_plots">
       <property name="decimals">
        <number>0</number>
@@ -312,7 +335,7 @@
       </property>
      </widget>
     </item>
-    <item row="16" column="0" colspan="2">
+    <item row="17" column="0" colspan="2">
      <widget class="QGroupBox" name="gbx_block_area">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -358,7 +381,7 @@
       </layout>
      </widget>
     </item>
-    <item row="17" column="0">
+    <item row="18" column="0">
      <widget class="QLabel" name="label_mandatory">
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot; font-style:italic; color:#ff0000;&quot;&gt;*&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;) Mandatory field&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>

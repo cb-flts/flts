@@ -892,4 +892,3 @@ INSERT INTO cb_relevant_auth_reg_division (relv_auth_id, reg_division_id)
 
 	INSERT INTO cb_user (user_name, first_name, last_name)
 	SELECT usename, usename, '' FROM pg_user;
-
