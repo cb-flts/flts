@@ -41,7 +41,7 @@ from stdm.utils.flts import lht_plot_layer
 from stdm import STYLES_DIR
 
 CERTIFICATE_PLOT = 'Certificate Plot'
-STYLE_FILE = '{0}/scheme_plots_label.qml'.format(STYLES_DIR)
+# STYLE_FILE = '{0}/scheme_plots_label.qml'.format(STYLES_DIR)
 
 
 def certificate_preprocess(plot, plots):
@@ -51,17 +51,13 @@ def certificate_preprocess(plot, plots):
     """
     scheme_plot_layer = lht_plot_layer(plot.scheme_id, CERTIFICATE_PLOT)
     QgsMapLayerRegistry.instance().addMapLayer(scheme_plot_layer)
-    # if QFile.exists(STYLE_FILE):
-    #     scheme_plot_layer.loadNamedStyle(STYLE_FILE)
-    #     scheme_plot_layer.triggerRepaint()
-    # iface.mapCanvas().setExtent(scheme_plot_layer.extent())
-    # QgsApplication.processEvents()
 
     # Styling reference plot using primary key
     filter_exp = '"id" = ' + str(plot.id)
     scheme_symbol = QgsSymbolV2.defaultSymbol(
         scheme_plot_layer.geometryType()
     )
+    # Rule-based rendering
     rule_renderer = QgsRuleBasedRendererV2(scheme_symbol)
     root_rule = rule_renderer.rootRule()
 
@@ -145,4 +141,3 @@ def pg_certificate_number():
     for row in result:
         cert_number = row[0]
     return cert_number
-
