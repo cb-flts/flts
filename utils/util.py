@@ -56,6 +56,10 @@ from stdm.data.configuration import (
 )
 
 from qgis.gui import QgsEncodingFileDialog
+from qgis.core import (
+    QGis,
+    QgsVectorLayer
+)
 
 PLUGIN_DIR = os.path.abspath(os.path.join(
     os.path.dirname( __file__ ), os.path.pardir)).replace("\\", "/")
@@ -1271,4 +1275,67 @@ def is_chrome_installed():
             status = True
 
     return status, inst_path
+
+
+def wkbtype_to_string(wkbtype):
+    """
+    Converts the QGis::WkbType to the equivalent string representation.
+    :param wkbtype: Geometry type
+    :type wkbtype: Qgis.WkbType
+    :return: Returns the string equivalent of the WKB enum.
+    :rtype: str
+    """
+    if wkbtype == QGis.WKBUnknown:
+        return 'Unknown'
+    elif wkbtype == QGis.WKBNoGeometry:
+        return 'None'
+    elif wkbtype == QGis.WKBPoint or wkbtype == QGis.WKBPoint25D:
+        return 'point'
+    elif wkbtype == QGis.WKBLineString  or wkbtype == QGis.WKBLineString25D:
+        return 'linestring'
+    elif wkbtype == QGis.WKBPolygon or wkbtype == QGis.WKBPolygon25D:
+        return 'polygon'
+    elif wkbtype == QGis.WKBMultiPoint or wkbtype == QGis.WKBMultiPoint25D:
+        return 'multipoint'
+    elif wkbtype == QGis.WKBMultiLineString or wkbtype == QGis.WKBMultiLineString25D:
+        return 'multilinestring'
+    elif wkbtype == QGis.WKBMultiPolygon or wkbtype == QGis.WKBMultiPolygon25D:
+        return 'multipolygon'
+
+    return ''
+
+
+def clone_vector_layer(vlayer, name='Duplicated_Layer'):
+    """
+    Creates a memory vector layer by cloning the specified vector layer.
+    Please note that this only clones the schema of the source layer i.e.
+    the field mapping. Vector joins, features etc. are not included.
+    :param vlayer: Input layer to be cloned.
+    :type vlayer: QgsVectorLayer
+    :param name: Name of the cloned layer. Defaults to 'Duplicate Layer'.
+    :type name: str
+    :return: Returns the cloned memory vector layer or None if the source
+    vector layer in invalid.
+    :rtype: QgsVectorLayer
+    """
+    if not vlayer.isValid:
+        return None
+
+    crs = vlayer.crs().authid()
+    geom_type = wkbtype_to_string(vlayer.wkbType())
+    if not geom_type or geom_type == 'Unknown':
+        return None
+
+    if geom_type == 'None':
+        uri = geom_type
+    else:
+        uri = '{0}?crs={1}&index=yes'.format(geom_type, crs)
+
+    mem_layer = QgsVectorLayer(uri, name, 'memory')
+    mem_layer_data = mem_layer.dataProvider()
+    attr = vlayer.dataProvider().fields().toList()
+    mem_layer_data.addAttributes(attr)
+    mem_layer.updateFields()
+
+    return mem_layer
 

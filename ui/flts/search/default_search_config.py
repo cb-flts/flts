@@ -18,6 +18,8 @@ email                : stdm@unhabitat.org
  ***************************************************************************/
 """
 from collections import OrderedDict
+import string
+
 from PyQt4.QtGui import QWidget
 
 from stdm.settings.search_config import (
@@ -49,9 +51,13 @@ class FltsSearchConfigurationLoader(AbstractSearchConfigurationLoader):
     """
     Loads search configuration specified in the FLTS search_config.INI file.
     """
+    GENERAL = 'General'
     DATA_SOURCE = 'DataSource'
     ICONS = 'Icon'
+    FILTER_COLUMNS = 'FilterColumns'
     BASE_ICON_PATH = ':/plugins/stdm/images/icons/'
+    LIMIT_SEC = 'ResultLimit'
+    LIMIT = 'limit'
 
     def _load_configs(self):
         # Get data source section and create configuration objects
@@ -65,15 +71,42 @@ class FltsSearchConfigurationLoader(AbstractSearchConfigurationLoader):
         # Create config for the given data source.
         column_map = self._column_mapping(data_source)
         icon_file = self._icon(data_source)
+        filter_cols = self._data_source_filter_columns(data_source)
+        limit = self._results_limit(data_source)
         args = {
             'data_source': data_source,
             'display_name': display_name,
             'column_mapping': column_map,
+            'filter_columns': filter_cols,
             'icon': icon_file,
+            'limit':limit,
             'create_widget_func': search_widget_factory
         }
 
         return FltsSearchConfiguration(**args)
+
+    def _data_source_filter_columns(self, data_source):
+        # Get the filter columns specified in the config for the given
+        # data source.
+        filter_cols = []
+        if self._config_parser.has_option(self.FILTER_COLUMNS, data_source):
+            cols_str = self._config_parser.get(
+                self.FILTER_COLUMNS, data_source
+            )
+            cols_str = cols_str.strip()
+            if cols_str:
+                filter_cols = map(string.strip, cols_str.split(','))
+
+        return filter_cols
+
+    def _results_limit(self, data_source):
+        # Get the search results limit
+        if self._config_parser.has_option(self.LIMIT_SEC, data_source):
+            return int(self._config_parser.get(self.LIMIT_SEC, data_source))
+        elif self._config_parser.has_option(self.GENERAL, self.LIMIT):
+            return int(self._config_parser.get(self.GENERAL, self.LIMIT))
+        else:
+            return -1
 
     def _column_mapping(self, data_source):
         # Create column mapping for the given data source.

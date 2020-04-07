@@ -18,22 +18,46 @@ email                : stdm@unhabitat.org
  ***************************************************************************/
 """
 from collections import OrderedDict
+
 from PyQt4.QtGui import (
+    QCompleter,
+    QDialog,
     QDockWidget,
     QStackedWidget,
     QWidget
 )
+
 from PyQt4.QtCore import (
     Qt
 )
 
+from qgis.core import (
+    QgsExpression,
+    QgsFeatureRequest
+)
+from qgis.gui import (
+    QgsExpressionBuilderDialog
+)
+
 from stdm.settings.search_config import SearchConfigurationRegistry
 from stdm.data.pg_utils import (
+    columnType,
     pg_table_exists,
     table_column_names,
     vector_layer
 )
+from stdm.data.flts.search import (
+    column_searches,
+    save_column_search
+)
+from stdm.utils.util import clone_vector_layer
 from stdm.ui.notification import NotificationBar, ERROR
+from stdm.ui.flts.search.search_model import SearchResultsModel
+from stdm.ui.flts.search.sort_dialog import SortColumnDialog
+from stdm.ui.flts.search.operators import (
+    PG_QUOTE_TYPES,
+    PG_TYPE_EXPRESSIONS
+)
 from ui_flts_search_widget import Ui_FltsSearchWidget
 
 
@@ -109,6 +133,13 @@ class FltsSearchDockWidget(QDockWidget):
         self._search_widget_idx = dict()
 
 
+class FltsSearchException(Exception):
+    """
+    Exceptions related to search operations.
+    """
+    pass
+
+
 class FltsSearchConfigDataSourceManager(object):
     """
     Provides data management functions based on a given search configuration
@@ -119,7 +150,9 @@ class FltsSearchConfigDataSourceManager(object):
         self._is_valid = self._validate_data_source()
         self._geom_columns = []
         self._valid_cols = OrderedDict()
+        self._valid_filter_cols = OrderedDict()
         self._vector_layer = None
+        self._column_types = {}
 
         # Set attributes if data source is valid
         if self._is_valid:
@@ -128,9 +161,16 @@ class FltsSearchConfigDataSourceManager(object):
                 True
             )
             self._valid_cols = self._validate_columns()
+            self._valid_filter_cols = self._validate_filter_columns()
+
+            # Use the first geometry column in the list. Hence, it is
+            # important to ensure that each data has not more than one
+            # geometry column.
+            geom_col = self._geom_columns[0] if len(self._geom_columns) > 0 else ''
             self._vector_layer = vector_layer(
                 self._config.data_source,
-                layer_name=self._config.display_name
+                layer_name=self._config.display_name,
+                geom_column=geom_col
             )
 
     def _validate_data_source(self):
@@ -150,8 +190,24 @@ class FltsSearchConfigDataSourceManager(object):
         v_col_mapping = OrderedDict()
         for vc in valid_cols_set:
             v_col_mapping[vc] = self._config.columns.get(vc)
+            # Set column type
+            col_type = columnType(
+                self._config.data_source,
+                vc
+            )
+            if col_type:
+                self._column_types[vc] = col_type
 
         return v_col_mapping
+
+    def _validate_filter_columns(self):
+        # Assert filter columns exist and create the mapping
+        filter_col_mapping = OrderedDict()
+        for fc in self._config.filter_columns:
+            if fc in self._valid_cols:
+                filter_col_mapping[fc] = self._valid_cols.get(fc)
+
+        return filter_col_mapping
 
     @property
     def search_config(self):
@@ -160,6 +216,59 @@ class FltsSearchConfigDataSourceManager(object):
         :rtype: FltsSearchConfiguration
         """
         return self._config
+
+    @property
+    def column_types(self):
+        """
+        :return: Returns a collection of the PostgreSQL/PostGIS column types
+        for each validated column in the data source.
+        :rtype: OrderedDict
+        """
+        return self._column_types
+
+    def column_type(self, column_name):
+        """
+        Gets the PostgreSQL/PostGIS column type for the given column name.
+        :param column_name: Column name for which the type is to be extracted.
+        :type column_name: str
+        :return: Returns the corresponding column type or an empty string if
+        the column was not found.
+        :rtype: str
+        """
+        return self._column_types.get(column_name, '')
+
+    def column_type_expression(self, column_name):
+        """
+        Gets the matching expressions for the data type of the specified
+        column.
+        :param column_name: Column name for the required type expressions.
+        :type column_name: str
+        :return: Returns the matching expressions for the data type of the
+        specified column or an empty collection if the column type was not
+        found or the matching expression has not been specified.
+        :rtype: dict
+        """
+        col_type = self.column_type(column_name)
+        if not col_type:
+            return {}
+        return PG_TYPE_EXPRESSIONS.get(col_type, {})
+
+    def quote_column_value(self, column_name):
+        """
+        True if the value of the given column requires to be quoted when
+        used in a QgsExpression.
+        :param column_name: Column name used to determine the type.
+        :type column_name: str
+        :return: Returns True if the value of the given column requires to be
+        quited when used in a QgsExpression, else False.
+        :rtype: bool
+        """
+        c_type = self.column_type(column_name)
+        if not c_type:
+            return False
+        if c_type in PG_QUOTE_TYPES:
+            return True
+        return False
 
     @property
     def vector_layer(self):
@@ -202,6 +311,106 @@ class FltsSearchConfigDataSourceManager(object):
         """
         return self._valid_cols
 
+    @property
+    def filter_column_mapping(self):
+        """
+        :return: Returns a collection containing a validated mapping of
+        filter columns.
+        :rtype: OrderedDict
+        """
+        return self._valid_filter_cols
+
+    def clone_source_layer(self):
+        """
+        :return: Returns a cloned memory vector layer. If the source vector
+        layer is invalid then it returns None.
+        :rtype: QgsVectorLayer
+        """
+        return clone_vector_layer(
+            self._vector_layer,
+            self._config.display_name
+        )
+
+    def search_data_source(self, search_expression, sort_map):
+        """
+        Searches the data source using the specified search expression.
+        :param search_expression: Search expression either as a string or
+        instance of QgsExpression.
+        :type search_expression: str or QgsExpression
+        :param sort_map: List containing a definition of column sorting.
+        :type sort_map: list
+        :return: Returns a list containing search results consisting of
+        QgsFeature objects.
+        :rtype: list
+        """
+        results = []
+        if not self._vector_layer.isValid():
+            raise FltsSearchException(
+                'Search cannot be performed, data source is invalid.'
+            )
+        if isinstance(search_expression, basestring):
+            search_expression = QgsExpression(search_expression)
+
+        # Assert if there are errors in the expression
+        if search_expression.hasParserError():
+            raise FltsSearchException(
+                search_expression.parserErrorString()
+            )
+
+        fr = QgsFeatureRequest(search_expression)
+        # Set sorting if specified.
+        if sort_map:
+            for s in sort_map:
+                ascending = True if s[1] == 0 else False
+                fr.addOrderBy(s[0], ascending)
+
+        feat_iter = self._vector_layer.getFeatures(fr)
+        for f in feat_iter:
+            results.append(f)
+
+        return results
+
+
+class BasicSearchQuery(object):
+    """
+    Container for the definition of basic search parameters.
+    """
+    def __init__(self, **kwargs):
+        self.filter_column = kwargs.pop('filter_column', '')
+        self.expression = kwargs.pop('expression', '')
+        self.search_term = kwargs.pop('search_term', '')
+        self.quote_column_value = False
+
+    def is_valid(self):
+        if not self.filter_column or not self.expression or not \
+                self.search_term:
+            return False
+
+        return True
+
+    def _quoted_column_value(self):
+        # Quote filter column value if flag has been set.
+        search_term = self.search_term.strip()
+        if self.quote_column_value:
+            search_term = '\'{0}\''.format(search_term)
+
+        return search_term
+
+    def expression_text(self):
+        """
+        :return: Builds a string search expression using the specified
+        search parameters.
+        :rtype: str
+        """
+        if not self.is_valid():
+            return ''
+
+        return u'"{0}" {1} {2}'.format(
+            self.filter_column,
+            self.expression,
+            self._quoted_column_value()
+        )
+
 
 class FltsSearchWidget(QWidget, Ui_FltsSearchWidget):
     """
@@ -221,6 +430,10 @@ class FltsSearchWidget(QWidget, Ui_FltsSearchWidget):
         self._config = search_config
         self._ds_mgr = FltsSearchConfigDataSourceManager(self._config)
 
+        # Sort dialog and mapping
+        self._sort_dialog = None
+        self._sort_map = None
+
         # Check validity
         self._check_validity()
         if not self._ds_mgr.is_valid:
@@ -238,6 +451,7 @@ class FltsSearchWidget(QWidget, Ui_FltsSearchWidget):
         self.btn_advanced_search.setEnabled(enable)
         self.btn_clear.setEnabled(enable)
         self.tb_results.setEnabled(enable)
+        self.btn_sort.setEnabled(enable)
 
     def _check_validity(self):
         # Notify is the data source is invalid.
@@ -250,6 +464,191 @@ class FltsSearchWidget(QWidget, Ui_FltsSearchWidget):
             )
 
     def _init_gui(self):
-        # Initialize GUI controls.
-        for col, disp_col in self._ds_mgr.valid_column_mapping.iteritems():
+        # Connect signals
+        self.btn_search.clicked.connect(
+            self.on_basic_search
+        )
+        self.cbo_column.currentIndexChanged.connect(
+            self._on_filter_col_changed
+        )
+        self.btn_clear.clicked.connect(
+            self.clear_results
+        )
+        self.btn_advanced_search.clicked.connect(
+            self.on_advanced_search
+        )
+        self.btn_sort.clicked.connect(
+            self.on_sort_columns
+        )
+
+        # Set filter columns
+        self.cbo_column.clear()
+        for col, disp_col in self._ds_mgr.filter_column_mapping.iteritems():
             self.cbo_column.addItem(disp_col, col)
+
+        # Set model
+        self._res_model = SearchResultsModel(self._ds_mgr)
+        self.tb_results.setModel(self._res_model)
+        self.tb_results.hideColumn(0)
+
+    def _on_filter_col_changed(self, idx):
+        # Set the valid expressions based on the type of the filter column.
+        self.cbo_expression.clear()
+        self.txt_keyword.clearValue()
+        if idx == -1:
+            return
+
+        filter_col = self.cbo_column.itemData(idx)
+        filter_exp = self._ds_mgr.column_type_expression(filter_col)
+        for disp, exp in filter_exp.iteritems():
+            self.cbo_expression.addItem(disp, exp)
+
+        # Update the search completer
+        self._set_search_completer()
+
+    def _set_search_completer(self):
+        # Set the completer for the search line edit for showing
+        # previously saved searches.
+        ds = self._config.data_source
+        filter_col = self.cbo_column.itemData(
+            self.cbo_column.currentIndex()
+        )
+        searches = column_searches(
+            ds,
+            filter_col
+        )
+
+        # Create and set completer
+        completer = QCompleter(searches, self)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        self.txt_keyword.setCompleter(completer)
+
+    def clear_results(self):
+        """
+        Removes any previous search results in the view.
+        """
+        self._res_model.clear_results()
+        self._update_search_status(-1)
+
+    def on_basic_search(self):
+        """
+        Slot raised to execute basic search.
+        """
+        # Validate if input parameters have been specified
+        filter_col = ''
+        msgs = []
+        if not self.cbo_column.currentText():
+            msgs.append('Filter column has not been specified.')
+        else:
+            filter_col = self.cbo_column.itemData(
+                self.cbo_column.currentIndex()
+            )
+
+        filter_exp = None
+        if not self.cbo_expression.currentText():
+            msgs.append('Filter expression has not been specified.')
+        else:
+            filter_exp = self.cbo_expression.itemData(
+                self.cbo_expression.currentIndex()
+            )
+
+        search_term = self.txt_keyword.value()
+        if not search_term:
+            msgs.append('Please specify the search term.')
+
+        # Clear any previous notifications
+        self.notif_bar.clear()
+
+        # Insert warning messages
+        for msg in msgs:
+            self.notif_bar.insertWarningNotification(msg)
+
+        if len(msgs) > 0:
+            return
+
+        # Save search and update completer with historical searches
+        save_column_search(self._config.data_source, filter_col, search_term)
+        self._set_search_completer()
+
+        # Build search query object
+        search_query = BasicSearchQuery()
+        search_query.filter_column = filter_col
+        search_query.expression = filter_exp
+        search_query.search_term = search_term
+        search_query.quote_column_value = self._ds_mgr.quote_column_value(
+            filter_col
+        )
+
+        exp_text = search_query.expression_text()
+        self.exec_search(exp_text)
+
+    def exec_search(self, search_expression):
+        """
+        Execute a search operation based on the specified filter expression.
+        :param search_expression: Filter expression.
+        :type search_expression: str
+        """
+        if not search_expression:
+            msg = 'Search expression cannot be empty.'
+            self.notif_bar.insertWarningNotification(msg)
+            return
+
+        try:
+            results = self._ds_mgr.search_data_source(
+                search_expression,
+                self._sort_map
+            )
+            self._update_search_status(len(results))
+            # Update model
+            self._res_model.set_results(results)
+
+        except FltsSearchException as fe:
+            self.notif_bar.insertWarningNotification(
+                str(fe)
+            )
+
+    def _update_search_status(self, count=-1):
+        # Updates search count label.
+        txt = ''
+        suffix = 'record' if count == 1 else 'records'
+        if count != -1:
+            # Separate thousand using comma
+            cs_count = '{:n}'.format(count)
+            txt = '{0} {1}'.format(cs_count, suffix)
+
+        self.lbl_results_count.setText(txt)
+
+    def on_advanced_search(self):
+        # Slot raised to show the expression editor.
+        filter_col = self.cbo_column.itemData(
+            self.cbo_column.currentIndex()
+        )
+        start_txt = '"{0}" = '.format(filter_col)
+        exp_dlg = QgsExpressionBuilderDialog(
+            self._ds_mgr.vector_layer,
+            start_txt,
+            self,
+            self._config.display_name
+        )
+        exp_dlg.setWindowTitle('{0} Filter Editor'. format(
+            self._config.display_name)
+        )
+        if exp_dlg.exec_() == QDialog.Accepted:
+            exp_text = exp_dlg.expressionText()
+            self.exec_search(exp_text)
+
+    def on_sort_columns(self):
+        # Slot raised to show the sort column dialog
+        col_mapping = self._ds_mgr.valid_column_mapping
+        if not self._sort_dialog:
+            self._sort_dialog = SortColumnDialog(
+                col_mapping,
+                self
+            )
+
+        if self._sort_dialog.exec_() == QDialog.Accepted:
+            sort_map = self._sort_dialog.sort_mapping()
+            if len(sort_map) > 0:
+                self._sort_map = sort_map
+            else:
+                self._sort_map = None

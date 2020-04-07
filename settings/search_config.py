@@ -47,7 +47,9 @@ class AbstractSearchConfiguration(object):
         self._data_source = kwargs.pop('data_source', '')
         self._display_name = kwargs.pop('display_name', '')
         self._columns = kwargs.pop('column_mapping', OrderedDict())
+        self._filter_columns = kwargs.pop('filter_columns', [])
         self._icon_file = kwargs.pop('icon', '')
+        self._results_limit = kwargs.pop('limit', -1)
         self._contains_geometry = False
         self._search_prefix = 'Search'
 
@@ -68,6 +70,15 @@ class AbstractSearchConfiguration(object):
         return self._display_name
 
     @property
+    def filter_columns(self):
+        """
+        :return: Returns a list containing the column names for filtering
+        data in basic search mode.
+        :rtype: list
+        """
+        return self._filter_columns
+
+    @property
     def columns(self):
         """
         :return: Returns the collection of column names and corresponding
@@ -75,6 +86,14 @@ class AbstractSearchConfiguration(object):
         :rtype: OrderedDict
         """
         return self._columns
+
+    @property
+    def limit(self):
+        """
+        :return: Returns the limit of search results. No limit if -1.
+        :rtype: int
+        """
+        return self._results_limit
 
     def add_column(self, column_name, display_name):
         """
@@ -115,6 +134,17 @@ class AbstractSearchConfiguration(object):
         :rtype: QWidget
         """
         raise NotImplementedError
+
+    def column_display_name(self, name):
+        """
+        Gets the corresponding display name of the column if defined in the
+        mapping.
+        :param name: Column name.
+        :type name: str
+        :return: Returns the display name of the specified column or an
+        empty string if not specified.
+        """
+        return self._columns.get(name, '')
 
 
 class AbstractSearchConfigurationLoader(object):

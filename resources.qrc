@@ -180,5 +180,6 @@
 	<file>images/icons/qrcode_512.png</file>
     <file>images/icons/disapprove.png</file>
     <file>images/icons/approve.png</file>
+    <file>images/icons/sort.png</file>
   </qresource>
 </RCC>

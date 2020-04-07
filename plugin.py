@@ -1116,10 +1116,10 @@ class STDMQGISLoader(object):
         self.thirdExaminationAct.triggered.connect(self.third_examination)
         self.importPlotsAct.triggered.connect(self.import_plots)
         self.schemeRevisionAct.triggered.connect(self.revise_scheme)
-        self.printCertificateAct.triggered.connect(self.print_certificate)
-        self.scanCertificateAct.triggered.connect(self.scan_certificate)
-        self.searchAct.triggered.connect(self.flts_search)
-        self.reportAct.triggered.connect(self.flts_report)
+        #self.printCertificateAct.triggered.connect(self.print_certificate)
+        # self.scanCertificateAct.triggered.connect(self.scan_certificate)
+        # self.searchAct.triggered.connect(self.flts_search)
+        # self.reportAct.triggered.connect(self.flts_report)
 
 
         # Create content items
@@ -1146,7 +1146,6 @@ class STDMQGISLoader(object):
         wzdConfigCnt.code = "F16CA4AC-3E8C-49C8-BD3C-96111EA74206"
 
         # FLTS
-
         schemeLodgementCnt = ContentGroup.contentItemFromQAction(self.schemeLodgementAct)
         schemeLodgementCnt.code = "97EB2313-AA9C-4478-83F8-896E30E8FA78"
 
@@ -1302,9 +1301,8 @@ class STDMQGISLoader(object):
         certSettingsCntGroups = []
         certSettingsCntGroups.append(self.docGeneratorCntGroup)
         certSettingsCntGroups.append(self.docDesignerCntGroup)
-
+        searchReportCntgroups = []
         # toolbar items
-
         self.toolbarLoader.addContent(self.wzdConfigCntGroup,
                                       [adminMenu, adminBtn]
                                       )
@@ -1377,15 +1375,13 @@ class STDMQGISLoader(object):
         # Configure search registry
         search_config_file = QDesktopServices.storageLocation(
             QDesktopServices.HomeLocation
-        ) + '/.stdm/search_configuration.ini'
+        ) + '/.stdm/search/configuration.ini'
 
         # Initialize registry
         SearchConfigurationRegistry.instance(
             files=[search_config_file],
             loader_cls=FltsSearchConfigurationLoader
         )
-
-        print SearchConfigurationRegistry.instance().all()
 
     def load_profiles_combobox(self):
         """
