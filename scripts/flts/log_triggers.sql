@@ -39,7 +39,6 @@ CREATE TABLE cb_holder_log (
   "stamp" timestamp(6),
   "user_id" text,
   "id" int4,
-  "plot_number" int4,
   "transfer_contract_date" date,
   "plot_use" int4,
   "holder_first_name" varchar(50),
