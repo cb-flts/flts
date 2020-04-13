@@ -43,6 +43,9 @@ SORT_ORDER_NAME = {
     1: 'Descending'
 }
 
+# Action source enumeration
+COLUMN_NAME, SORT_ORDER, NO_SOURCE = range(0, 3)
+
 # Role for storing sort-related data
 DATA_ROLE = Qt.UserRole + 1023
 
@@ -66,7 +69,7 @@ class SortItemModel(QStandardItemModel):
 
         # Flag for preventing infinite loop of slots when a
         # complementary item is changed.
-        self._complementary_source = 0
+        self.action_source = NO_SOURCE
 
     def add_column(self, column_name, display_name, order=NOT_SET):
         """
@@ -81,11 +84,12 @@ class SortItemModel(QStandardItemModel):
         col_item = QStandardItem(display_name)
         col_item.setCheckable(True)
         col_item.setData(column_name, DATA_ROLE)
+
         sort_item = QStandardItem()
-        if order != NOT_SET:
-            sort_txt = SORT_ORDER_NAME.get(order)
-            sort_item.setText(sort_txt)
-            sort_item.setData(order, DATA_ROLE)
+        sort_txt = SORT_ORDER_NAME.get(order, '')
+        sort_item.setText(sort_txt)
+        sort_item.setData(order, DATA_ROLE)
+
         self.appendRow([col_item, sort_item])
 
     def sort_mapping(self):
@@ -136,8 +140,7 @@ class SortItemModel(QStandardItemModel):
         otherwise it is not applied.
         :type sort_order: int
         """
-        if self._complementary_source == 1:
-            self._complementary_source = 0
+        if self.action_source != COLUMN_NAME:
             return
 
         sort_item = self.item(row, 1)
@@ -145,36 +148,43 @@ class SortItemModel(QStandardItemModel):
         if enable_sort:
             text = SORT_ORDER_NAME.get(sort_order)
         else:
-            sort_order = None
+            sort_order = NOT_SET
 
-        self._complementary_source = 1
         sort_item.setText(text)
-        self._complementary_source = 1
         sort_item.setData(sort_order, DATA_ROLE)
 
-    def enable_sort_state(self, row, sort_order):
+    def enable_sort_state(self, row, sort_order, display_name='', column_name=''):
         """
         Enables or disables the sort state for the column name based on the
         value of the sort order.
         :param row: Row number.
         :type row: int
-        :param sort_order: Sort order. -1 disables sorting for the column
+        :param sort_order: Sort order. NOT_SET disables sorting for the column
         in the given row.
         :type sort_order: int
+        :param display_name: Display name of the column.
+        :type display_name: str
+        :param column_name: Column name.
+        :type column_name: str
         """
-        if self._complementary_source == 1:
-            self._complementary_source = 0
+        if self.action_source != SORT_ORDER:
             return
 
         col_item = self.item(row, 0)
-        self._complementary_source = 1
-        if sort_order != -1:
+        if sort_order != NOT_SET:
             col_item.setCheckState(Qt.Checked)
         else:
             col_item.setCheckState(Qt.Unchecked)
 
+        if display_name:
+            col_item.setText(display_name)
+        if column_name:
+            col_item.setData(column_name, DATA_ROLE)
+
+        self.action_source = NO_SOURCE
+
     def reset_complementary_source(self):
-        self._complementary_source = 0
+        self.action_source = NO_SOURCE
 
 
 class SortOrderItemDelegate(QStyledItemDelegate):
@@ -194,7 +204,12 @@ class SortOrderItemDelegate(QStyledItemDelegate):
 
             return combo
         else:
-            QStyledItemDelegate.createEditor(self, parent, option, index)
+            return QStyledItemDelegate.createEditor(
+                self,
+                parent,
+                option,
+                index
+            )
 
     def setEditorData(self, editor, index):
         # Set the combobox index
@@ -244,6 +259,13 @@ class SortColumnDialog(QDialog, Ui_SortColumnDialog):
         sort_order_delegate = SortOrderItemDelegate(self)
         self.tv_sort_config.setItemDelegate(sort_order_delegate)
 
+        self.btn_up.clicked.connect(
+            self.on_move_row_up
+        )
+        self.btn_down.clicked.connect(
+            self.on_move_row_down
+        )
+
     @property
     def columns(self):
         """
@@ -272,16 +294,132 @@ class SortColumnDialog(QDialog, Ui_SortColumnDialog):
 
         # If check state has changed
         if col == 0:
+            self._model.action_source = COLUMN_NAME
             check_state = True if item.checkState() == Qt.Checked else False
             self._model.set_sorting_order(row, check_state)
+            self._model.action_source = NO_SOURCE
         else:
             # Sort order has changed
+            self._model.action_source = SORT_ORDER
             sort_order = item.data(DATA_ROLE)
-            if sort_order is None:
-                sort_order = -1
             self._model.enable_sort_state(row, sort_order)
+            self._model.action_source = NO_SOURCE
 
-    def _enable_ok_btn(self, enabled):
-        # Enable/disable OK button.
-        if self._ok_btn:
-            self._ok_btn.setEnabled(enabled)
+    def move_item(self, current_row, move_up=True):
+        """
+        Moves the column name and sort order items up (smaller new_row
+        number) or down (bigger new_row number).
+        :param current_row: Row number of the item to be moved.
+        :type current_row: int
+        :param move_up: True to move up, False to move down.
+        :type move_up: bool
+        :return: Returns True if the item was successfully moved, else False
+        if the current_row is the first item (for a move up operation) or
+        last item (for a move down operation).
+        :rtype: bool
+        """
+        # Cannot be moved any further up
+        if current_row == 0 and move_up:
+            return False
+
+        # Cannot be moved any further down
+        if current_row == self._model.rowCount() -1 and not move_up:
+            return False
+
+        if move_up:
+            replace_row = current_row - 1
+        else:
+            replace_row = current_row + 1
+
+        sel_col_item = self._model.item(current_row, 0)
+        sel_order_item = self._model.item(current_row, 1)
+        replace_col_item = self._model.item(replace_row, 0)
+        replace_order_item = self._model.item(replace_row, 1)
+
+        # Capture the data to be replaced in the new row
+        rep_col_display, rep_col_checked, rep_col_data = \
+            replace_col_item.text(), replace_col_item.checkState(), \
+            replace_col_item.data(DATA_ROLE)
+        rep_order_text, rep_order_data = \
+            replace_order_item.text(), replace_order_item.data(DATA_ROLE)
+
+        # We need to use the approach below to avoid infinite loop of signals
+        # Update column item with selection data
+        self._model.action_source = SORT_ORDER
+        self._model.enable_sort_state(
+            replace_row,
+            sel_order_item.data(DATA_ROLE),
+            sel_col_item.text(),
+            sel_col_item.data(DATA_ROLE)
+        )
+        self._model.action_source = NO_SOURCE
+
+        sort_order = sel_order_item.data(DATA_ROLE)
+        enable_sort = True
+        if sort_order == NOT_SET:
+            enable_sort = False
+        # Update sort item with selection data
+        self._model.action_source = COLUMN_NAME
+        self._model.set_sorting_order(
+            replace_row,
+            enable_sort,
+            sort_order
+        )
+        self._model.action_source = NO_SOURCE
+
+        # Now update the row that has been pushed
+        self._model.action_source= SORT_ORDER
+        self._model.enable_sort_state(
+            current_row,
+            rep_order_data,
+            rep_col_display,
+            rep_col_data
+        )
+        self._model.action_source = NO_SOURCE
+
+        enable_sort = True
+        if rep_order_data == NOT_SET:
+            enable_sort = False
+        self._model.action_source = COLUMN_NAME
+        self._model.set_sorting_order(
+            current_row,
+            enable_sort,
+            rep_order_data
+        )
+        self._model.action_source = NO_SOURCE
+
+        # Select the new row
+        self.tv_sort_config.selectRow(replace_row)
+
+        return True
+
+    def _selected_row(self):
+        # Returns the number of the currently selected row or -1 if there
+        # is no selection.
+        sel_row = -1
+        sel_idxs = self.tv_sort_config.selectedIndexes()
+        if len(sel_idxs) > 0:
+            sel_idx = sel_idxs[0]
+            sel_row = sel_idx.row()
+
+        return sel_row
+
+    def on_move_row_up(self):
+        """
+        Slot raised to move the selected row up.
+        """
+        sel_row = self._selected_row()
+        if sel_row == -1:
+            return
+
+        self.move_item(sel_row)
+
+    def on_move_row_down(self):
+        """
+        Slot raised to move the selected row down.
+        """
+        sel_row = self._selected_row()
+        if sel_row == -1:
+            return
+
+        self.move_item(sel_row, False)

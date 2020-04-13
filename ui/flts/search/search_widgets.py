@@ -23,6 +23,7 @@ from PyQt4.QtGui import (
     QCompleter,
     QDialog,
     QDockWidget,
+    QIcon,
     QStackedWidget,
     QWidget
 )
@@ -358,6 +359,12 @@ class FltsSearchConfigDataSourceManager(object):
             )
 
         fr = QgsFeatureRequest(search_expression)
+        if not self._config.limit:
+            limit = -1
+        else:
+            limit = self._config.limit
+        fr.setLimit(limit)
+
         # Set sorting if specified.
         if sort_map:
             for s in sort_map:
@@ -480,16 +487,22 @@ class FltsSearchWidget(QWidget, Ui_FltsSearchWidget):
         self.btn_sort.clicked.connect(
             self.on_sort_columns
         )
+        self.txt_keyword.returnPressed.connect(
+            self.on_basic_search
+        )
 
         # Set filter columns
         self.cbo_column.clear()
+        col_ico = QIcon(':/plugins/stdm/images/icons/column.png')
         for col, disp_col in self._ds_mgr.filter_column_mapping.iteritems():
-            self.cbo_column.addItem(disp_col, col)
+            self.cbo_column.addItem(col_ico, disp_col, col)
 
         # Set model
         self._res_model = SearchResultsModel(self._ds_mgr)
         self.tb_results.setModel(self._res_model)
         self.tb_results.hideColumn(0)
+
+        self.txt_keyword.setFocus()
 
     def _on_filter_col_changed(self, idx):
         # Set the valid expressions based on the type of the filter column.
@@ -500,8 +513,9 @@ class FltsSearchWidget(QWidget, Ui_FltsSearchWidget):
 
         filter_col = self.cbo_column.itemData(idx)
         filter_exp = self._ds_mgr.column_type_expression(filter_col)
+        exp_ico = QIcon(':/plugins/stdm/images/icons/math_operators.png')
         for disp, exp in filter_exp.iteritems():
-            self.cbo_expression.addItem(disp, exp)
+            self.cbo_expression.addItem(exp_ico, disp, exp)
 
         # Update the search completer
         self._set_search_completer()
@@ -602,6 +616,11 @@ class FltsSearchWidget(QWidget, Ui_FltsSearchWidget):
             # Update model
             self._res_model.set_results(results)
 
+            # Notify user if there are no results
+            if len(results) == 0:
+                self.notif_bar.insertInformationNotification(
+                    'No results found matching the search keyword.'
+                )
         except FltsSearchException as fe:
             self.notif_bar.insertWarningNotification(
                 str(fe)
@@ -630,7 +649,7 @@ class FltsSearchWidget(QWidget, Ui_FltsSearchWidget):
             self,
             self._config.display_name
         )
-        exp_dlg.setWindowTitle('{0} Filter Editor'. format(
+        exp_dlg.setWindowTitle('{0} Expression Editor'. format(
             self._config.display_name)
         )
         if exp_dlg.exec_() == QDialog.Accepted:

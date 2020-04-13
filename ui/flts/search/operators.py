@@ -31,7 +31,7 @@ NUM_DATE = OrderedDict({
 })
 TEXT = OrderedDict({
     'Equal to (=)': '=',
-    'Starts with': 'STW'
+    'Like': 'Like'
 })
 BOOL = OrderedDict({
     'Equal to (=)': '=',

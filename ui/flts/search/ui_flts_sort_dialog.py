@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_flts_sort_dialog.ui'
 #
-# Created: Tue Apr  7 22:28:59 2020
+# Created: Thu Apr  9 14:33:17 2020
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ class Ui_SortColumnDialog(object):
         self.tv_sort_config = QtGui.QTableView(SortColumnDialog)
         self.tv_sort_config.setEditTriggers(QtGui.QAbstractItemView.DoubleClicked|QtGui.QAbstractItemView.SelectedClicked)
         self.tv_sort_config.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        self.tv_sort_config.setSelectionBehavior(QtGui.QAbstractItemView.SelectItems)
+        self.tv_sort_config.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.tv_sort_config.setObjectName(_fromUtf8("tv_sort_config"))
         self.tv_sort_config.horizontalHeader().setDefaultSectionSize(150)
         self.tv_sort_config.horizontalHeader().setStretchLastSection(True)
@@ -39,14 +39,14 @@ class Ui_SortColumnDialog(object):
         self.btn_up.setIcon(icon)
         self.btn_up.setObjectName(_fromUtf8("btn_up"))
         self.gridLayout.addWidget(self.btn_up, 1, 1, 1, 1)
-        self.pushButton = QtGui.QPushButton(SortColumnDialog)
-        self.pushButton.setMaximumSize(QtCore.QSize(32, 16777215))
-        self.pushButton.setText(_fromUtf8(""))
+        self.btn_down = QtGui.QPushButton(SortColumnDialog)
+        self.btn_down.setMaximumSize(QtCore.QSize(32, 16777215))
+        self.btn_down.setText(_fromUtf8(""))
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(_fromUtf8(":/plugins/stdm/images/icons/down.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton.setIcon(icon1)
-        self.pushButton.setObjectName(_fromUtf8("pushButton"))
-        self.gridLayout.addWidget(self.pushButton, 2, 1, 1, 1)
+        self.btn_down.setIcon(icon1)
+        self.btn_down.setObjectName(_fromUtf8("btn_down"))
+        self.gridLayout.addWidget(self.btn_down, 2, 1, 1, 1)
         spacerItem = QtGui.QSpacerItem(20, 235, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem, 3, 1, 1, 1)
         self.buttonBox = QtGui.QDialogButtonBox(SortColumnDialog)

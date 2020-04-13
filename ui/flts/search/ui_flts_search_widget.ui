@@ -20,17 +20,176 @@
    <string/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="0" colspan="2">
-    <widget class="QLabel" name="lbl_results_count">
-     <property name="text">
-      <string/>
+   <item row="0" column="0" colspan="9">
+    <layout class="QVBoxLayout" name="vlNotification"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QComboBox" name="cbo_column">
+     <property name="minimumSize">
+      <size>
+       <width>150</width>
+       <height>20</height>
+      </size>
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="4">
-    <layout class="QVBoxLayout" name="vlNotification"/>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="cbo_expression">
+     <property name="minimumSize">
+      <size>
+       <width>150</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+    </widget>
    </item>
-   <item row="3" column="0" colspan="4">
+   <item row="1" column="2">
+    <widget class="QgsFilterLineEdit" name="txt_keyword">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maxLength">
+      <number>50</number>
+     </property>
+     <property name="placeholderText">
+      <string>Search keyword</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QPushButton" name="btn_sort">
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>Sort options</string>
+     </property>
+     <property name="text">
+      <string>Sort Order...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../../resources.qrc">
+       <normaloff>:/plugins/stdm/images/icons/sort.png</normaloff>:/plugins/stdm/images/icons/sort.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
+    <widget class="QPushButton" name="btn_search">
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>Execute search</string>
+     </property>
+     <property name="text">
+      <string>Search</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../../resources.qrc">
+       <normaloff>:/plugins/stdm/images/icons/flts_search.png</normaloff>:/plugins/stdm/images/icons/flts_search.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="5">
+    <widget class="QPushButton" name="btn_advanced_search">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>Expression editor</string>
+     </property>
+     <property name="text">
+      <string>Advanced Search...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../../resources.qrc">
+       <normaloff>:/plugins/stdm/images/icons/expression.png</normaloff>:/plugins/stdm/images/icons/expression.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="6">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="7">
+    <widget class="QPushButton" name="btn_clear">
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>Clear search results</string>
+     </property>
+     <property name="text">
+      <string>Clear Results</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../../resources.qrc">
+       <normaloff>:/plugins/stdm/images/icons/reset.png</normaloff>:/plugins/stdm/images/icons/reset.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="8">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>9</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="0" colspan="9">
     <widget class="QTableView" name="tb_results">
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
@@ -49,200 +208,12 @@
      </attribute>
     </widget>
    </item>
-   <item row="1" column="0" colspan="4">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Define Filter</string>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Search in</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="cbo_column">
-        <property name="minimumSize">
-         <size>
-          <width>150</width>
-          <height>20</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Expression</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="cbo_expression">
-        <property name="minimumSize">
-         <size>
-          <width>150</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QgsFilterLineEdit" name="txt_keyword">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maxLength">
-         <number>50</number>
-        </property>
-        <property name="placeholderText">
-         <string>Search keyword</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_sort">
-        <property name="toolTip">
-         <string>Sort options</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../../../resources.qrc">
-          <normaloff>:/plugins/stdm/images/icons/sort.png</normaloff>:/plugins/stdm/images/icons/sort.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>16</width>
-          <height>16</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_search">
-        <property name="minimumSize">
-         <size>
-          <width>150</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Execute search</string>
-        </property>
-        <property name="text">
-         <string>Search</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../../../resources.qrc">
-          <normaloff>:/plugins/stdm/images/icons/flts_search.png</normaloff>:/plugins/stdm/images/icons/flts_search.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>16</width>
-          <height>16</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_advanced_search">
-        <property name="minimumSize">
-         <size>
-          <width>150</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Expression editor</string>
-        </property>
-        <property name="text">
-         <string>Advanced Search...</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../../../resources.qrc">
-          <normaloff>:/plugins/stdm/images/icons/expression.png</normaloff>:/plugins/stdm/images/icons/expression.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>62</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QPushButton" name="btn_clear">
-     <property name="minimumSize">
-      <size>
-       <width>150</width>
-       <height>20</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>200</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="toolTip">
-      <string>Clear search results</string>
-     </property>
+   <item row="3" column="0">
+    <widget class="QLabel" name="lbl_results_count">
      <property name="text">
-      <string>Clear Results</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../../../resources.qrc">
-       <normaloff>:/plugins/stdm/images/icons/reset.png</normaloff>:/plugins/stdm/images/icons/reset.png</iconset>
+      <string/>
      </property>
     </widget>
-   </item>
-   <item row="2" column="1" colspan="3">
-    <spacer name="horizontalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>622</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>
