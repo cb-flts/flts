@@ -22,20 +22,20 @@ from collections import OrderedDict
 
 # Expression by data type
 NUM_DATE = OrderedDict({
-    'Equal to (=)': '=',
-    'Less than (<)': '<',
-    'Greater than (>)': '>',
-    'Not equal to (<>)': '<>',
-    'Less than or equal to (<=)': '<=',
-    'Greater than or equal to (>=)': '>='
+    'Equal to': '=',
+    'Less than': '<',
+    'Greater than': '>',
+    'Not equal to': '<>',
+    'Less than or equal to': '<=',
+    'Greater than or equal to': '>='
 })
 TEXT = OrderedDict({
-    'Equal to (=)': '=',
-    'Like': 'Like'
+    'Equal to': '=',
+    'Like': 'ILIKE'
 })
 BOOL = OrderedDict({
-    'Equal to (=)': '=',
-    'Not equal to (<>)': '<>'
+    'Equal to': '=',
+    'Not equal to': '<>'
 })
 
 # PostgreSQL type mapping to valid expressions
@@ -65,3 +65,42 @@ PG_QUOTE_TYPES = [
     'char',
     'text'
 ]
+
+
+# Input value formatters based on the operator
+def like_value_formatter(value):
+    """
+    Formats the search input value for the ILIKE operator.
+    :param value: Search value to be formatted.
+    :type value: str
+    :return: Returns the formatted value for the ILIKE operator.
+    :rtype: str
+    """
+    if not value:
+        return value
+
+    return '%{0}%'.format(value)
+
+
+OPERATOR_VALUE_FORMATTER = {
+    'ILIKE': like_value_formatter
+}
+
+
+def operator_format_value(op, value):
+    """
+    Formats the search input value based on the given operator.
+    :param op: Operator type.
+    :type op: str
+    :param value: Search value to be formatted.
+    :type value: object
+    :return: Returns the formatted search input value, else an
+    unformatted value if there is no formatter defined for the given
+    operator.
+    :rtype: object
+    """
+    if not op in OPERATOR_VALUE_FORMATTER:
+        return value
+
+    fm_func = OPERATOR_VALUE_FORMATTER.get(op)
+    return fm_func(value)

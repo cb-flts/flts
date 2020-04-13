@@ -57,7 +57,8 @@ from stdm.ui.flts.search.search_model import SearchResultsModel
 from stdm.ui.flts.search.sort_dialog import SortColumnDialog
 from stdm.ui.flts.search.operators import (
     PG_QUOTE_TYPES,
-    PG_TYPE_EXPRESSIONS
+    PG_TYPE_EXPRESSIONS,
+    operator_format_value
 )
 from ui_flts_search_widget import Ui_FltsSearchWidget
 
@@ -252,7 +253,22 @@ class FltsSearchConfigDataSourceManager(object):
         col_type = self.column_type(column_name)
         if not col_type:
             return {}
+
         return PG_TYPE_EXPRESSIONS.get(col_type, {})
+
+    def format_value_by_operator(self, op, value):
+        """
+        Formats the search keywords based on the given search operator.
+        :param op: Operator.
+        :type op: str
+        :param value: Search keyword to be formatted.
+        :type value: object
+        :return: Returns the formatted search keyword based on the
+        pre-defined list of input value formatters, else returns the original
+        value if not formatter function is defined for the given operator.
+        :rtype: object
+        """
+        return operator_format_value(op, value)
 
     def quote_column_value(self, column_name):
         """
@@ -568,7 +584,7 @@ class FltsSearchWidget(QWidget, Ui_FltsSearchWidget):
 
         search_term = self.txt_keyword.value()
         if not search_term:
-            msgs.append('Please specify the search term.')
+            msgs.append('Please specify the search keyword.')
 
         # Clear any previous notifications
         self.notif_bar.clear()
@@ -584,11 +600,17 @@ class FltsSearchWidget(QWidget, Ui_FltsSearchWidget):
         save_column_search(self._config.data_source, filter_col, search_term)
         self._set_search_completer()
 
+        # Format the input value depending on the selected operator
+        fm_search_term = self._ds_mgr.format_value_by_operator(
+            filter_exp,
+            search_term
+        )
+
         # Build search query object
         search_query = BasicSearchQuery()
         search_query.filter_column = filter_col
         search_query.expression = filter_exp
-        search_query.search_term = search_term
+        search_query.search_term = fm_search_term
         search_query.quote_column_value = self._ds_mgr.quote_column_value(
             filter_col
         )
@@ -602,6 +624,7 @@ class FltsSearchWidget(QWidget, Ui_FltsSearchWidget):
         :param search_expression: Filter expression.
         :type search_expression: str
         """
+        self.clear_results()
         if not search_expression:
             msg = 'Search expression cannot be empty.'
             self.notif_bar.insertWarningNotification(msg)
@@ -632,7 +655,7 @@ class FltsSearchWidget(QWidget, Ui_FltsSearchWidget):
         suffix = 'record' if count == 1 else 'records'
         if count != -1:
             # Separate thousand using comma
-            cs_count = '{:n}'.format(count)
+            cs_count = format(count, ',')
             txt = '{0} {1}'.format(cs_count, suffix)
 
         self.lbl_results_count.setText(txt)
