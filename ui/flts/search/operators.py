@@ -1,7 +1,7 @@
 """
 /***************************************************************************
 Name                 : Search operators
-Description          : Operators for performing a basic searc,
+Description          : Operators for performing a basic search
 Date                 : 02/April/2020
 copyright            : (C) 2020 by UN-Habitat and implementing partners.
                        See the accompanying file CONTRIBUTORS.txt in the root

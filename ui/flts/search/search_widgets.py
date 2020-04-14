@@ -518,7 +518,7 @@ class FltsSearchWidget(QWidget, Ui_FltsSearchWidget):
         self.tb_results.setModel(self._res_model)
         self.tb_results.hideColumn(0)
 
-        # Connect to item selection chnaged signal
+        # Connect to item selection changed signal
         selection_model = self.tb_results.selectionModel()
         selection_model.selectionChanged.connect(
             self.on_selection_changed

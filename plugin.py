@@ -1466,13 +1466,13 @@ class STDMQGISLoader(object):
         moduleCntGroup.register()
         return moduleCntGroup
 
-    def show_search_widget(self, action):
+    def show_search_by_datasource(self, data_source):
         """
-        Slot raised when one of the search actions is clicked.
-        :param action: Action that triggered the signal.
-        :type action: QAction
+        Shows the search widget based on the name of the data source in the
+        search registry.
+        :param data_source: Data source name.
+        :type data_source: str
         """
-        data_source = action.data()
         if not data_source:
             return
 
@@ -1495,6 +1495,18 @@ class STDMQGISLoader(object):
                 QgsMessageBar.WARNING,
                 15
             )
+
+    def show_search_widget(self, action):
+        """
+        Slot raised when one of the search actions is clicked.
+        :param action: Action that triggered the signal.
+        :type action: QAction
+        """
+        data_source = action.data()
+        if not data_source:
+            return
+
+        self.show_search_by_datasource(data_source)
 
     def check_spatial_tables(self, show_message=False):
         """
@@ -2056,7 +2068,7 @@ class STDMQGISLoader(object):
             self.stdmInitToolbar.removeAction(self.scanCertificateAct)
             self.stdmInitToolbar.removeAction(self.searchAct)
             self.stdmInitToolbar.removeAction(self.reportAct)
-            # Clear current user name from statusbar
+            # Clear current user name from status bar
             self.flts_status_label.clear()
 
             if self.toolbarLoader is not None:
@@ -2263,8 +2275,6 @@ class STDMQGISLoader(object):
                                                  "restart QGIS.")
                 raise ConfigVersionException(err_msg)
 
-    # CB-flts
-
     def load_shortcut_dlg(self):
         """
         Load the dialog for user to select actions.
@@ -2285,6 +2295,11 @@ class STDMQGISLoader(object):
                 self.third_examination()
             elif action_code == 'PLT_SCM':
                 self.import_plots()
+            # For search-related items, extract the data source name
+            elif action_code.find(shortcut_dlg.search_item_prefix) != -1:
+                data_source = action_code.split(shortcut_dlg.search_item_prefix)
+                if len(data_source) > 1:
+                    self.show_search_by_datasource(data_source[1])
             return True
         else:
             return False
