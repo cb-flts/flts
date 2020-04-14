@@ -277,7 +277,7 @@ class FltsSearchConfigDataSourceManager(object):
         :param column_name: Column name used to determine the type.
         :type column_name: str
         :return: Returns True if the value of the given column requires to be
-        quited when used in a QgsExpression, else False.
+        quoted when used in a QgsExpression, else False.
         :rtype: bool
         """
         c_type = self.column_type(column_name)
@@ -518,6 +518,12 @@ class FltsSearchWidget(QWidget, Ui_FltsSearchWidget):
         self.tb_results.setModel(self._res_model)
         self.tb_results.hideColumn(0)
 
+        # Connect to item selection chnaged signal
+        selection_model = self.tb_results.selectionModel()
+        selection_model.selectionChanged.connect(
+            self.on_selection_changed
+        )
+
         self.txt_keyword.setFocus()
 
     def _on_filter_col_changed(self, idx):
@@ -694,3 +700,30 @@ class FltsSearchWidget(QWidget, Ui_FltsSearchWidget):
                 self._sort_map = sort_map
             else:
                 self._sort_map = None
+
+    def selected_rows(self):
+        """
+        :return: Returns the row numbers of the selected results.
+        :rtype: list
+        """
+        return [
+            idx.row() for idx in self.tb_results.selectionModel().selectedRows()
+        ]
+
+    def selected_features(self):
+        """
+        :return: Returns a list of QgsFeatures corresponding to the selected
+        results.
+        :rtype: list
+        """
+        features = []
+        for r in self.selected_rows():
+            feat = self._res_model.row_to_feature(r)
+            if feat:
+                features.append(feat)
+
+        return features
+
+    def on_selection_changed(self, previous_selection, current_selection):
+        # Slot raised when the selection changes in the results table.
+        features = self.selected_features()

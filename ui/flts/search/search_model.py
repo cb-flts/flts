@@ -37,6 +37,7 @@ class SearchResultsModel(QAbstractTableModel):
         self._config = self._ds_manager.search_config
         self._res_features = []
         self._field_idx_name = {}
+
         # Store index of 'id' column
         self._id_col_idx = -1
         self._update_field_index_name()
@@ -209,4 +210,21 @@ class SearchResultsModel(QAbstractTableModel):
         """
         self.removeRows(0, len(self._res_features))
         self._res_features = []
+
+    def row_to_feature(self, row):
+        """
+        Gets the feature contained in the given row number.
+        :param row: Row number.
+        :type row: int
+        :return: Returns the feature contained in the given row number, or
+        None if the row number is invalid.
+        :rtype: QgsFeature
+        """
+        if row < 0:
+            return None
+
+        if row != 0 and row >= self.rowCount():
+            return None
+
+        return self._res_features[row]
 
