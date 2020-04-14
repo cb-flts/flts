@@ -220,7 +220,7 @@ class UserShortcutDialog(QDialog, Ui_UserShortcutDialog):
         self._certificate_items.append(self.lsi_print_certificate)
         self._certificate_items.append(self.lsi_scan_certificate)
 
-        # Search items
+        # Search items adapted from items in the registry
         self._search_items = self._search_list_items()
 
         # Report items
