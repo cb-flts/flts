@@ -29,9 +29,25 @@ from collections import OrderedDict
 from distutils import file_util
 
 import errno
-from PyQt4.QtCore import QFile, QIODevice, Qt, QTextStream, pyqtSignal
-from PyQt4.QtGui import QMessageBox, QProgressBar, QDialog, QVBoxLayout, QLabel, QApplication, \
-    QCheckBox, QDialogButtonBox, QFileDialog, QLineEdit
+from PyQt4.QtCore import (
+    QFile,
+    QIODevice,
+    Qt,
+    QTextStream,
+    pyqtSignal
+)
+from PyQt4.QtGui import (
+    QMessageBox,
+    QProgressBar,
+    QDialog,
+    QVBoxLayout,
+    QLabel,
+    QApplication,
+    QCheckBox,
+    QDialogButtonBox,
+    QFileDialog,
+    QLineEdit
+)
 from PyQt4.QtXml import QDomDocument
 
 from stdm.data.configuration.config_updater import ConfigurationSchemaUpdater
@@ -58,13 +74,13 @@ from stdm.ui.ui_upgrade_paths import Ui_UpgradePaths
 
 COLUMN_TYPE_DICT = {'character varying': 'VARCHAR', 'date': 'DATE',
                     'serial': 'SERIAL', 'integer': 'INT', 'lookup':
-                    'LOOKUP', 'double precision': 'DOUBLE', 'GEOMETRY':
-                    'GEOMETRY', 'FOREIGN_KEY': 'FOREIGN_KEY', 'boolean': 'BOOL'
-                    , 'text': 'TEXT'}
+                        'LOOKUP', 'double precision': 'DOUBLE', 'GEOMETRY':
+                        'GEOMETRY', 'FOREIGN_KEY': 'FOREIGN_KEY', 'boolean': 'BOOL'
+    , 'text': 'TEXT'}
 COLUMN_PROPERTY_DICT = {'SERIAL': {"unique": "False", "tip": "",
-                                    "minimum": "-9223372036854775808",
-                                    "maximum": "9223372036854775807",
-                                    "index": "False", "mandatory": "False"},
+                                   "minimum": "-9223372036854775808",
+                                   "maximum": "9223372036854775807",
+                                   "index": "False", "mandatory": "False"},
                         'VARCHAR': {"unique": "False", "tip": "",
                                     "minimum": "0", "maximum": "30",
                                     "index": "False", "mandatory": "False",
@@ -73,10 +89,10 @@ COLUMN_PROPERTY_DICT = {'SERIAL': {"unique": "False", "tip": "",
                                 "minimum": "-9223372036854775806",
                                 "maximum": "9223372036854775807",
                                 "index": "False", "mandatory": "False"},
-                        'DATE':   {"unique": "False", "tip": "",
-                                   "minimum": "0", "maximum": "30",
-                                   "index": "False", "mandatory": "False",
-                                   "searchable": "False"},
+                        'DATE': {"unique": "False", "tip": "",
+                                 "minimum": "0", "maximum": "30",
+                                 "index": "False", "mandatory": "False",
+                                 "searchable": "False"},
                         'LOOKUP': {"unique": "False", "tip": "",
                                    "minimum": "0", "maximum": "30",
                                    "index": "False", "mandatory": "False",
@@ -89,65 +105,66 @@ COLUMN_PROPERTY_DICT = {'SERIAL': {"unique": "False", "tip": "",
                                      "maximum": "92233720368547",
                                      "index": "False", "mandatory": "False"},
                         'DEFAULT': {"unique": "False", "tip": "",
-                                    "minimum": "0", "maximum":"0",
+                                    "minimum": "0", "maximum": "0",
                                     "index": "False", "mandatory": "False"},
                         'FOREIGN_KEY': {"unique": "False", "tip": "",
-                                        "minimum": "0", "maximum":"2147483647",
+                                        "minimum": "0", "maximum": "2147483647",
                                         "index": "False", "mandatory":
                                             "False"},
                         'TEXT': {"unique": "False", "tip": "",
-                                        "minimum": "0", "maximum":"100",
-                                        "index": "False", "mandatory":
-                                            "False"},
+                                 "minimum": "0", "maximum": "100",
+                                 "index": "False", "mandatory":
+                                     "False"},
                         'BOOL': {"unique": "False", "tip": "",
-                                        "minimum": "0", "maximum":"10",
-                                        "index": "False", "mandatory":
-                                            "False"},
+                                 "minimum": "0", "maximum": "10",
+                                 "index": "False", "mandatory":
+                                     "False"},
                         }
 GEOMETRY_TYPES = {'LINESTRING': '1', 'POINT': '0', 'POLYGON': '2'}
 
 IMPORT = "import"
 
 STR_TABLES = OrderedDict([
-                ('social_tenure_relationship',
-                    OrderedDict([
-                        ('old', ('id',
-                                 'social_tenure_type',
-                                 'party',
-                                 'spatial_unit')),
-                        ('new', ('id',
-                                 'tenure_type',
-                                 'party_id',
-                                 'spatial_unit_id'))
-                                 ])
-                ),
-                ('supporting_document',
-                    OrderedDict([
-                        ('old', ('id',
-                                 'document_id',
-                                 'filename',
-                                 'doc_size')),
-                        ('new', ('id',
-                                 'document_identifier',
-                                 'filename',
-                                 'document_size',
-                                 'source_entity'
-                                 ))
-                                 ])
-                 ),
-                ('str_relations',
-                    OrderedDict([
-                        ('old', ('id',
-                                 'social_tenure_id',
-                                 'source_doc_id')),
-                        ('new', ('id',
-                                 'social_tenure_relationship_id',
-                                 'supporting_doc_id',
-                                 'document_type'
-                                 ))
-                                 ])
-                 )
-            ])
+    ('social_tenure_relationship',
+     OrderedDict([
+         ('old', ('id',
+                  'social_tenure_type',
+                  'party',
+                  'spatial_unit')),
+         ('new', ('id',
+                  'tenure_type',
+                  'party_id',
+                  'spatial_unit_id'))
+     ])
+     ),
+    ('supporting_document',
+     OrderedDict([
+         ('old', ('id',
+                  'document_id',
+                  'filename',
+                  'doc_size')),
+         ('new', ('id',
+                  'document_identifier',
+                  'filename',
+                  'document_size',
+                  'source_entity'
+                  ))
+     ])
+     ),
+    ('str_relations',
+     OrderedDict([
+         ('old', ('id',
+                  'social_tenure_id',
+                  'source_doc_id')),
+         ('new', ('id',
+                  'social_tenure_relationship_id',
+                  'supporting_doc_id',
+                  'document_type'
+                  ))
+     ])
+     )
+])
+
 
 class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
     """
@@ -277,7 +294,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
 
             status, msg, line, col = doc.setContent(config_file_path)
             if not status:
-                error_message = u'Configuration file cannot be loaded: {0}'.\
+                error_message = u'Configuration file cannot be loaded: {0}'. \
                     format(msg)
                 self.append_log(str(error_message))
 
@@ -333,7 +350,6 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                 self.file_handler.localPath()
             )
 
-
     def _rename_old_config_file(self, old_config_file, path):
         """
         Renames old configuration file
@@ -359,7 +375,6 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
         )
 
         file_util.copy_file(path, new_file)
-
 
     def _remove_old_config_file(self, config_file):
         """
@@ -527,12 +542,12 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                     column_dict = OrderedDict()
                     geom_dict = OrderedDict()
                     column_dict["col_name"] = unicode(
-                            geometry_node.attribute('column'))
+                        geometry_node.attribute('column'))
                     column_dict["col_search"] = 'no'
                     column_dict["col_descrpt"] = ''
                     column_dict["lookup"] = None
                     geom_dict["srid"] = unicode(
-                                            geometry_node.attribute('srid'))
+                        geometry_node.attribute('srid'))
                     geom_dict["type"] = GEOMETRY_TYPES[unicode(
                         geometry_node.attribute('type'))]
                     column_dict["col_type"] = geom_dict
@@ -563,10 +578,10 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
             if profile_child_node.tagName() == "table":
                 table_name = unicode(profile_child_node.attribute('name'))
                 table_descrpt = unicode(profile_child_node.attribute(
-                                        'fullname'))
+                    'fullname'))
                 self.table_list.append(table_descrpt)
                 table_shortname = unicode(profile_child_node.attribute(
-                                    'fullname'))
+                    'fullname'))
                 self.table_list.append(table_shortname)
                 columns_nodes = profile_child_node.childNodes()
                 self._set_table_columns(table_name, columns_nodes)
@@ -578,7 +593,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                 for relation in v:
                     lookup = "check_{0}_document_type".format(relation[0])
                     lookup_code = {"G": "General"}
-                    self.lookup_dict[lookup] =\
+                    self.lookup_dict[lookup] = \
                         lookup_code
                     self.check_doc_relation_lookup_dict[relation[0]] = lookup
 
@@ -599,7 +614,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                 self.version = unicode(child_node.attribute('version'))
 
             if child_node.tagName() == "profile":
-                profile = unicode(child_node.attribute('name')).\
+                profile = unicode(child_node.attribute('name')). \
                     replace(" ", "_")
                 profile_child_nodes = child_node.childNodes()
                 self._set_table_attributes(profile_child_nodes)
@@ -617,7 +632,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
         """
         self.progress.progress_message('Creating STDM 1.4 configuration file', '')
         self.config_file = QFile(os.path.join(self.file_handler.localPath(),
-                                 config_file_name))
+                                              config_file_name))
 
         if not self.config_file.open(QIODevice.ReadWrite | QIODevice.Truncate |
                                      QIODevice.Text):
@@ -684,9 +699,8 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                         c_child_node = c_child_nodes.item(0).toElement()
                         if c_child_node.tagName() == "Profile":
                             # remove if the same profile name exists
-                            if child_node.attribute('name') ==\
+                            if child_node.attribute('name') == \
                                     c_child_node.attribute('name'):
-
                                 config_root.removeChild(c_child_node)
                     # Insert at the top of the configuration
                     first_c_child_node = c_child_nodes.item(0).toElement()
@@ -707,7 +721,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
         sp_party_dict = OrderedDict()
         new_relation = []
         if relation_values:
-                new_relation = [relation_values[0][0], relation_values[1][0]]
+            new_relation = [relation_values[0][0], relation_values[1][0]]
         if self.spatial_unit_table:
             for sp_table in self.spatial_unit_table:
                 if sp_table in new_relation:
@@ -791,7 +805,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                         entities.setAttribute("createId", "True")
 
                         # Adds supporting document check
-                        for k, v in self.check_doc_relation_lookup_dict.\
+                        for k, v in self.check_doc_relation_lookup_dict. \
                                 iteritems():
                             if k == entity_key:
                                 entities.setAttribute("documentTypeLookup", v)
@@ -816,13 +830,13 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                                 elif col_k == "col_type":
                                     if isinstance(col_v, dict):
                                         for k, v in COLUMN_PROPERTY_DICT[
-                                            'GEOMETRY'].\
-                                                    iteritems():
-                                                column.setAttribute(k, v)
+                                            'GEOMETRY']. \
+                                                iteritems():
+                                            column.setAttribute(k, v)
                                         column.setAttribute("TYPE_INFO",
                                                             "GEOMETRY")
                                         geometry = self.doc_old.createElement(
-                                                    "Geometry")
+                                            "Geometry")
                                         geometry.setAttribute(
                                             "layerDisplay", "")
                                         for k, v in col_v.iteritems():
@@ -832,11 +846,11 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                                         column.setAttribute("TYPE_INFO", col_v)
                                         if COLUMN_PROPERTY_DICT[col_v]:
                                             for k, v in COLUMN_PROPERTY_DICT[
-                                                    col_v].iteritems():
+                                                col_v].iteritems():
                                                 column.setAttribute(k, v)
                                         else:
                                             for k, v in COLUMN_PROPERTY_DICT[
-                                                'DEFAULT'].\
+                                                'DEFAULT']. \
                                                     iteritems():
                                                 column.setAttribute(k, v)
 
@@ -850,7 +864,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                                     column.appendChild(relation)
                                     entity_relation_dict[attribute] = [
                                         col_v, entity_key, unicode(
-                                                    self.table_col_name)]
+                                            self.table_col_name)]
                                 if col_k == 'parent':
                                     self.parent = col_v
 
@@ -859,9 +873,9 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                                         "Relation")
                                     relation.setAttribute(
                                         "name", "fk_{0}_{1}_id_{2}_ {3}_{"
-                                        "4}".format(pref, self.parent, pref,
-                                                    entity_key,
-                                                    self.table_col_name))
+                                                "4}".format(pref, self.parent, pref,
+                                                            entity_key,
+                                                            self.table_col_name))
                                     column.appendChild(relation)
                             columns.appendChild(column)
                         entities.appendChild(columns)
@@ -876,7 +890,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
 
                         for relation in relation_values:
                             entity_relation = self.doc_old.createElement(
-                                    "EntityRelation")
+                                "EntityRelation")
                             entity_relation.setAttribute(
                                 "parent", relation[0])
                             entity_relation.setAttribute(
@@ -902,7 +916,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                         for relation in relation_values:
                             ###################################################
                             entity_relation = self.doc_old.createElement(
-                                    "EntityRelation")
+                                "EntityRelation")
                             entity_relation.setAttribute("parent", relation[0])
                             for k, v in sp_party_dict.iteritems():
                                 if k == "spatial_unit_table" and v == \
@@ -911,19 +925,19 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                                         "childColumn", "spatial_unit_id")
                                     entity_relation.setAttribute(
                                         "name", "fk_{0}_{1}_{2}_{3}_{4}_{"
-                                        "5}".format(pref, relation[0],
-                                                    relation[1], pref,
-                                                    relation_key,
-                                                    "spatial_unit_id"))
+                                                "5}".format(pref, relation[0],
+                                                            relation[1], pref,
+                                                            relation_key,
+                                                            "spatial_unit_id"))
                                 if k == "party_table" and v == \
                                         relation[0]:
                                     entity_relation.setAttribute(
                                         "childColumn", "party_id")
                                     entity_relation.setAttribute(
                                         "name", "fk_{0}_{1}_{2}_{3}_{4}_{"
-                                        "5}".format(pref, relation[0],
-                                                    relation[1], pref,
-                                                    relation_key, "party_id"))
+                                                "5}".format(pref, relation[0],
+                                                            relation[1], pref,
+                                                            relation_key, "party_id"))
                             entity_relation.setAttribute(
                                 'displayColumns', relation[3])
                             entity_relation.setAttribute(
@@ -934,29 +948,29 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
 
                             ##################################################
                             entity_relation = self.doc_old.createElement(
-                                    "EntityRelation")
+                                "EntityRelation")
                             entity_relation.setAttribute(
                                 "parent", "check_" + relation[0] +
                                           "_document_type")
                             entity_relation.setAttribute(
                                 "child", relation[0] + "_supporting_document")
                             entity_relation.setAttribute(
-                                    "name", "fk_" + pref + "_check_" +
-                                            relation[0] +
-                                    "_document_type_id_" + pref + "_" +
-                                            relation[0]
-                                    + "_supporting_document_document_type")
+                                "name", "fk_" + pref + "_check_" +
+                                        relation[0] +
+                                        "_document_type_id_" + pref + "_" +
+                                        relation[0]
+                                        + "_supporting_document_document_type")
                             entity_relation.setAttribute(
                                 'displayColumns', relation[3])
                             entity_relation.setAttribute(
                                 "parentColumn", "id")
                             entity_relation.setAttribute(
-                                    "childColumn", "document_type")
+                                "childColumn", "document_type")
                             relationship.appendChild(entity_relation)
 
                             ##################################################
                             entity_relation = self.doc_old.createElement(
-                                    "EntityRelation")
+                                "EntityRelation")
                             entity_relation.setAttribute(
                                 "parent", relation[0])
                             entity_relation.setAttribute(
@@ -970,8 +984,8 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                                         "name", "fk_" + pref + "_" +
                                                 relation[0] + "_" +
                                                 relation[1] + "_" + pref +
-                                        "_" + relation[0] +
-                                        "_supporting_document_" +
+                                                "_" + relation[0] +
+                                                "_supporting_document_" +
                                                 "spatial_unit_id")
                                 if k == "party_table" and v == \
                                         relation[0]:
@@ -982,31 +996,31 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                                                 relation[0] +
                                                 "_" + relation[1] + "_" +
                                                 pref + "_" + relation[0] +
-                                        "_supporting_document_" + "party_id")
+                                                "_supporting_document_" + "party_id")
                             entity_relation.setAttribute(
                                 'displayColumns', relation[3])
                             entity_relation.setAttribute(
-                                    "parentColumn", "id")
+                                "parentColumn", "id")
                             relationship.appendChild(entity_relation)
 
                             ##################################################
                             entity_relation = self.doc_old.createElement(
-                                    "EntityRelation")
+                                "EntityRelation")
                             entity_relation.setAttribute(
-                                        "parent",  "supporting_document")
+                                "parent", "supporting_document")
                             entity_relation.setAttribute(
                                 "child", relation[0] + "_supporting_document")
                             entity_relation.setAttribute(
-                                    "name", "fk_" + pref +
-                                    "_supporting_document_id_" + pref +
-                                    "_" + relation[0] +
-                                    "_supporting_document_supporting_doc_id")
+                                "name", "fk_" + pref +
+                                        "_supporting_document_id_" + pref +
+                                        "_" + relation[0] +
+                                        "_supporting_document_supporting_doc_id")
                             entity_relation.setAttribute(
                                 'displayColumns', relation[3])
                             entity_relation.setAttribute(
                                 "parentColumn", "id")
                             entity_relation.setAttribute(
-                                    "childColumn", "supporting_doc_id")
+                                "childColumn", "supporting_doc_id")
                             relationship.appendChild(entity_relation)
 
                 # Default relations
@@ -1089,7 +1103,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                 if entity_relation_dict:
                     for k, v in entity_relation_dict.iteritems():
                         entity_relation = self.doc_old.createElement(
-                                "EntityRelation")
+                            "EntityRelation")
                         entity_relation.setAttribute("parent", v[0])
                         entity_relation.setAttribute("displayColumns", "")
                         entity_relation.setAttribute("child", v[1])
@@ -1117,7 +1131,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                                                    sp_party_dict[
                                                        'spatial_unit_table'])
                         social_tenure.setAttribute("party", sp_party_dict[
-                                                       'party_table'])
+                            'party_table'])
 
                 profile_element.appendChild(social_tenure)
 
@@ -1155,8 +1169,8 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                 profile_element.setAttribute("description", "")
                 profile_element.setAttribute("name", config_profile)
                 profile_element = self._create_entity_valuelist_relation_nodes(
-                                    conf_prefix, config_profile,
-                                    profile_element, values)
+                    conf_prefix, config_profile,
+                    profile_element, values)
                 config.appendChild(profile_element)
 
         return config
@@ -1172,7 +1186,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
 
         # Create profile valuelists and entity nodes
         config = self._create_profile_value_lists_entity_nodes(
-                    self.entities_lookup_relations, configuration)
+            self.entities_lookup_relations, configuration)
 
         # configuration.appendChild(config)
 
@@ -1202,7 +1216,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                     # If the paths are not filled still,
                     # leave the upgrade process
                     if source_documents_path() is None or \
-                                    composer_template_path() is None:
+                            composer_template_path() is None:
                         self.reg_config.write(
                             {CONFIG_UPDATED: '-1'}
                         )
@@ -1214,7 +1228,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                 )
                 self.new_data_folder_path = source_documents_path()
 
-                #self.append_log('stdmConfig.xml exists')
+                # self.append_log('stdmConfig.xml exists')
                 self.config_updated_dic = self.reg_config.read(
                     [CONFIG_UPDATED]
                 )
@@ -1258,7 +1272,6 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                     # fix issue #143
                     delete_table_data('content_roles')
                     delete_table_data('content_base')
-
 
                     return self.upgrade
 
@@ -1345,8 +1358,8 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
         )
 
         if self.text_template.text() != '' and \
-                        self.text_document.text() != '' and \
-                        self.text_output.text() != '':
+                self.text_document.text() != '' and \
+                self.text_output.text() != '':
             self.notice.clear()
             self.notice.insertSuccessNotification(success)
             # Commit document path to registry
@@ -1474,7 +1487,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                     profile_child_nodes = child_node.childNodes()
 
                     for profile_i in range(profile_child_nodes.count()):
-                        profile_nodes = profile_child_nodes.item(profile_i).\
+                        profile_nodes = profile_child_nodes.item(profile_i). \
                             toElement()
                         if profile_nodes.tagName() == "ValueLists":
                             value_list_nodes = profile_nodes.childNodes()
@@ -1494,8 +1507,8 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                                         for code_v_i in range(
                                                 code_value_nodes.count()):
                                             code_value_node = \
-                                                    code_value_nodes.item(
-                                                        code_v_i).toElement()
+                                                code_value_nodes.item(
+                                                    code_v_i).toElement()
                                             code_value = unicode(
                                                 code_value_node.attribute(
                                                     'value'))
@@ -1518,7 +1531,6 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
 
                                         if missing_lookup not in \
                                                 code_values_lists:
-
                                             value_list_node.appendChild(
                                                 code_value)
 
@@ -1573,7 +1585,7 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                         if missing_lookup is None:
                             value[lookup_col_index] = None
                         else:
-                            if isinstance(missing_lookup, int) or missing_lookup\
+                            if isinstance(missing_lookup, int) or missing_lookup \
                                     is None:
                                 pass
                             else:
@@ -1614,13 +1626,13 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                 if not isinstance(data, int) and data is not None and not \
                         isinstance(data, datetime.date):
 
-                        if data.find("\'") is not -1:
-                            data = unicode(data)
-                            data = data.replace("'", "`")
+                    if data.find("\'") is not -1:
+                        data = unicode(data)
+                        data = data.replace("'", "`")
 
-                            inner_data_list.append(data)
-                        else:
-                            inner_data_list.append(data)
+                        inner_data_list.append(data)
+                    else:
+                        inner_data_list.append(data)
 
                 elif isinstance(data, datetime.date):
                     data = data.strftime('%Y-%m-%d')
@@ -1718,13 +1730,13 @@ class ConfigurationFileUpdater(QDialog, Ui_UpgradePaths):
                             new_values = unicode(new_values).replace("[", "(")
                             new_values = unicode(new_values).replace("]", ")")
                             new_values = unicode(new_values).replace("None",
-                                                                 "NULL")
+                                                                     "NULL")
 
                         # Remove Unicode
                         values = new_values.replace("u\'", "\'")
                         column_keys = ",".join(new_keys)
                         if not import_data(social_tenure_table, column_keys,
-                                       values):
+                                           values):
                             pass
                         else:
                             fix_sequence(social_tenure_table)

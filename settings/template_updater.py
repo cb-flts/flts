@@ -29,7 +29,7 @@ import xml.etree.ElementTree as ET
 from PyQt4.QtXml import QDomDocument
 from PyQt4.QtCore import QFile, QIODevice
 from PyQt4.QtGui import (
-    QApplication,  QMessageBox
+    QApplication, QMessageBox
 )
 
 from qgis.utils import (
@@ -54,6 +54,7 @@ from stdm.data.configuration.stdm_configuration import StdmConfiguration
 
 from config_file_updater import ConfigurationFileUpdater
 
+
 class TemplateFileHandler:
     def __init__(self):
         """
@@ -73,7 +74,7 @@ class TemplateFileHandler:
         """
         os.chdir(self.template_path)
         for file in glob.glob('*.sdt'):
-           self.templates.append(file)
+            self.templates.append(file)
 
     def template_file_path(self, template):
         """
@@ -137,7 +138,6 @@ class TemplateFileHandler:
             'it is being used by another process'
         )
 
-
         if os.path.exists(old_path):
             try:
                 dir_util.copy_tree(old_path, self.template_path)
@@ -150,6 +150,7 @@ class TemplateFileHandler:
                 self.updater.append_log(str(ex))
             except Exception as ex:
                 self.updater.append_log(str(ex))
+
 
 class TemplateContentReader(
     TemplateFileHandler
@@ -258,12 +259,12 @@ class TemplateContentReader(
                         attrs.item(j).nodeValue()
 
                 if 'View' in value.values() or \
-                                'view' in value.values():
+                        'view' in value.values():
 
                     return 'view', value['name']
 
                 elif 'Table' in value.values() or \
-                                'table' in value.values():
+                        'table' in value.values():
                     return 'table', value['name']
 
 
@@ -304,9 +305,9 @@ class TemplateViewHandler:
         """
         if view in pg_views():
             t = text('SELECT definition '
-                'FROM pg_views '
-                'WHERE viewname=:view_name;'
-            )
+                     'FROM pg_views '
+                     'WHERE viewname=:view_name;'
+                     )
 
             result = _execute(t, view_name=view)
 
@@ -408,9 +409,9 @@ class TemplateViewHandler:
                 if '{},'.format(table_col) in view_definition:
 
                     select_value = '(SELECT {0}.value ' \
-                       'FROM {0} ' \
-                       'WHERE {0}.id =' \
-                       ' {1}) AS {2},'.format(
+                                   'FROM {0} ' \
+                                   'WHERE {0}.id =' \
+                                   ' {1}) AS {2},'.format(
                         lookup_table,
                         table_col,
                         column
@@ -424,9 +425,9 @@ class TemplateViewHandler:
                                    'FROM {0} ' \
                                    'WHERE {0}.id =' \
                                    ' {1})'.format(
-                                        lookup_table,
-                                        table_col
-                                    )
+                        lookup_table,
+                        table_col
+                    )
                     view_definition = view_definition.replace(
                         ', {}'.format(table_col), select_value
                     )
@@ -447,17 +448,17 @@ class TemplateViewHandler:
                 # if the join has braces
                 if ') ORDER BY CASE' in view_definition:
                     order_statement = ' JOIN {0} ON ' \
-                        '({0}.id = {1})) ' \
-                        'ORDER BY CASE {0}.value WHEN'.format(
-                            lookup_table, table_col
-                        )
+                                      '({0}.id = {1})) ' \
+                                      'ORDER BY CASE {0}.value WHEN'.format(
+                        lookup_table, table_col
+                    )
                     view_definition = view_definition.replace(
                         ') ORDER BY CASE {} WHEN'.format(table_col),
                         order_statement
                     )
                 # if the join has no braces
                 elif ') ORDER BY CASE' not in view_definition and \
-                                'ORDER BY CASE' in view_definition:
+                        'ORDER BY CASE' in view_definition:
                     order_statement = ' JOIN {0} ON ' \
                                       '({0}.id = {1}) ' \
                                       'ORDER BY CASE {0}.value WHEN'.format(
@@ -540,8 +541,6 @@ class TemplateViewHandler:
                     ' {}'.format(old), ' {}'.format(old)
                 )
 
-
-
             text = text.replace(
                 ' {} '.format(old), ' {} '.format(new)
             )
@@ -604,7 +603,6 @@ class TemplateFileUpdater(
         TemplateContentReader.__init__(self)
         TemplateViewHandler.__init__(self, old_new_tables)
 
-
         self.prog = progress
         # self.prog.overall_progress(
         #     'Updating Templates...',
@@ -613,7 +611,6 @@ class TemplateFileUpdater(
         # self.prog.show()
         self.old_new_cols_list = []
         self.plugin_dir = plugin_dir
-
 
     def update_template(
             self, template, old_source, new_source, ref_table=None
@@ -663,7 +660,6 @@ class TemplateFileUpdater(
                     # update the DataSource name if
                     #  still using old_source
                     if elem.attrib['name'] == old_source:
-
                         elem.attrib['name'] = elem.attrib['name'].replace(
                             old_source, new_source
                         )
@@ -671,14 +667,12 @@ class TemplateFileUpdater(
                         elem, old_new_cols
                     )
 
-
             other_old_new_col_dic = {
                 k: v
                 for old_new in self.old_new_cols_list
                 for k, v in old_new.items()
-                }
+            }
             if len(other_old_new_col_dic) > 0:
-
                 old_new_cols.update(
                     other_old_new_col_dic
                 )
@@ -767,7 +761,7 @@ class TemplateFileUpdater(
                         elem.attrib[key] = old_table
 
             # replace static items in QGIS directory
-            #If svg files are used, replace them with the new version
+            # If svg files are used, replace them with the new version
             qgis_path = QgsApplication.prefixPath().rstrip('.')
             self.update_path_items(
                 elem,
@@ -916,7 +910,6 @@ class TemplateFileUpdater(
             for key, value in child.attrib.iteritems():
                 ref_old_new_cols = None
                 if key == 'table':
-
                     ref_old_new_cols = self.update_table(
                         key, child
                     )
@@ -1039,7 +1032,6 @@ class TemplateFileUpdater(
 
         else:
             self.prog.progress_message('Skipping', template)
-
 
     def process_update(self, force_update=False):
         """

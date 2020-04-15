@@ -1,16 +1,18 @@
 import copy
 from stdm.data.pg_utils import (
-       pg_table_exists,
-       _execute
-       )
+    pg_table_exists,
+    _execute
+)
+
 
 class PrivilegeProvider(object):
-    Privileges = {'Create':'INSERT','Select':'SELECT','Update':'UPDATE','Delete':'DELETE'}
+    Privileges = {'Create': 'INSERT', 'Select': 'SELECT', 'Update': 'UPDATE', 'Delete': 'DELETE'}
+
     def __init__(self, content_name, profile=None):
         self.content_name = content_name
         self.content_short_name = self.fmt_short_name(self.content_name)
         self.related_contents = {}
-        self.profile = profile 
+        self.profile = profile
         self.base_table_roles = self.get_base_table_roles()
 
     def fmt_short_name(self, name):
@@ -32,8 +34,8 @@ class PrivilegeProvider(object):
 
     def base_roles(self, table_name):
         results = set()
-        sql = "Select grantee from information_schema.role_table_grants "\
-                "where table_name = '{}' ".format(table_name)
+        sql = "Select grantee from information_schema.role_table_grants " \
+              "where table_name = '{}' ".format(table_name)
         records = _execute(sql)
 
         for record in records:
@@ -42,7 +44,7 @@ class PrivilegeProvider(object):
         return results
 
     def get_base_table_roles(self):
-        base_tables =  ['content_base', 'content_roles', 'role']
+        base_tables = ['content_base', 'content_roles', 'role']
         table_roles = {}
         for bt in base_tables:
             roles = self.base_roles(bt)
@@ -71,12 +73,12 @@ class SinglePrivilegeProvider(PrivilegeProvider):
 
     def fmt_short_name(self, name):
         if name.find(' ') > 0:
-            return name[name.index(' ')+1:]  #.replace(' ','_')
+            return name[name.index(' ') + 1:]  # .replace(' ','_')
         else:
             return name
 
     def grant_privilege_base_table(self, role):
-        base_tables =  ['content_base', 'content_roles', 'role']
+        base_tables = ['content_base', 'content_roles', 'role']
         for bt in base_tables:
             if not role in self.base_table_roles[bt]:
                 self.grant_or_revoke('GRANT', 'SELECT', bt, role)
@@ -109,7 +111,7 @@ class MultiPrivilegeProvider(PrivilegeProvider):
         self.populate_roles()
 
     def fmt_short_name(self, name):
-        return name.replace(' ','_')
+        return name.replace(' ', '_')
 
     def add_related_content(self, column_name, content):
         self.related_contents[column_name] = content
@@ -122,18 +124,18 @@ class MultiPrivilegeProvider(PrivilegeProvider):
         roles['manager'] = ['Select', 'Create']
         """
         stmt = "SELECT content_base.id, content_base.name AS content, " \
-                         "content_roles.role_id, role.name AS role " \
-                   " FROM content_base, content_roles, role " \
-                  " WHERE content_roles.role_id = role.id " \
-                    " AND content_base.id = content_roles.content_base_id " \
-                    " AND content_base.name like '%%{}' " \
-                  " ORDER BY role.name ".format(self.content_name)
+               "content_roles.role_id, role.name AS role " \
+               " FROM content_base, content_roles, role " \
+               " WHERE content_roles.role_id = role.id " \
+               " AND content_base.id = content_roles.content_base_id " \
+               " AND content_base.name like '%%{}' " \
+               " ORDER BY role.name ".format(self.content_name)
 
         records = _execute(stmt)
         for row in records:
             content = row['content']
             role = row['role']
-            if role == 'postgres':continue
+            if role == 'postgres': continue
             if role not in self.roles:
                 self.roles[role] = []
             self.roles[role].append(content[:content.index(' ')])
@@ -144,9 +146,8 @@ class MultiPrivilegeProvider(PrivilegeProvider):
                 privilege = PrivilegeProvider.Privileges[p]
                 temp_content = ''
                 for related_content in self.related_contents.values():
-                    if temp_content == related_content:continue
+                    if temp_content == related_content: continue
                     if pg_table_exists(related_content):
                         temp_content = related_content
                         self.grant_or_revoke(operation, privilege, related_content, role)
                         self.grant_or_revoke(operation, 'SELECT', related_content, role)
-

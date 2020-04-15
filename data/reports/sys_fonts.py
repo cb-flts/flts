@@ -21,7 +21,7 @@ class SysFonts:
 
     def __init__(self):
         self.reg = ttffiles.Registry()
-        if fontCachePath() == None:
+        if fontCachePath() is None:
             return
         self.reg.load(fontCachePath())
 

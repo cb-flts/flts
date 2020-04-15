@@ -1,4 +1,3 @@
-
 """
 /***************************************************************************
 Name                 : Config
@@ -31,6 +30,7 @@ from stdm.data.configuration.profile import Profile
 
 LOGGER = logging.getLogger('stdm')
 
+
 @Singleton
 class StdmConfiguration(QObject):
     """
@@ -58,7 +58,7 @@ class StdmConfiguration(QObject):
         for p in self.profiles.values():
             for e in p.entities.values():
                 if e.TYPE_INFO == 'VALUE_LIST':
-                        count += len(e.values.values())
+                    count += len(e.values.values())
                 count += len(e.columns)
             count += len(p.entities)
         count += len(self.profiles)
@@ -95,7 +95,7 @@ class StdmConfiguration(QObject):
             if self.is_null:
                 self.is_null = False
 
-            #Raise profile_added signal
+            # Raise profile_added signal
             self.profile_added.emit(profile)
 
     def create_profile(self, name):
@@ -129,11 +129,11 @@ class StdmConfiguration(QObject):
         if len(self.profiles) == 0:
             self.is_null = True
 
-        #Remove all references for the profile using the clone object
+        # Remove all references for the profile using the clone object
         if not del_profile is None:
             del_profile.on_delete()
 
-        #Add to the list of removed profiles
+        # Add to the list of removed profiles
         self._removed_profiles.append(del_profile)
 
         LOGGER.debug('%s profile removed.', name)
@@ -194,4 +194,3 @@ class StdmConfiguration(QObject):
         """
         self.profiles = OrderedDict()
         self.is_null = True
-

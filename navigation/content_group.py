@@ -19,12 +19,12 @@ email                : gkahiu@gmail.com
 import hashlib
 
 from PyQt4.QtGui import QApplication
-from PyQt4.QtCore import pyqtSignal,QObject
+from PyQt4.QtCore import pyqtSignal, QObject
 
 from sqlalchemy import (
-        Table,
-        and_
-        )
+    Table,
+    and_
+)
 
 from stdm.data.database import (
     Content,
@@ -38,29 +38,30 @@ from stdm.utils.hashable_mixin import HashableMixin
 
 __all__ = ["ContentGroup,TableContentGroup"]
 
-class ContentGroup(QObject,HashableMixin):
+
+class ContentGroup(QObject, HashableMixin):
     """
     Groups related content items together.
     """
     contentAuthorized = pyqtSignal(Content)
-    
-    def __init__(self,username,containerItem = None,parent = None):
+
+    def __init__(self, username, containerItem=None, parent=None):
         from stdm.security.authorization import Authorizer
 
-        QObject.__init__(self,parent)
+        QObject.__init__(self, parent)
         HashableMixin.__init__(self)
         self._username = username
         self._contentItems = []
         self._authorizer = Authorizer(self._username)
         self._containerItem = containerItem
-        
-    def hasPermission(self,content):
+
+    def hasPermission(self, content):
         """
         Checks whether the currently logged in user has permissions to access
         the given content item.
         """
         return self._authorizer.CheckAccess(content.code)
-    
+
     @staticmethod
     def contentItemFromQAction(qAction):
         """
@@ -68,49 +69,49 @@ class ContentGroup(QObject,HashableMixin):
         """
         cnt = Content()
         cnt.name = qAction.text()
-        
+
         return cnt
-    
+
     def contentItems(self):
         """
         Returns a list of content items in the group.
         """
         return self._contentItems
-    
-    def addContent(self,name,code):
+
+    def addContent(self, name, code):
         """
         Create a new Content item and add it to the collection.
         """
         cnt = Content()
         cnt.name = name
         cnt.code = code
-        
+
         self._contentItems.append(cnt)
-        
-    def addContentItems(self,contents):
+
+    def addContentItems(self, contents):
         """
         Append list of content items to the group's collection.
         """
         self._contentItems.extend(contents)
-        
-    def addContentItem(self,content):
+
+    def addContentItem(self, content):
         """
         Adds a Content instance to the collection.
         """
         self._contentItems.append(content)
-    
-    def setContainerItem(self,containerItem):
+
+    def setContainerItem(self, containerItem):
         """
         ContainerItem can be a QAction, QListWidgetItem, etc. that can be associated with the group.
         """
         self._containerItem = containerItem
-        
+
     def containerItem(self):
         """
         Returns an instance of a ContainerItem associated with this group.
         """
         return self._containerItem
-    
+
     def checkContentAccess(self):
         """
         Asserts whether each content item(s) in the group has access permissions.
@@ -119,15 +120,15 @@ class ContentGroup(QObject,HashableMixin):
         Those items which have been granted permission will be returned in a list.
         """
         allowedContent = []
-        
+
         for c in self.contentItems():
             hasPerm = self.hasPermission(c)
             if hasPerm:
                 allowedContent.append(c)
                 self.contentAuthorized.emit(c)
-            
+
         return allowedContent
-    
+
     def hash_code(self, name):
         ht = hashlib.sha1(name.encode('utf-8'))
         return ht.hexdigest()
@@ -137,11 +138,11 @@ class ContentGroup(QObject,HashableMixin):
         Registers the content items into the database. Registration only works for a 
         postgres user account.
         """
-        PG_ACCOUNT = "postgres"   
-        
+        PG_ACCOUNT = "postgres"
+
         if self._username == PG_ACCOUNT:
             for c in self.contentItems():
-                if isinstance(c,Content):
+                if isinstance(c, Content):
                     cnt = Content()
                     qo = cnt.queryObject()
 
@@ -153,37 +154,36 @@ class ContentGroup(QObject,HashableMixin):
 
                     cn = qo.filter(Content.code == code).first()
 
-                    #If content not found then add
+                    # If content not found then add
                     if cn is None:
-                        #Check if the 'postgres' role is defined, if not then create one
+                        # Check if the 'postgres' role is defined, if not then create one
                         rl = Role()
                         rolequery = rl.queryObject()
                         role = rolequery.filter(Role.name == PG_ACCOUNT).first()
-                        
+
                         if role is None:
                             rl.name = PG_ACCOUNT
                             rl.contents = [c]
-                            rl.save()                     
+                            rl.save()
                         else:
                             existingContents = role.contents
-                            #Append new content to existing 
+                            # Append new content to existing
                             if c.code is None:
-                                c.code = code 
+                                c.code = code
 
-                            if len([e_cont for e_cont in existingContents if e_cont.name ==  c.name])==0:
+                            if len([e_cont for e_cont in existingContents if e_cont.name == c.name]) == 0:
                                 existingContents.append(c)
                                 role.contents = existingContents
                                 role.update()
         else:
             for c in self.contentItems():
-                if isinstance(c,Content):
+                if isinstance(c, Content):
                     cnt = Content()
                     qo = cnt.queryObject()
                     cn = qo.filter(Content.name == c.name).first()
                     c.code = cn.code
 
 
-            
 class TableContentGroup(ContentGroup):
     """
     For grouping CRUD operations for a specific model corresponding
@@ -193,12 +193,12 @@ class TableContentGroup(ContentGroup):
     read_op = QApplication.translate("DatabaseContentGroup", "Select")
     update_op = QApplication.translate("DatabaseContentGroup", "Update")
     delete_op = QApplication.translate("DatabaseContentGroup", "Delete")
-    
-    def __init__(self, username, groupName, action = None):
-        ContentGroup.__init__(self,username,action)
+
+    def __init__(self, username, groupName, action=None):
+        ContentGroup.__init__(self, username, action)
         self._groupName = groupName
         self._createDbOpContent()
-        
+
     def _createDbOpContent(self):
         """
         Create content for database operations.
@@ -207,97 +207,69 @@ class TableContentGroup(ContentGroup):
         self._createCnt = Content()
         self._createCnt.name = self._buildName(self.create_op)
         self.addContentItem(self._createCnt)
-        
+
         self._readCnt = Content()
         self._readCnt.name = self._buildName(self.read_op)
         self.addContentItem(self._readCnt)
-        
+
         self._updateCnt = Content()
         self._updateCnt.name = self._buildName(self.update_op)
         self.addContentItem(self._updateCnt)
-        
+
         self._deleteCnt = Content()
         self._deleteCnt.name = self._buildName(self.delete_op)
         self.addContentItem(self._deleteCnt)
-        
-    def _buildName(self,contentName):
+
+    def _buildName(self, contentName):
         """
         Appends group name to the content name
         """
         return u"{0} {1}".format(contentName, self._groupName)
-        
+
     def createContentItem(self):
         """
         Returns Create content item.
         """
         return self._createCnt
-    
+
     def readContentItem(self):
         """
         Returns Read/Select content item.
         """
         return self._readCnt
-    
+
     def updateContentItem(self):
         """
         Returns Update content item.
         """
         return self._updateCnt
-    
+
     def deleteContentItem(self):
         """
         Returns Delete content item.
         """
         return self._deleteCnt
-    
+
     def canRead(self):
         """
         Returns whether the current user has read permissions.
         """
         return self.hasPermission(self._readCnt)
-    
+
     def canCreate(self):
         """
         Returns whether the current user has create permissions.
         """
         return self.hasPermission(self._createCnt)
-    
+
     def canUpdate(self):
         """
         Returns whether the current user has update permissions.
         """
         return self.hasPermission(self._updateCnt)
-    
+
     def canDelete(self):
         """
         Returns whether the current user has delete permissions.
         """
         return self.hasPermission(self._deleteCnt)
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        

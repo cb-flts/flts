@@ -28,7 +28,7 @@ class TestProfile(TestCase):
         self.profile = add_basic_profile(self.config)
 
     def test_set_social_tenure_attr(self):
-        #Add STR entities then define the relationship.
+        # Add STR entities then define the relationship.
         set_profile_social_tenure(self.profile)
 
         valid = self.profile.social_tenure.valid()

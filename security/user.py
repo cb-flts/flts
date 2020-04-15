@@ -16,12 +16,15 @@ email                : gkahiu@gmail.com
  *                                                                         *
  ***************************************************************************/
 """
+
+
 class User(object):
     """
     Container for basic user account settings.
     'Validity' is of PyDate type
     """
-    def __init__(self,UserName,Password='',Validity = None,Approved = True):
+
+    def __init__(self, UserName, Password='', Validity=None, Approved=True):
         self.UserName = UserName
         self.Password = Password
         self.Approved = Approved

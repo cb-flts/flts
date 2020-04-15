@@ -34,6 +34,7 @@ from PyQt4.QtGui import (
 )
 
 import matplotlib
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
@@ -58,6 +59,7 @@ legend_positions = OrderedDict({
     QApplication.translate("ChartConfiguration", "Upper Center"): "upper center",
     QApplication.translate("ChartConfiguration", "Center"): "center"
 })
+
 
 class BarValueConfiguration(object):
     tag_name = "Value"
@@ -122,6 +124,7 @@ class BarValueConfiguration(object):
         bar_cfg.set_value_field(dom_element.attribute("field"))
 
         return bar_cfg
+
 
 class ChartConfiguration(LinkedTableItemConfiguration):
     tag_name = "Plot"
@@ -199,7 +202,7 @@ class ChartConfiguration(LinkedTableItemConfiguration):
         """
         return self._title
 
-    def set_title(self,title):
+    def set_title(self, title):
         """
         Set the plot _title
         :param title: Plot _title
@@ -381,7 +384,7 @@ class ChartConfiguration(LinkedTableItemConfiguration):
         else:
             self._replace_none_by_zero = True
 
-        #Set base linked table properties
+        # Set base linked table properties
         self._extract_from_dom_element(dom_element)
 
     @staticmethod
@@ -398,7 +401,7 @@ class ChartConfiguration(LinkedTableItemConfiguration):
         if not plot_type:
             return None
 
-        plot_type_config = ChartConfiguration.types.get(plot_type,None)
+        plot_type_config = ChartConfiguration.types.get(plot_type, None)
         if plot_type_config is None:
             return None
 
@@ -411,6 +414,7 @@ class ChartConfiguration(LinkedTableItemConfiguration):
         """
         return NotImplementedError("Chart handlers only supported in subclasses")
 
+
 class ChartConfigurationCollection(ConfigurationCollectionBase):
     """
     Class for managing a collection of ChartConfiguration objects.
@@ -422,21 +426,23 @@ class ChartConfigurationCollection(ConfigurationCollectionBase):
     config_root = ChartConfiguration.tag_name
     item_config = ChartConfiguration
 
+
 class ChartItemValueHandler(LinkedTableValueHandler):
     """
     For implementing common functions that can shared across subclasses.
     """
-    font_props = {'color' : '#000000',
-        'weight' : 'bold'
-        }
+    font_props = {'color': '#000000',
+                  'weight': 'bold'
+                  }
+
     def __init__(self, *args):
-        LinkedTableValueHandler.__init__(self,*args)
+        LinkedTableValueHandler.__init__(self, *args)
         self._fig, self._ax = plt.subplots()
         self._legend_items = OrderedDict()
 
-        #Clear figure and axes
-        #self.clear_figure()
-        #self.clear_axes()
+        # Clear figure and axes
+        # self.clear_figure()
+        # self.clear_axes()
 
     def add_legend_artist(self, label, artist):
         """
@@ -512,7 +518,7 @@ class ChartItemValueHandler(LinkedTableValueHandler):
         :rtype: tuple
         """
         val_arr = np.array(values)
-        #Index of items to remove
+        # Index of items to remove
         rem_idx = []
 
         if self.config_item().replace_none_by_zero():
@@ -543,16 +549,18 @@ class ChartItemValueHandler(LinkedTableValueHandler):
 
             plt.savefig(tmp_file_name, format="tif", dpi=200)
 
-            #Set path of picture item
+            # Set path of picture item
             self.composer_item().setPicturePath(tmp_file_name)
 
         else:
             raise RuntimeError("Chart item could not be rendered")
 
+
 class VerticalBarValueHandler(ChartItemValueHandler):
     """
     Handler for vertical bar graphs.
     """
+
     def set_data_source_record(self, record):
         chart_item = self.composer_item()
 
@@ -576,11 +584,11 @@ class VerticalBarValueHandler(ChartItemValueHandler):
 
         value_fields = self.config_item().value_fields()
 
-        #Append x-field to fetch x values as well
+        # Append x-field to fetch x values as well
         col_value_fields = []
         col_value_fields.extend(value_fields)
         col_value_fields.append(self.config_item().x_field())
-        column_values = col_values(col_value_fields,results)
+        column_values = col_values(col_value_fields, results)
 
         x_values = column_values[self.config_item().x_field()]
 
@@ -588,17 +596,17 @@ class VerticalBarValueHandler(ChartItemValueHandler):
         pos = np.arange(N)
         width = 0.35
 
-        #For use in setting limits along y-axis
+        # For use in setting limits along y-axis
         max_value = 0
 
-        #Add vertical bars based on bar configuration values
+        # Add vertical bars based on bar configuration values
         for i, vf in enumerate(value_fields):
             value_cfg = self.config_item().value_configuration_by_name(vf)
             if not value_cfg is None:
-                #Recode values accordingly
+                # Recode values accordingly
                 recoded_values, rem_idx = self._recode_values(column_values[vf])
 
-                #Remove values based on indexes containing invalid values
+                # Remove values based on indexes containing invalid values
                 if len(rem_idx):
                     pass
 
@@ -610,9 +618,9 @@ class VerticalBarValueHandler(ChartItemValueHandler):
                 x_delta = width * i
                 rect = self._ax.bar(pos + x_delta, field_values, width, color=value_cfg.fill_color())
 
-                #Get legend label
+                # Get legend label
                 legend_label = value_cfg.legend_name()
-                #If legend name is not defined then use the field name
+                # If legend name is not defined then use the field name
                 if not legend_label:
                     legend_label = vf
 
@@ -620,23 +628,24 @@ class VerticalBarValueHandler(ChartItemValueHandler):
 
         self.set_y_label(self.config_item().y_label())
 
-        #Centre x-tick labels
-        x_tick_pos = (width * len(value_fields))/2
+        # Centre x-tick labels
+        x_tick_pos = (width * len(value_fields)) / 2
         self._ax.set_xticks(pos + x_tick_pos)
 
         self.set_x_ticklabels(tuple(x_values))
         self.set_title(self.config_item().title())
         self._ax.set_xlabel(self.config_item().x_label(), fontdict=self.axes_font_props())
 
-        #Set limits for proper scaling of the bars along the respective axes
+        # Set limits for proper scaling of the bars along the respective axes
         self._ax.set_xlim((-0.05, len(x_values)))
         self._ax.set_ylim((0, (max_value + 0.1)))
 
-        #Insert legend if enabled
+        # Insert legend if enabled
         if self.config_item().insert_legend():
             self.insert_legend()
 
         self.render_plot()
+
 
 class VerticalBarConfiguration(ChartConfiguration):
     """
@@ -688,7 +697,7 @@ class VerticalBarConfiguration(ChartConfiguration):
     def to_dom_element(self, dom_document):
         vbar_config_el = super(VerticalBarConfiguration, self).to_dom_element(dom_document, self.plot_type)
 
-        #Append bar value configurations
+        # Append bar value configurations
         for cfg in self.value_configurations():
             cfg.to_dom_element(dom_document, vbar_config_el)
 
@@ -699,11 +708,11 @@ class VerticalBarConfiguration(ChartConfiguration):
 
     @staticmethod
     def create(dom_element):
-        #Create new instance and extract properties from dom element.
+        # Create new instance and extract properties from dom element.
         vbar_config = VerticalBarConfiguration()
         vbar_config._set_base_properties(dom_element)
 
-        #Get barconfig elements
+        # Get barconfig elements
         bar_cfg_el_lst = dom_element.elementsByTagName(BarValueConfiguration.tag_name)
         for i in range(bar_cfg_el_lst.length()):
             bar_cfg_el = bar_cfg_el_lst.item(i).toElement()
@@ -713,9 +722,5 @@ class VerticalBarConfiguration(ChartConfiguration):
 
         return vbar_config
 
+
 VerticalBarConfiguration.register()
-
-
-
-
-

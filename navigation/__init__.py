@@ -18,4 +18,4 @@ from web_spatial_loader import (
     WebSpatialLoader
 )
 from content_group import ContentGroup, TableContentGroup
-#from socialtenure import PersonNodeFormatter,BaseSTRNode, STRNode, PropertyNode, ConflictNode
+# from socialtenure import PersonNodeFormatter,BaseSTRNode, STRNode, PropertyNode, ConflictNode

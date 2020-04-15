@@ -215,8 +215,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
         self.dbl_spinbx_block_area.setSuffix(" Sq.m")
         self.dbl_spinbx_block_area.setDecimals(0)
-
-        # self._on_area_check()
         self.radio_hectares.toggled.connect(
             self._on_hectares_clicked
         )

@@ -28,6 +28,7 @@ from .pg_utils import foreign_key_parent_tables
 
 SUPPORTING_DOC_TAGS = ["supporting_document"]
 
+
 def supporting_doc_tables_regexp():
     """
     :return: Returns an instance of a Regex class for filtering supporting
@@ -36,6 +37,7 @@ def supporting_doc_tables_regexp():
     """
     doc_tables_filter = "|".join(SUPPORTING_DOC_TAGS)
     return QRegExp(doc_tables_filter)
+
 
 def supporting_doc_tables(ref_table):
     """
@@ -51,7 +53,7 @@ def supporting_doc_tables(ref_table):
     """
     doc_regexp = supporting_doc_tables_regexp()
 
-    return  foreign_key_parent_tables(ref_table, False, doc_regexp)
+    return foreign_key_parent_tables(ref_table, False, doc_regexp)
 
 
 def document_models(entity, link_column, link_value):

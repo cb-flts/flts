@@ -17,7 +17,7 @@ copyright            : (C) 2019
 """
 import datetime
 from collections import namedtuple
-from PyQt4.QtCore import (QSize, Qt,)
+from PyQt4.QtCore import (QSize, Qt, )
 from PyQt4.QtGui import (
     QApplication,
     QIcon,
@@ -34,6 +34,7 @@ class Config(object):
     """
     Workflow Manager configuration interface
     """
+
     def __init__(self):
         self._configurations = configurations
         self._parent = None
@@ -52,6 +53,7 @@ class ButtonIcons(Config):
     """
     QPushButton icons configuration interface
     """
+
     def __init__(self):
         super(ButtonIcons, self).__init__()
         self.Icon = namedtuple('Icon', ['icon', 'size'])
@@ -108,6 +110,7 @@ class CommentConfig(Config):
     """
     Comment Manager widget configuration interface
     """
+
     @property
     def columns(self):
         """
@@ -152,7 +155,7 @@ class CommentConfig(Config):
         :return: Save column values
         :rtype: List
         """
-        return self.get_data('save_columns').\
+        return self.get_data('save_columns'). \
             get('comment_save', None)
 
 
@@ -161,6 +164,7 @@ class DocumentConfig(Config):
     Scheme supporting documents table
     view configuration interface
     """
+
     @property
     def columns(self):
         """
@@ -194,6 +198,7 @@ class HolderConfig(Config):
     """
     Scheme holders table view configuration interface
     """
+
     @property
     def columns(self):
         """
@@ -228,6 +233,7 @@ class PlotImportFileConfig(Config):
     Scheme plot import file table view
     configuration interface
     """
+
     @property
     def columns(self):
         """
@@ -244,6 +250,7 @@ class PlotImportPreviewConfig(Config):
     Scheme plot import preview table view
     configuration interface
     """
+
     @property
     def columns(self):
         """
@@ -262,7 +269,7 @@ class PlotImportPreviewConfig(Config):
         :return: Save column values
         :rtype: List
         """
-        return self.get_data('save_columns').\
+        return self.get_data('save_columns'). \
             get('plot_import_save', None)
 
 
@@ -271,6 +278,7 @@ class ServitudeImportPreviewConfig(Config):
     Scheme servitude import preview table view
     configuration interface
     """
+
     @property
     def columns(self):
         """
@@ -289,7 +297,7 @@ class ServitudeImportPreviewConfig(Config):
         :return: Save column values
         :rtype: List
         """
-        return self.get_data('save_columns').\
+        return self.get_data('save_columns'). \
             get('servitude_import_save', None)
 
 
@@ -298,6 +306,7 @@ class BeaconImportPreviewConfig(Config):
     Scheme beacon import preview table view
     configuration interface
     """
+
     @property
     def columns(self):
         """
@@ -316,7 +325,7 @@ class BeaconImportPreviewConfig(Config):
         :return: Save column values
         :rtype: List
         """
-        return self.get_data('save_columns').\
+        return self.get_data('save_columns'). \
             get('beacon_import_save', None)
 
 
@@ -324,6 +333,7 @@ class PlotViewerConfig(Config):
     """
     Scheme plot viewer table view configuration interface
     """
+
     @property
     def columns(self):
         """
@@ -338,6 +348,7 @@ class BeaconViewerConfig(Config):
     """
     Scheme beacon viewer table view configuration interface
     """
+
     @property
     def columns(self):
         """
@@ -352,6 +363,7 @@ class ServitudeViewerConfig(Config):
     """
     Scheme servitude viewer table view configuration interface
     """
+
     @property
     def columns(self):
         """
@@ -375,7 +387,7 @@ class PlotSTRConfig(Config):
         :return: Save column values
         :rtype: List
         """
-        return self.get_data('save_columns').\
+        return self.get_data('save_columns'). \
             get('plot_str_save', None)
 
 
@@ -383,6 +395,7 @@ class StyleSheet(Config):
     """
     Widget style sheet interface
     """
+
     @property
     def header_style(self):
         """
@@ -397,6 +410,7 @@ class ToolbarButtonsConfig(Config):
     """
     Scheme toolbar QPushButton configuration interface
     """
+
     def __init__(self):
         super(ToolbarButtonsConfig, self).__init__()
 
@@ -414,6 +428,7 @@ class PaginationButtonsConfig(Config):
     """
     Scheme pagination QPushButton configuration interface
     """
+
     def __init__(self):
         super(PaginationButtonsConfig, self).__init__()
 
@@ -431,6 +446,7 @@ class PlotImportButtonsConfig(Config):
     """
     Scheme plot import QPushButton configuration interface
     """
+
     def __init__(self):
         super(PlotImportButtonsConfig, self).__init__()
 
@@ -448,6 +464,7 @@ class SchemeConfig(Config):
     """
     Scheme table view configuration interface
     """
+
     def __init__(self, parent=None):
         super(SchemeConfig, self).__init__()
         self._parent = parent
@@ -486,7 +503,7 @@ class SchemeConfig(Config):
         :return: Save column values
         :rtype: List
         """
-        return self.get_data('save_columns').\
+        return self.get_data('save_columns'). \
             get('scheme_save', None)
 
     @property
@@ -496,7 +513,7 @@ class SchemeConfig(Config):
         :return: Update column values
         :rtype: List
         """
-        return self.get_data('update_columns').\
+        return self.get_data('update_columns'). \
             get('scheme_update', None)
 
 
@@ -519,6 +536,7 @@ class TabIcons(Config):
     """
     QTabWidget icons configuration interface
     """
+
     def __init__(self):
         super(TabIcons, self).__init__()
 
@@ -536,6 +554,7 @@ class TableModelIcons(Config):
     """
     QAbstractTableModel icons configuration interface
     """
+
     def __init__(self):
         super(TableModelIcons, self).__init__()
 
@@ -553,6 +572,7 @@ class FilterQueryBy:
     """
     Filters query result by a column value
     """
+
     def __init__(self):
         self._profile = None
 
@@ -635,6 +655,7 @@ class EntityRecordId(Config):
     """
     Returns entity record ID
     """
+
     def __init__(self, entity_name, filters):
         super(EntityRecordId, self).__init__()
         self._entity_name = entity_name
@@ -670,6 +691,7 @@ class ColumnSettings:
     """
     Column associated properties
     """
+
     def __init__(self, name, type_, flag=None):
         self.name = name
         self.type = type_
@@ -693,8 +715,8 @@ LookUp = namedtuple(
     'LookUp',
     [
         'schemeLodgement', 'schemeEstablishment', 'firstExamination',
-        'secondExamination', 'thirdExamination', 'importPlot', 'APPROVAL_STATUS',
-        'WORKFLOW', 'WORKFLOW_COLUMN', 'APPROVAL_COLUMN', 'APPROVED',
+        'secondExamination', 'thirdExamination', 'importPlot',
+        'APPROVAL_STATUS', 'WORKFLOW', 'WORKFLOW_COLUMN', 'APPROVAL_COLUMN', 'APPROVED',
         'PENDING', 'DISAPPROVED', 'HELD', 'CHECK', 'STATUS',
         'SCHEME_COLUMN', 'SCHEME_NUMBER', 'COMMENT_COLUMN', 'VIEW_PDF'
     ]

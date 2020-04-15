@@ -24,28 +24,20 @@ from qgis.core import (
 
 from stdm.utils.reverse_dict import ReverseDict
 
+
 def pg_layerNamesIDMapping():
-    '''
+    """
     Returns a dictionary containing the original table names and corresponding layer IDs in the
     QGIS legend for only those layers from a postgres database.
-    '''
+    """
     mapping = ReverseDict()
     layers = QgsMapLayerRegistry.instance().mapLayers()
-    
-    for name,layer in layers.iteritems():
+
+    for name, layer in layers.iteritems():
         if hasattr(layer, 'dataProvider'):
             if layer.dataProvider().name() == 'postgres':
                 layerConnStr = layer.dataProvider().dataSourceUri()
                 dataSourceURI = QgsDataSourceURI(layerConnStr)
                 mapping[dataSourceURI.table()] = layer.id()
-    
+
     return mapping
-    
-    
-    
-    
-    
-    
-    
-    
-    

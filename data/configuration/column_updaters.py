@@ -60,9 +60,9 @@ def _base_col_attrs(col):
     :rtype: dict
     """
     col_attrs = {}
-    #col_attrs['index'] = col.index
+    # col_attrs['index'] = col.index
     col_attrs['nullable'] = not col.mandatory
-    #col_attrs['unique'] = col.unique
+    # col_attrs['unique'] = col.unique
 
     return col_attrs
 
@@ -196,13 +196,13 @@ def _update_col(column, table, data_type, columns):
 
 
 def _clear_ref_in_entity_relations(column):
-    #Check if the column is referenced by entity relation objects and delete.
+    # Check if the column is referenced by entity relation objects and delete.
     child_relations = column.child_entity_relations()
     parent_relations = column.parent_entity_relations()
 
     referenced_relations = child_relations + parent_relations
 
-    #Flag profile to remove entity relations that reference the given column
+    # Flag profile to remove entity relations that reference the given column
     for er in referenced_relations:
         column.profile.remove_relation(er.name)
 
@@ -325,6 +325,7 @@ def geometry_updater(column, table, columns):
     return _update_col(column, table, Geometry(geometry_type=geom_type,
                                                srid=column.srid),
                        columns)
+
 
 def yes_no_updater(column, table, columns):
     """

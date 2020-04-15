@@ -9,7 +9,7 @@ from PyQt4.QtCore import (
 from qgis.core import QgsApplication
 from qgis.gui import QgsMapCanvas
 
-#Static variable used to hold hand to running QGIS app
+# Static variable used to hold hand to running QGIS app
 QGIS_APP = None
 CANVAS = None
 PARENT = None
