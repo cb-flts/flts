@@ -33,6 +33,7 @@ from stdm.settings.registryconfig import (
     RegistryConfig,
     SHOW_SHORTCUT_DIALOG
 )
+from stdm.settings.search_config import SearchConfigurationRegistry
 
 from .ui_user_shortcut import Ui_UserShortcutDialog
 from ..notification import NotificationBar,ERROR
@@ -95,6 +96,15 @@ class UserShortcutDialog(QDialog, Ui_UserShortcutDialog):
             self.accepted = True
             return False
 
+    @property
+    def search_item_prefix(self):
+        """
+        :return: Returns a prefix code to be appended in search-related
+        QListWidgetItems.
+        :rtype: str
+        """
+        return 'SRCH_'
+
     def show_dialog(self):
         """
         Show shortcut dialog after login if the user has never
@@ -151,10 +161,6 @@ class UserShortcutDialog(QDialog, Ui_UserShortcutDialog):
             QIcon(':/plugins/stdm/images/icons/flts_revision.png'),
             self.tr('Revision')
         )
-        self.lsi_sch_search = QListWidgetItem(
-            QIcon(':/plugins/stdm/images/icons/flts_scheme_management_search.png'),
-            self.tr('Search')
-        )
         self.lsi_import_plots = QListWidgetItem(
             QIcon(':/plugins/stdm/images/icons/flts_scheme_import_plot.png'),
             self.tr('Import Plots')
@@ -195,9 +201,6 @@ class UserShortcutDialog(QDialog, Ui_UserShortcutDialog):
         self.lsi_second_examination.setData(Qt.UserRole, 'EXM2_SCM')
         self.lsi_third_examination.setData(Qt.UserRole, 'EXM3_SCM')
         self.lsi_import_plots.setData(Qt.UserRole, 'PLT_SCM')
-        self.lsi_sch_search.setData(Qt.UserRole, 'SRC_SCM')
-        self.lsi_search_holder.setData(Qt.UserRole, 'SRC_HLD')
-        self.lsi_search_plot.setData(Qt.UserRole, 'SRC_PLT')
         self.lsi_print_certificate.setData(Qt.UserRole, 'P_CRT')
         self.lsi_scan_certificate.setData(Qt.UserRole, 'S_CRT')
         self.lsi_scheme_notification.setData(Qt.UserRole, 'NTF_SCM')
@@ -212,18 +215,32 @@ class UserShortcutDialog(QDialog, Ui_UserShortcutDialog):
         self._scheme_items.append(self.lsi_third_examination)
         self._scheme_items.append(self.lsi_import_plots)
         self._scheme_items.append(self.lsi_scheme_notification)
-        self._scheme_items.append(self.lsi_sch_search)
 
         # Certificate items
         self._certificate_items.append(self.lsi_print_certificate)
         self._certificate_items.append(self.lsi_scan_certificate)
 
-        # Search items
-        self._search_items.append(self.lsi_search_plot)
-        self._search_items.append(self.lsi_search_holder)
+        # Search items adapted from items in the registry
+        self._search_items = self._search_list_items()
 
         # Report items
         self._report_items.append(self.lsi_report)
+
+    def _search_list_items(self):
+        # Creates a list of QListWidgetItems based on the search
+        # configuration items in the search registry.
+        search_items = []
+        for act in SearchConfigurationRegistry.instance().actions():
+            si = QListWidgetItem(
+                act.icon(),
+                act.text()
+            )
+            # Code based on search prefix and data source name
+            code = self.search_item_prefix + act.data()
+            si.setData(Qt.UserRole, code)
+            search_items.append(si)
+
+        return search_items
 
     def load_categories(self):
         # Load items based on category selection
@@ -247,13 +264,9 @@ class UserShortcutDialog(QDialog, Ui_UserShortcutDialog):
 
     def _clear_category_items(self):
         # Remove all items without deleting them
-        print self.lsw_category_action.count()
         for i in range(self.lsw_category_action.count()):
             row_item = self.lsw_category_action.item(i)
-            print row_item
-
             if row_item != 0:
-                # print row_item.text()
                 self.lsw_category_action.takeItem(i)
 
     def _load_category_items(self, lst_items):
@@ -270,7 +283,6 @@ class UserShortcutDialog(QDialog, Ui_UserShortcutDialog):
             return
 
         self.module_icons()
-
         # Get selected items
         tr_cat_item = sel_tr_items[0]
         cat_code = tr_cat_item.data(1, Qt.DisplayRole)

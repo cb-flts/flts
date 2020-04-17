@@ -23,6 +23,7 @@ from numbers import Number
 
 from PyQt4.QtGui import (
     QApplication,
+    QColor,
     QImage,
     QPainter,
     QPrinter,
@@ -37,7 +38,8 @@ from PyQt4.QtCore import (
     QSizeF,
     QRectF,
     QDir,
-    QDate
+    QDate,
+    Qt
 )
 from PyQt4.QtXml import QDomDocument
 

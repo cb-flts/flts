@@ -20,7 +20,7 @@ email                : gkahiu@gmail.com
 import os, os.path
 import tempfile
 from decimal import Decimal
-import binascii, string, random
+import binascii,string,random
 from collections import OrderedDict
 from datetime import (
     date,
@@ -56,27 +56,29 @@ from stdm.data.configuration import (
 )
 
 from qgis.gui import QgsEncodingFileDialog
+from qgis.core import (
+    QGis,
+    QgsVectorLayer
+)
 
 PLUGIN_DIR = os.path.abspath(os.path.join(
-    os.path.dirname(__file__), os.path.pardir)).replace("\\", "/")
-CURRENCY_CODE = ""  # TODO: Put in the registry
-DOUBLE_FILE_EXTENSIONS = ['tar.gz', 'tar.bz2']
+    os.path.dirname( __file__ ), os.path.pardir)).replace("\\", "/")
+CURRENCY_CODE = "" #TODO: Put in the registry
+DOUBLE_FILE_EXTENSIONS = ['tar.gz','tar.bz2']
 
-
-def getIndex(listObj, item):
+def getIndex(listObj,item):
     '''
     Get the index of the list item without raising an 
     error if the item is not found
     '''
-    index = -1
+    index=-1
     try:
-        index = listObj.index(item)
+        index=listObj.index(item)
     except ValueError:
         pass
-    return index
+    return index 
 
-
-def loadComboSelections(comboref, obj):
+def loadComboSelections(comboref,obj):
     '''
     Convenience method for loading lookup values in combo boxes
     '''
@@ -84,9 +86,8 @@ def loadComboSelections(comboref, obj):
     modelItems = modelinstance.queryObject().all()
     comboref.addItem("")
     for item in modelItems:
-        comboref.addItem(item.value, item.id)
-
-
+        comboref.addItem(item.value,item.id) 
+            
 def readComboSelections(obj):
     '''
     Convenience method for loading lookup values in combo boxes
@@ -94,9 +95,9 @@ def readComboSelections(obj):
     modelinstance = obj()
     modelItems = modelinstance.queryObject().all()
     return modelItems
-
-
-def setModelAttrFromCombo(model, attributename, combo, ignorefirstitem=True):
+    
+    
+def setModelAttrFromCombo(model,attributename,combo,ignorefirstitem = True): 
     '''
     Convenience method for checking whether an item in the combo box
     has been selected an get the corresponding integer stored in the
@@ -104,31 +105,29 @@ def setModelAttrFromCombo(model, attributename, combo, ignorefirstitem=True):
     '''
     if combo.count() == 0:
         return
-
+    
     if ignorefirstitem == True:
         if combo.currentIndex() == 0:
             return
-
-    itemValue = combo.itemData(combo.currentIndex())
-    setattr(model, attributename, itemValue)
-
-
-def setComboCurrentIndexWithItemData(combo, itemdata, onNoneSetCurrentIndex=True):
-    """
+    
+    itemValue = combo.itemData(combo.currentIndex()) 
+    setattr(model,attributename,itemValue)
+    
+def setComboCurrentIndexWithItemData(combo,itemdata,onNoneSetCurrentIndex = True):
+    '''
     Convenience method for setting the current index of the combo item
     with the specified value of the item data.
-    """
+    '''    
     if itemdata == None and onNoneSetCurrentIndex:
         combo.setCurrentIndex(0)
     elif itemdata == None and not onNoneSetCurrentIndex:
         return
-
+    
     currIndex = combo.findData(itemdata)
     if currIndex != -1:
         combo.setCurrentIndex(currIndex)
-
-
-def setComboCurrentIndexWithText(combo, text):
+        
+def setComboCurrentIndexWithText(combo,text):
     """
     Convenience method for setting the current index of the combo item
     with the specified value of the corresponding display text.
@@ -136,79 +135,74 @@ def setComboCurrentIndexWithText(combo, text):
     txtIndex = combo.findText(text)
     if txtIndex != -1:
         combo.setCurrentIndex(txtIndex)
-
-
-def createQuerySet(columnList, resultSet, imageFields):
-    """
+        
+def createQuerySet(columnList,resultSet,imageFields):
+    '''
     Create a list consisting of dictionary items
     derived from the database result set.
     For image fields, the fxn will write the binary object to disk
-    and insert the full path of the image into the dictionary.
-    """
-    qSet = []
-    # Create root directory name to be used for storing the current session's image files
-    rtDir = ''
-    if len(imageFields) > 0:
-        rtDir = tempfile.mkdtemp()
-    for r in resultSet:
-        rowItems = {}
-        for c in range(len(columnList)):
-            clmName = str(columnList[c])
-            # Get the index of the image field, if one has been defined
-            imgIndex = getIndex(imageFields, clmName)
-            if imgIndex != -1:
-                imgPath = writeImage(rtDir, str(r[c]))
-                rowItems[clmName] = imgPath
-            else:
-                rowItems[clmName] = str(r[c])
-        qSet.append(rowItems)
-
-    return rtDir, qSet
-
+    and insert the full path of the image into the dictionary.    
+    '''
+    qSet=[]
+    #Create root directory name to be used for storing the current session's image files
+    rtDir=''
+    if len(imageFields)>0:        
+        rtDir=tempfile.mkdtemp()    
+    for r in resultSet:           
+        rowItems={}
+        for c in range(len(columnList)): 
+            clmName=str(columnList[c])
+            #Get the index of the image field, if one has been defined
+            imgIndex=getIndex(imageFields,clmName) 
+            if imgIndex!=-1:
+                imgPath=writeImage(rtDir,str(r[c]))
+                rowItems[clmName]=imgPath
+            else:                        
+                rowItems[clmName]=str(r[c])        
+        qSet.append(rowItems)       
+    
+    return rtDir,qSet
 
 def writeImage(rootDir, imageStr):
-    """
+    '''
     Write an image object to disk under the root directory in the
-    system's temp directory.
+    system's temp directory. 
     The method returns the absolute path to the image.
-    """
-    imgTemp = PLUGIN_DIR + '/images/icons/img_not_available.jpg'
-
+    '''
+    imgTemp = PLUGIN_DIR + '/images/icons/img_not_available.jpg'  
+      
     try:
-        os_hnd, imgPath = tempfile.mkstemp(suffix='.JPG', dir=rootDir)
+        os_hnd,imgPath = tempfile.mkstemp(suffix='.JPG',dir=rootDir)
         pimgPix = QPixmap()
         imgPix = pimgPix.scaled(80, 60, aspectRatioMode=Qt.KeepAspectRatio)
-        lStatus = imgPix.loadFromData(imageStr)  # Load Status
-
+        lStatus=imgPix.loadFromData(imageStr) #Load Status
+        
         if lStatus:
-            wStatus = imgPix.save(imgPath)  # Write Status
+            wStatus=imgPix.save(imgPath) #Write Status
             if wStatus:
-                imgTemp = imgPath
-        os.close(os_hnd)
-
+                imgTemp=imgPath  
+        os.close(os_hnd)   
+                       
     except:
         pass
-
-    return imgTemp
-
-
+    
+    return imgTemp    
+        
 def copyattrs(objfrom, objto, names):
-    # Copies named attributes over to another object
+    #Copies named attributes over to another object
     for n in names:
-        if hasattr(objfrom, n):
-            v = getattr(objfrom, n)
-            setattr(objto, n, v)
-
-
+        if hasattr(objfrom,n):
+            v = getattr(objfrom,n)
+            setattr(objto,n,v) 
+            
 def compareLists(validList, userList):
-    # Method for validating if items defined in the user list actually exist in the valid list
-    validList = [x for x in userList if x in validList]
-    # Get invalid items in the user list
+    #Method for validating if items defined in the user list actually exist in the valid list        
+    validList = [x for x in userList if x in validList]    
+    #Get invalid items in the user list    
     invalidList = [x for x in userList if x not in validList]
-
+    
     return validList, invalidList
-
-
+        
 def replaceNoneText(dbvalue, replacewith=""):
     '''
     Replaces 'None' string with more friendly text.
@@ -217,8 +211,7 @@ def replaceNoneText(dbvalue, replacewith=""):
         return replacewith
     else:
         return dbvalue
-
-
+        
 def moneyfmt(value, places=2, curr=CURRENCY_CODE, sep=',', dp='.',
              pos='', neg='-', trailneg=''):
     """Convert Decimal to a money formatted string.
@@ -233,7 +226,7 @@ def moneyfmt(value, places=2, curr=CURRENCY_CODE, sep=',', dp='.',
     trailneg:optional trailing minus indicator:  '-', ')', space or blank
 
     """
-    q = Decimal(10) ** -places
+    q = Decimal(10) ** -places      
     sign, digits, exp = value.quantize(q).as_tuple()
     result = []
     digits = map(str, digits)
@@ -255,26 +248,23 @@ def moneyfmt(value, places=2, curr=CURRENCY_CODE, sep=',', dp='.',
     build(curr)
     build(neg if sign else pos)
     return ''.join(reversed(result))
-
-
+        
 def guess_extension(filename):
     """
     Extracts the file extension from the file name. It is also enabled to work with files 
     containing double extensions.
     """
-    root, ext = os.path.splitext(filename)
+    root,ext = os.path.splitext(filename)
     if any([filename.endswith(x) for x in DOUBLE_FILE_EXTENSIONS]):
-        root, first_ext = os.path.splitext(root)
+        root,first_ext = os.path.splitext(root)
         ext = first_ext + ext
-    return root, ext
-
+    return root,ext
 
 def gen_random_string(numbytes=10):
     """
     Generates a random string based on the number of bytes specified.
     """
     return binascii.b2a_hex(os.urandom(numbytes))
-
 
 def randomCodeGenerator(size=8):
     '''
@@ -283,7 +273,6 @@ def randomCodeGenerator(size=8):
     chars = string.ascii_uppercase + string.digits
     return ''.join(random.choice(chars) for _ in range(size))
 
-
 def documentTemplates():
     """
     Return a dictionary of document names and their corresponding absolute file paths.
@@ -291,40 +280,40 @@ def documentTemplates():
     from stdm.settings.registryconfig import RegistryConfig
 
     docTemplates = OrderedDict()
-
+    
     regConfig = RegistryConfig()
     keyName = "ComposerTemplates"
-
+        
     pathConfig = regConfig.read([keyName])
 
     if len(pathConfig) > 0:
         templateDir = pathConfig[keyName]
-
+        
         pathDir = QDir(templateDir)
         pathDir.setNameFilters(["*.sdt"])
         docFileInfos = pathDir.entryInfoList(QDir.Files, QDir.Name)
 
         for df in docFileInfos:
+
             docTemplates[df.completeBaseName()] = df.absoluteFilePath()
-
+        
     return docTemplates
-
-
-def openDialog(parent, filtering="GPX (*.gpx)", dialogMode="SingleFile"):
+        
+def openDialog( parent, filtering="GPX (*.gpx)", dialogMode="SingleFile"):
     settings = QSettings()
-    dirName = settings.value("/UI/lastShapefileDir")
-    encode = settings.value("/UI/encoding")
-    fileDialog = QgsEncodingFileDialog(parent, "Save output file", dirName, filtering, encode)
-    fileDialog.setFileMode(QFileDialog.ExistingFiles)
-    fileDialog.setAcceptMode(QFileDialog.AcceptOpen)
+    dirName = settings.value( "/UI/lastShapefileDir" )
+    encode = settings.value( "/UI/encoding" )
+    fileDialog = QgsEncodingFileDialog( parent, "Save output file", dirName, filtering, encode )
+    fileDialog.setFileMode( QFileDialog.ExistingFiles )
+    fileDialog.setAcceptMode( QFileDialog.AcceptOpen )
     if not fileDialog.exec_() == QDialog.Accepted:
-        return None, None
+            return None, None
     files = fileDialog.selectedFiles()
-    settings.setValue("/UI/lastShapefileDir", QFileInfo(unicode(files[0])).absolutePath())
+    settings.setValue("/UI/lastShapefileDir", QFileInfo( unicode( files[0] ) ).absolutePath() )
     if dialogMode == "SingleFile":
-        return (unicode(files[0]), unicode(fileDialog.encoding()))
+      return ( unicode( files[0] ), unicode( fileDialog.encoding() ) )
     else:
-        return (files, unicode(fileDialog.encoding()))
+      return ( files, unicode( fileDialog.encoding() ) )
 
 
 def datetime_from_string(str_val):
@@ -347,7 +336,6 @@ def date_from_string(str_val):
     :rtype: date
     """
     return datetime.strptime(str(str_val), '%Y-%m-%d').date()
-
 
 def format_name(attr, trim_id=True):
     """
@@ -434,7 +422,6 @@ def entity_searchable_columns(entity):
     ]
     return searchable_column
 
-
 def model_obj_display_data(model, entity, profile):
     """
     Formats a model object data with a formatted column name and
@@ -456,7 +443,6 @@ def model_obj_display_data(model, entity, profile):
             model_display[format_name(key)] = value
     return model_display
 
-
 def model_display_mapping(model, entity):
     """
     Formats model display columns.
@@ -476,7 +462,6 @@ def model_display_mapping(model, entity):
             model_display_cols[col] = format_name(col)
     return model_display_cols
 
-
 def profile_spatial_tables(profile):
     """
     Returns the current profile spatial tables.
@@ -493,7 +478,6 @@ def profile_spatial_tables(profile):
     ]
     spatial_tables = dict(spatial_tables)
     return spatial_tables
-
 
 def profile_user_tables(profile, include_views=True, admin=False, sort=False):
     """
@@ -555,7 +539,6 @@ def profile_user_tables(profile, include_views=True, admin=False, sort=False):
         return sorted_table
     return tables
 
-
 def db_user_tables(profile):
     """
     Returns user accessible tables from database.
@@ -602,7 +585,6 @@ def profile_lookup_columns(profile):
         r.child_column for r in profile.relations.values()
     ]
     return lookup_columns
-
 
 def lookup_parent_entity(profile, col):
     """
@@ -667,6 +649,7 @@ def lookup_id_to_value(profile, col, id):
         return id
 
 
+
 def get_db_attr(db_model, source_col, source_attr, destination_col):
     """
     Gets the column value when supplied with the destination column.
@@ -693,7 +676,6 @@ def get_db_attr(db_model, source_col, source_attr, destination_col):
             None
         )
         return destination_attr
-
 
 def entity_id_to_attr(entity, attr, id):
     """
@@ -780,7 +762,6 @@ def entity_id_to_model(entity, id):
     result = model_obj.queryObject().filter(model.id == id).first()
     return result
 
-
 def entity_attr_to_model(entity, attr, value):
     """
     Gets the first model of an entity based on an attribute and the entity.
@@ -801,7 +782,6 @@ def entity_attr_to_model(entity, attr, value):
     ).first()
 
     return result
-
 
 def entity_attr_to_id(entity, col_name, attr_val, lower=False):
     """
@@ -885,6 +865,7 @@ def enable_drag_sort(mv_widget):
         QAbstractItemView.InternalMove
     )
 
+
     def drop_event(mv_widget, event):
         """
         A drop event function that prevents overwriting of
@@ -904,8 +885,8 @@ def enable_drag_sort(mv_widget):
             view = True
             rows = set(
                 [mi.row()
-                 for mi in mv_widget.selectedIndexes()
-                 ]
+                for mi in mv_widget.selectedIndexes()
+                ]
             )
 
             target_row = mv_widget.indexAt(
@@ -967,6 +948,7 @@ def enable_drag_sort(mv_widget):
     mv_widget.__class__.dropEvent = drop_event
 
 
+
 def enable_drag_sort_widgets(qt_widget):
     """
     Enables internal drag and drop sorting in
@@ -1001,8 +983,8 @@ def enable_drag_sort_widgets(qt_widget):
 
             rows = set(
                 [mi.row()
-                 for mi in qt_widget.selectedIndexes()
-                 ]
+                for mi in qt_widget.selectedIndexes()
+                ]
             )
 
             widget_item = qt_widget.itemAt(event.pos())
@@ -1048,6 +1030,7 @@ def enable_drag_sort_widgets(qt_widget):
                 tgt_widget = qt_widget.itemWidget(tgt_widget_item)
                 qt_widget.setItemWidget(tgt_widget_item, tgt_widget)
                 qt_widget.takeItem(src_row)
+
 
             for row in reversed(
                     sorted(row_mapping.iterkeys())
@@ -1121,7 +1104,6 @@ def simple_dialog(parent, title, message, checkbox_text=None, yes_no=True):
     else:
         return result, False
 
-
 def file_text(path):
     """
     Read any readable file.
@@ -1186,7 +1168,6 @@ def profile_and_user_views(profile, check_party=False):
             source_tables.append(value)
     return source_tables
 
-
 def user_non_profile_views():
     """
     Gets and return user based views excluding profile views in the configuration.
@@ -1224,7 +1205,6 @@ def version_from_metadata():
                 version_line = line.split('=')
                 version = version_line[1]
                 return version
-
 
 def code_columns(entity, current_column_name):
     """
@@ -1295,3 +1275,67 @@ def is_chrome_installed():
             status = True
 
     return status, inst_path
+
+
+def wkbtype_to_string(wkbtype):
+    """
+    Converts the QGis::WkbType to the equivalent string representation.
+    :param wkbtype: Geometry type
+    :type wkbtype: Qgis.WkbType
+    :return: Returns the string equivalent of the WKB enum.
+    :rtype: str
+    """
+    if wkbtype == QGis.WKBUnknown:
+        return 'Unknown'
+    elif wkbtype == QGis.WKBNoGeometry:
+        return 'None'
+    elif wkbtype == QGis.WKBPoint or wkbtype == QGis.WKBPoint25D:
+        return 'point'
+    elif wkbtype == QGis.WKBLineString  or wkbtype == QGis.WKBLineString25D:
+        return 'linestring'
+    elif wkbtype == QGis.WKBPolygon or wkbtype == QGis.WKBPolygon25D:
+        return 'polygon'
+    elif wkbtype == QGis.WKBMultiPoint or wkbtype == QGis.WKBMultiPoint25D:
+        return 'multipoint'
+    elif wkbtype == QGis.WKBMultiLineString or wkbtype == QGis.WKBMultiLineString25D:
+        return 'multilinestring'
+    elif wkbtype == QGis.WKBMultiPolygon or wkbtype == QGis.WKBMultiPolygon25D:
+        return 'multipolygon'
+
+    return ''
+
+
+def clone_vector_layer(vlayer, name='Duplicated_Layer'):
+    """
+    Creates a memory vector layer by cloning the specified vector layer.
+    Please note that this only clones the schema of the source layer i.e.
+    the field mapping. Vector joins, features etc. are not included.
+    :param vlayer: Input layer to be cloned.
+    :type vlayer: QgsVectorLayer
+    :param name: Name of the cloned layer. Defaults to 'Duplicate Layer'.
+    :type name: str
+    :return: Returns the cloned memory vector layer or None if the source
+    vector layer in invalid.
+    :rtype: QgsVectorLayer
+    """
+    if not vlayer.isValid:
+        return None
+
+    crs = vlayer.crs().authid()
+    geom_type = wkbtype_to_string(vlayer.wkbType())
+    if not geom_type or geom_type == 'Unknown':
+        return None
+
+    if geom_type == 'None':
+        uri = geom_type
+    else:
+        uri = '{0}?crs={1}&index=yes'.format(geom_type, crs)
+
+    mem_layer = QgsVectorLayer(uri, name, 'memory')
+    mem_layer_data = mem_layer.dataProvider()
+    attr = vlayer.dataProvider().fields().toList()
+    mem_layer_data.addAttributes(attr)
+    mem_layer.updateFields()
+
+    return mem_layer
+

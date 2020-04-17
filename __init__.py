@@ -138,6 +138,26 @@ def copy_holders_configuration():
     copy_status = holders_conf_file.copy(holders_conf_dest)
 
 
+def copy_search_configuration():
+    """
+    Copies the configuration file containing the search settings to the
+    user's ./stdm/search folder.
+    """
+    search_conf_path = u'{0}/templates/search/configuration.ini'.format(
+        os.path.dirname(__file__)
+    )
+
+    # Exit if the search config file does not exist
+    if not QFile.exists(search_conf_path):
+        return
+
+    # Copy settings file if none existed in USER_PLUGIN_DIR
+    search_conf_file = QFile(search_conf_path)
+    search_conf_dest = u'{0}/search/configuration.ini'.format(USER_PLUGIN_DIR)
+
+    copy_status = search_conf_file.copy(search_conf_dest)
+
+
 def classFactory(iface):
     """
     Load STDMQGISLoader class.
@@ -149,6 +169,9 @@ def classFactory(iface):
 
     # Copy the holders mapping config file
     copy_holders_configuration()
+
+    # Copy the search settings file
+    copy_search_configuration()
 
     from stdm.plugin import STDMQGISLoader
     return STDMQGISLoader(iface)
