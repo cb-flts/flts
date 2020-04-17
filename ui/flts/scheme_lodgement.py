@@ -1,6 +1,6 @@
 """
 /***************************************************************************
-Name                 : SchemeSummaryWidget
+Name                 : Scheme Lodgement Wizard
 Description          : A table widget that provides a quick access menus for
                        uploading and viewing supporting documents.
 Date                 : 16/July/2019

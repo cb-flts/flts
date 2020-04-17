@@ -120,6 +120,7 @@ def certificate_postprocess(plot, plots):
     cert_model = entity_model(cert_entity)
     cert_obj = cert_model()
     cert_obj.plot_id = plot.id
+    cert_obj.scheme_id = plot.scheme_id
     cert_obj.certificate_number = cert_number
     cert_obj.production_date = curr_datetime
     cert_obj.prod_user = user_name
