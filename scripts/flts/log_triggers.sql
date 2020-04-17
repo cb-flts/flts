@@ -77,7 +77,8 @@ CREATE TABLE cb_plot_log (
   "use" int4,
   "plot_number" varchar(6),
   "area" numeric(18,6),
-  "scheme_id" int4
+  "scheme_id" int4,
+  "crs_id" int4
 )
 ;
 
