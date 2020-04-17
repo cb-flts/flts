@@ -133,7 +133,7 @@ class Entity(QObject, TableItem):
         self.is_proxy = is_proxy
 
         # Sync this with row index of the viewer 
-        self.row_index = -1  
+        self.row_index = -1
 
         self.entity_in_database = False
 
@@ -296,7 +296,7 @@ class Entity(QObject, TableItem):
 
         self.updated_columns[col.name] = col
 
-        #Update action
+        # Update action
         if self.action == DbItem.NONE:
             self.action = DbItem.ALTER
 
@@ -333,8 +333,8 @@ class Entity(QObject, TableItem):
         entity.description = self.description
         entity.is_associative = self.is_associative
         entity.user_editable = self.user_editable
-        #Copy columns
-        #self._copy_columns(entity)
+        # Copy columns
+        # self._copy_columns(entity)
 
     def on_delete(self):
         """
@@ -415,10 +415,10 @@ class Entity(QObject, TableItem):
 
         all_relations = parents + children
 
-        #Dependent entity names
+        # Dependent entity names
         dep_ent = [e.short_name for e in all_relations]
 
-        #Add views as well
+        # Add views as well
         dep_views = table_view_dependencies(self.name)
 
         return {'entities': dep_ent, 'views': dep_views}
@@ -500,7 +500,6 @@ class Entity(QObject, TableItem):
 
         return self.supporting_doc.document_types_non_hex()
 
-
     def document_path(self):
         """
         :return: Returns a subpath for locating supporting documents using
@@ -555,14 +554,14 @@ class Entity(QObject, TableItem):
             return False
 
         return True
-    
+
     # Added in 1.7
     def update_column_row_index(self, name, index):
         if name in self.columns:
             self.columns[name].row_index = index
 
     def sort_columns(self):
-        self.columns = RenameableKeyDict(sorted(self.columns.iteritems(), key=lambda e : e[1].row_index))
+        self.columns = RenameableKeyDict(sorted(self.columns.iteritems(), key=lambda e: e[1].row_index))
 
 
 class EntitySupportingDocument(Entity):
@@ -580,7 +579,7 @@ class EntitySupportingDocument(Entity):
 
         self.user_editable = False
 
-        #Supporting document ref column
+        # Supporting document ref column
         self.document_reference = ForeignKeyColumn('supporting_doc_id', self)
 
         normalize_name = self.parent_entity.short_name.replace(
@@ -598,20 +597,19 @@ class EntitySupportingDocument(Entity):
         self._doc_types_value_list = self._doc_type_vl(vl_name)
 
         if self._doc_types_value_list is None:
-
             self._doc_types_value_list = self.profile.create_value_list(
                 vl_name
             )
             self.profile.add_entity(self._doc_types_value_list)
 
-            #Add a default type
+            # Add a default type
             self._doc_types_value_list.add_value(self.tr('General'))
 
-        #Document type column
+        # Document type column
         self.doc_type = LookupColumn('document_type', self)
         self.doc_type.value_list = self._doc_types_value_list
 
-        #Append columns
+        # Append columns
         self.add_column(self.document_reference)
         self.add_column(self.entity_reference)
         self.add_column(self.doc_type)
@@ -619,7 +617,7 @@ class EntitySupportingDocument(Entity):
         LOGGER.debug('Updating foreign key references in %s entity.',
                      self.name)
 
-        #Update foreign key references
+        # Update foreign key references
         self._update_fk_references()
 
         LOGGER.debug('%s entity successfully initialized', self.name)
@@ -635,11 +633,11 @@ class EntitySupportingDocument(Entity):
         return vl_name
 
     def _doc_type_vl(self, name):
-        #Search for the document type value list based on the given name
+        # Search for the document type value list based on the given name
         value_lists = self.profile.value_lists()
 
         doc_type_vl = [v for v in value_lists if v.short_name == name]
-        #Return first item
+        # Return first item
 
         if len(doc_type_vl) > 0:
             return doc_type_vl[0]
@@ -647,8 +645,8 @@ class EntitySupportingDocument(Entity):
         return None
 
     def _update_fk_references(self):
-        #Update ForeignKey references.
-        #check if there is an 'id' column
+        # Update ForeignKey references.
+        # check if there is an 'id' column
         entity_id = self._entity_id_column(self.parent_entity)
 
         LOGGER.debug('Attempting to set %s entity as the parent entity to '
@@ -659,7 +657,7 @@ class EntitySupportingDocument(Entity):
             err = self.tr('%s does not have an id column. This is required '
                           'in order to link it to the supporting document '
                           'table through this association '
-                          'table.'%(self.parent_entity.name))
+                          'table.' % (self.parent_entity.name))
 
             LOGGER.debug(err)
 
@@ -669,9 +667,9 @@ class EntitySupportingDocument(Entity):
                                                        self.parent_entity)
         self.entity_reference.set_entity_relation_attr('parent_column', 'id')
 
-        #Supporting document reference
+        # Supporting document reference
         self.document_reference.set_entity_relation_attr('parent',
-                                            self.profile.supporting_document)
+                                                         self.profile.supporting_document)
         self.document_reference.set_entity_relation_attr('parent_column',
                                                          'id')
 
@@ -683,7 +681,7 @@ class EntitySupportingDocument(Entity):
         :param shortname: Shortname of the parent entity.
         :type shortname: str
         """
-        #Remove the object then re-insert so as to update index
+        # Remove the object then re-insert so as to update index
         doc_entity = self.profile.entities.pop(self.short_name)
 
         supporting_docs_shortname = self._entity_short_name(
@@ -693,26 +691,26 @@ class EntitySupportingDocument(Entity):
             '_'
         ).lower()
 
-        #Update shortname and name
+        # Update shortname and name
         super(EntitySupportingDocument, self).rename(
             supporting_docs_shortname
         )
 
-        #Re-insert the entity
+        # Re-insert the entity
         self.profile.add_entity(self, True)
 
-        #Get entity relations and update entity references
+        # Get entity relations and update entity references
         parent_relations = self.profile.parent_relations(self)
         child_relations = self.profile.child_relations(self)
 
-        #Update relations
+        # Update relations
         for pr in parent_relations:
             pr.parent = self
 
         for cr in child_relations:
             cr.child = self
 
-        #Rename lookup for supporting documents lookup
+        # Rename lookup for supporting documents lookup
         if not self._doc_types_value_list is None:
             norm_parent_short_name = self.parent_entity.short_name.replace(
                 ' ',
@@ -768,4 +766,3 @@ class EntitySupportingDocument(Entity):
         Check if the entity has an ID column and return it, else returns None.
         """
         return entity.column('id')
-

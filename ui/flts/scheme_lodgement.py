@@ -1,6 +1,6 @@
 """
 /***************************************************************************
-Name                 : SchemeSummaryWidget
+Name                 : Scheme Lodgement Wizard
 Description          : A table widget that provides a quick access menus for
                        uploading and viewing supporting documents.
 Date                 : 16/July/2019
@@ -215,8 +215,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
         self.dbl_spinbx_block_area.setSuffix(" Sq.m")
         self.dbl_spinbx_block_area.setDecimals(0)
-
-        # self._on_area_check()
         self.radio_hectares.toggled.connect(
             self._on_hectares_clicked
         )

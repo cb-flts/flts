@@ -365,9 +365,9 @@ class PlotLayer:
         :param geom: Input geometry
         :type geom: QgsGeometry
         :param source_crs: Source CRS
-        :type source_crs: String
+        :type source_crs: int
         :param destination_crs: Target CRS
-        :type destination_crs: String
+        :type destination_crs: int
         """
         tr = QgsCoordinateTransform(source_crs, destination_crs)
         geom.transform(tr)

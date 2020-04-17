@@ -77,7 +77,8 @@ CREATE TABLE cb_plot_log (
   "use" int4,
   "plot_number" varchar(6),
   "area" numeric(18,6),
-  "scheme_id" int4
+  "scheme_id" int4,
+  "crs_id" int4
 )
 ;
 
@@ -147,11 +148,12 @@ CREATE OR REPLACE FUNCTION cb_plot_log() RETURNS TRIGGER AS $cb_plot_log$
     END;
 $cb_plot_log$ LANGUAGE plpgsql;
 
--- CREATE OR REPLACE FUNCTION cb_plot_num_drop_zeros() RETURNS TRIGGER AS $cb_plot_num_drop_zeros$
+-- CREATE OR REPLACE FUNCTION cb_plot_num_to_int() RETURNS TRIGGER AS $cb_plot_num_to_int$
 --     BEGIN
---
+--         UPDATE cb_plot SET plot_number=(plot_number::INTEGER)::TEXT;
+--         RETURN NULL;
 --     END;
--- $cb_plot_num_drop_zeros$ LANGUAGE plppgsql;
+-- $cb_plot_num_to_int$ LANGUAGE plpgsql;
 
 ------ Timestamp
 
@@ -173,8 +175,12 @@ CREATE TRIGGER cb_holder_log
 AFTER INSERT OR UPDATE OR DELETE ON cb_holder
     FOR EACH ROW EXECUTE PROCEDURE cb_holder_log();
 
+-- CREATE TRIGGER cb_plot_num_to_int
+-- AFTER INSERT OR UPDATE ON cb_plot
+--     FOR EACH ROW EXECUTE PROCEDURE cb_plot_num_to_int();
+
 CREATE TRIGGER cb_plot_log
-AFTER INSERT ON cb_plot
+AFTER INSERT OR UPDATE ON cb_plot
     FOR EACH ROW EXECUTE PROCEDURE cb_plot_log();
 
 CREATE TRIGGER comment_timestamp

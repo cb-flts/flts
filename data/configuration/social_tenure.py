@@ -735,12 +735,12 @@ class SocialTenure(Entity):
 
         fk_col_name = self._foreign_key_column_name(party_entity)
 
-        #Remove column from the collection
+        # Remove column from the collection
         status = self.remove_column(fk_col_name)
         if not status:
             return False
 
-        #Remove from internal collection
+        # Remove from internal collection
         if fk_col_name in self._party_fk_columns:
             del self._party_fk_columns[fk_col_name]
 
@@ -866,7 +866,7 @@ class SocialTenure(Entity):
         if party_entity is None:
             return
 
-        #Check if there is an 'id' column
+        # Check if there is an 'id' column
         party_id = self._entity_id_column(party_entity)
 
         LOGGER.debug('Attempting to set %s entity as the party.',
@@ -875,7 +875,7 @@ class SocialTenure(Entity):
         if party_id is None:
             err = self.tr('%s does not have an id column. This is required '
                           'in order to link it to the social tenure '
-                          'relationship table.'%(party_entity.name))
+                          'relationship table.' % (party_entity.name))
 
             LOGGER.debug(err)
 
@@ -883,7 +883,7 @@ class SocialTenure(Entity):
 
         self._party = party_entity
 
-        #Set parent attributes
+        # Set parent attributes
         self.party_foreign_key.set_entity_relation_attr('parent', self._party)
         self.party_foreign_key.set_entity_relation_attr('parent_column', 'id')
 
@@ -906,7 +906,7 @@ class SocialTenure(Entity):
         if spatial_unit_entity is None:
             return
 
-        #check if there is an 'id' column
+        # check if there is an 'id' column
         sp_unit_id = self._entity_id_column(spatial_unit_entity)
 
         LOGGER.debug('Attempting to set %s entity as the spatial unit.',
@@ -915,7 +915,7 @@ class SocialTenure(Entity):
         if sp_unit_id is None:
             err = self.tr('%s does not have an id column. This is required '
                           'in order to link it to the social tenure '
-                          'relationship table.'%(spatial_unit_entity.name))
+                          'relationship table.' % (spatial_unit_entity.name))
 
             LOGGER.debug(err)
 
@@ -924,18 +924,18 @@ class SocialTenure(Entity):
         if not spatial_unit_entity.has_geometry_column():
             spatial_unit_entity = None
             return
-            #err = self.tr('%s does not have a geometry column. This is required'
-                           #' when setting the spatial unit entity in a '
-                           #'social tenure relationship definition.'
-                           #%(spatial_unit_entity.name))
+            # err = self.tr('%s does not have a geometry column. This is required'
+            # ' when setting the spatial unit entity in a '
+            # 'social tenure relationship definition.'
+            # %(spatial_unit_entity.name))
 
-            #LOGGER.debug(err)
+            # LOGGER.debug(err)
 
-            #raise AttributeError(err)
+            # raise AttributeError(err)
 
         self._spatial_unit = spatial_unit_entity
 
-        #Set parent attributes
+        # Set parent attributes
         self.spatial_unit_foreign_key.set_entity_relation_attr(
             'parent',
             self._spatial_unit
@@ -968,10 +968,10 @@ class SocialTenure(Entity):
         return entity.column('id')
 
     def _prepare_tenure_type_value_list(self):
-        #Create tenure types lookup table
+        # Create tenure types lookup table
         tenure_value_list = ValueList(self.tenure_type_list, self.profile)
 
-        #Set lookup column reference value list
+        # Set lookup column reference value list
         self.tenure_type_lookup.value_list = tenure_value_list
 
         return tenure_value_list
@@ -1007,4 +1007,3 @@ class SocialTenure(Entity):
         :type engine: Engine
         """
         self.view_creator(engine)
-

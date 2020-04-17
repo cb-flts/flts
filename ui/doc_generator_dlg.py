@@ -169,7 +169,7 @@ class CertificateGeneratorDialogWrapper(object):
 
         self._doc_gen_dlg = DocumentGeneratorDialog(self._iface, parent, plugin=plugin)
         self._doc_gen_dlg.hide_show_record_selection(False)
-        self._doc_gen_dlg.setWindowTitle('LandHold Title Generator')
+        self._doc_gen_dlg.setWindowTitle('Land Hold Title Generator')
         self._doc_gen_dlg.rbExpPDF.setChecked(True)
         self._doc_gen_dlg.groupBox_2.setVisible(False)
         self._notif_bar = self._doc_gen_dlg.notification_bar()
@@ -253,7 +253,7 @@ class ReportGeneratorDialogWrapper(object):
     """
     A wrapper class that fetches the tables in the active profile
     and creates the corresponding EntityConfig objects, which are then
-    added to the CertificateGeneratorDialog.
+    added to the Gender report generator.
     """
 
     def __init__(self, iface, parent=None, plugin=None):
@@ -263,6 +263,8 @@ class ReportGeneratorDialogWrapper(object):
         self._report_gen_dlg.hide_show_record_selection(True)
         self._report_gen_dlg.setWindowTitle('Report Generator')
         self._report_gen_dlg.rbExpPDF.setChecked(True)
+        self._report_gen_dlg.chk_template_datasource.setChecked(True)
+        self._report_gen_dlg.chk_template_datasource.setVisible(False)
         self._report_gen_dlg.groupBox_2.setVisible(False)
         self._notif_bar = self._report_gen_dlg.notification_bar()
 
@@ -270,6 +272,8 @@ class ReportGeneratorDialogWrapper(object):
 
         # Load entity configurations
         self._load_entity_configurations()
+        # Remove other non-report templates
+        self._report_gen_dlg.unload_nonreport_template('Land Hold Title Certificate')
 
     def _load_entity_configurations(self):
         """
@@ -282,8 +286,8 @@ class ReportGeneratorDialogWrapper(object):
 
             for i, t in enumerate(entities):
                 QApplication.processEvents()
-                # TODO modify these to select table based on context/docuemnts
-                if t.name != 'cb_scheme':
+                # TODO modify these to select table based on context/documents
+                if t.name != 'cb_plot':
                     continue
                 # Exclude custom tenure entities
                 if 'check' in t.name:
@@ -582,6 +586,14 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
             if filter_table != self.last_data_source:
                 # Load template data source fields
                 self._load_template_datasource_fields()
+
+    def unload_nonreport_template(self, lht_cert_template):
+        # Remove non report template name from list of templates
+        filter_ = self.current_config().data_source()
+        template_selector = TemplateDocumentSelector(self, filter_data_source=filter_)
+        doc_templates = documentTemplates()
+        if lht_cert_template in doc_templates.keys():
+            doc_templates.pop(lht_cert_template, None)
 
     def _load_template_datasource_fields(self):
         # If using template data source

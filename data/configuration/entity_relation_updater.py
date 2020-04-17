@@ -33,7 +33,6 @@ from stdm.data.pg_utils import (
     table_column_names
 )
 
-
 LOGGER = logging.getLogger('stdm')
 
 
@@ -203,6 +202,7 @@ def drop_foreign_key_constraint(entity_relation):
                      unicode(pe))
 
         return False
+
 
 def _get_table(table_name):
     # Get Table object from metadata or create one

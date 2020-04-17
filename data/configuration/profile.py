@@ -81,10 +81,10 @@ class Profile(QObject):
         self.entities = OrderedDict()
         self.relations = OrderedDict()
         self.removed_relations = []
-        #Base entity for supporting documents within the profile
+        # Base entity for supporting documents within the profile
         self.supporting_document = SupportingDocument(self)
 
-        #Init STR
+        # Init STR
         self.social_tenure = self._create_social_tenure()
 
         self._str_table_exists = False
@@ -93,7 +93,7 @@ class Profile(QObject):
         self._auto_generate_code = AutoGenerateCode(self)
         self.removed_entities = []
 
-        #Add default entities to the entity collection
+        # Add default entities to the entity collection
         self.add_entity(self.supporting_document)
         self.add_entity(self._admin_spatial_unit)
         self.add_entity(self._auto_generate_code)
@@ -144,7 +144,7 @@ class Profile(QObject):
         :return: Returns the entity corresponding to the auto generate code
         :rtype: AutoGenerateCode
         """
-        #versionadded in 1.7.4
+        # versionadded in 1.7.4
         return self._auto_generate_code
 
     @property
@@ -301,7 +301,7 @@ class Profile(QObject):
         of the specified argument.
         :rtype: EntityRelation
         """
-        #Get corresponding entity
+        # Get corresponding entity
         if not isinstance(item, Entity):
             return []
 
@@ -413,16 +413,16 @@ class Profile(QObject):
 
         ent = self.entities[name]
 
-        #Check existing entity relation where this entity is referenced
+        # Check existing entity relation where this entity is referenced
         parent_relations = self.parent_relations(ent)
         child_relations = self.child_relations(ent)
         remove_relations = parent_relations + child_relations
 
-        #Check if the entity has supporting documents and remove references
+        # Check if the entity has supporting documents and remove references
         if ent.supports_documents:
             supporting_doc_ent = ent.supporting_doc
             if not supporting_doc_ent is None:
-                #Some relations will be duplicated with ones in the main ent.
+                # Some relations will be duplicated with ones in the main ent.
                 doc_parent_relations = self.parent_relations(supporting_doc_ent)
                 doc_child_relations = self.child_relations(supporting_doc_ent)
 
@@ -432,10 +432,10 @@ class Profile(QObject):
         for er in remove_relations:
             self.remove_relation(er.name)
 
-        #Remove association entities if any
+        # Remove association entities if any
         self.remove_association_entities(ent)
 
-        #Now remove the entity from the collection
+        # Now remove the entity from the collection
         del_entity = self.entities.pop(name, None)
 
         LOGGER.debug('%s entity removed from %s profile', name, self.name)
@@ -459,7 +459,7 @@ class Profile(QObject):
         """
         assoc_entities = self.parent_association_entities(entity)
 
-        #Remove association entities
+        # Remove association entities
         for ae in assoc_entities:
             self.remove_entity(ae.short_name)
 
@@ -537,7 +537,7 @@ class Profile(QObject):
     def parent_association_entities(
             self,
             entity,
-            parent=AssociationEntity.FIRST_PARENT|AssociationEntity.SECOND_PARENT
+            parent=AssociationEntity.FIRST_PARENT | AssociationEntity.SECOND_PARENT
     ):
         """
         :param entity: First or second parent association entity.
@@ -552,14 +552,14 @@ class Profile(QObject):
         """
         parents = []
 
-        #Get first parent if specified
+        # Get first parent if specified
         if (parent & AssociationEntity.FIRST_PARENT) == AssociationEntity.FIRST_PARENT:
             first_parents = [ae for ae in self.association_entities()
                              if ae.first_parent.name == entity.name]
 
             parents.extend(first_parents)
 
-        #Get second parent if specified
+        # Get second parent if specified
         if (parent & AssociationEntity.SECOND_PARENT) == AssociationEntity.SECOND_PARENT:
             second_parents = [ae for ae in self.association_entities()
                               if ae.second_parent.name == entity.name]
@@ -657,7 +657,7 @@ class Profile(QObject):
             self.entities[name].row_index = index
 
     def sort_entities(self):
-        self.entities = OrderedDict(sorted(self.entities.iteritems(), key=lambda e : e[1].row_index))
+        self.entities = OrderedDict(sorted(self.entities.iteritems(), key=lambda e: e[1].row_index))
 
     @property
     def str_table_exists(self):
@@ -666,4 +666,3 @@ class Profile(QObject):
     @str_table_exists.setter
     def str_table_exists(self, value):
         self._str_table_exists = value
-

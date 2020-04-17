@@ -26,23 +26,26 @@ from sqlalchemy.orm import relationship, mapper, clear_mappers
 
 from sqlalchemy.exc import *
 
+
 class RoleMapper(object):
     pass
 
+
 class Authorizer(object):
-    '''
-    This class has the responsibility of asserting whether an account with 
+    """
+    This class has the responsibility of asserting whether an account with
     the given user name has permissions to access a particular content item
-    '''
+    """
+
     def __init__(self, username):
         self.username = username
         self.userRoles = []
-        self._getUserRoles()        
-        
+        self._getUserRoles()
+
     def _getUserRoles(self):
-        '''
+        """
         Get roles that the user belongs to
-        '''
+        """
         roleProvider = RoleProvider()
         self.userRoles = roleProvider.GetRolesForUser(self.username)
         '''
@@ -53,25 +56,25 @@ class Authorizer(object):
         pg_account = 'postgres'
         if self.username == pg_account:
             self.userRoles.append(pg_account)
-        
+
     def CheckAccess(self, contentCode):
-        '''
+        """
         Assert whether the given user has permissions to access a content
-        item with the gien code. 
-        '''        
+        item with the gien code.
+        """
         hasPermission = False
-        #Get roles with permission        
+        # Get roles with permission
         try:
-            cnt = Content()                       
+            cnt = Content()
             qo = cnt.queryObject()
             '''            
             cntRef = qo.filter(Content.code == contentCode).first()            
             '''
             cntRef = qo.filter(Content.code == contentCode).first()
             if cntRef != None:
-                cntRoles =cntRef.roles 
+                cntRoles = cntRef.roles
                 for rl in cntRoles:
-                    if getIndex(self.userRoles,rl.name) != -1:
+                    if getIndex(self.userRoles, rl.name) != -1:
                         hasPermission = True
                         break
         except Exception:
@@ -79,19 +82,6 @@ class Authorizer(object):
             Current user does not have permission to access the content tables.
             Catches all errors
             '''
-            #pass
+            # pass
             raise
         return hasPermission
-    
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-          

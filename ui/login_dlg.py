@@ -33,9 +33,9 @@ SUPERUSER = 'postgres'
 
 
 class loginDlg(QDialog, Ui_frmLogin):
-    '''
+    """
     This class handles user authentication for accessing STDM resources
-    '''
+    """
 
     def __init__(self, parent=None, test_connect_mode=False):
         QDialog.__init__(self, parent)
@@ -52,9 +52,9 @@ class loginDlg(QDialog, Ui_frmLogin):
         self.dbConn = None
 
     def initGui(self):
-        '''
+        """
         Initialize GUI
-        '''
+        """
         # Change the name of the OK button to Login
         btnLogin = self.btnBox.button(QDialogButtonBox.Ok)
 
@@ -91,9 +91,9 @@ class loginDlg(QDialog, Ui_frmLogin):
         self.dbConn = db_connection
 
     def validateInput(self):
-        '''
+        """
         Assert whether required fields have been entered
-        '''
+        """
         self.notifBar.clear()
 
         if self.txtUserName.text() == "":

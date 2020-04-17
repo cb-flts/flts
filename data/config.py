@@ -34,9 +34,9 @@ class DatabaseConfig(object):
         self.reg_config = RegistryConfig()
 
     def read(self):
-        '''
+        """
         Get the database connection properties
-        '''
+        """
         db_props = self.reg_config.read([self.host, self.port, self.db_name])
 
         if len(db_props) < 3:
@@ -46,9 +46,9 @@ class DatabaseConfig(object):
                                       db_props[self.db_name])
 
     def write(self, db_connection):
-        '''
+        """
         Writes the database connection settings to the registry
-        '''
+        """
         db_settings = {}
         db_settings[self.host] = db_connection.Host
         db_settings[self.port] = db_connection.Port

@@ -32,6 +32,7 @@ class SearchComponent:
     """
     Scheme workflow manager search component
     """
+
     def __init__(self):
         self.widgets = Widgets()
 
@@ -91,6 +92,7 @@ class ToolbarComponent:
     """
     Scheme workflow manager toolbar component
     """
+
     def __init__(self):
         self.config = ToolbarButtonsConfig().buttons
         self.widgets = Widgets()
@@ -147,6 +149,7 @@ class SchemeExamination(ToolbarComponent):
     """
     Scheme Examination toolbar component
     """
+
     def __init__(self):
         ToolbarComponent.__init__(self)
         component = self._create_component()
@@ -166,6 +169,7 @@ class SchemeLodgementToolbarComponent(ToolbarComponent):
     """
     Scheme Lodgement toolbar component
     """
+
     def __init__(self):
         ToolbarComponent.__init__(self)
         component = self._create_component()
@@ -185,6 +189,7 @@ class SchemeEstablishmentToolbarComponent(SchemeExamination):
     """
     Scheme Establishment toolbar component
     """
+
     def __init__(self):
         SchemeExamination.__init__(self)
 
@@ -193,6 +198,7 @@ class FirstExaminationtToolbarWidget(SchemeExamination):
     """
     First Examination toolbar component
     """
+
     def __init__(self):
         SchemeExamination.__init__(self)
 
@@ -201,6 +207,7 @@ class SecondExaminationToolbarWidget(SchemeExamination):
     """
     Second Examination toolbar component
     """
+
     def __init__(self):
         SchemeExamination.__init__(self)
 
@@ -231,6 +238,7 @@ class ImportPlotToolbarComponent(ToolbarComponent):
     """
     Import Plot toolbar component
     """
+
     def __init__(self):
         ToolbarComponent.__init__(self)
         component = self._create_component()

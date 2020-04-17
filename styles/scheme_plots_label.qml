@@ -78,7 +78,7 @@
     <property key="labeling/fontLimitPixelSize" value="false"/>
     <property key="labeling/fontMaxPixelSize" value="10000"/>
     <property key="labeling/fontMinPixelSize" value="3"/>
-    <property key="labeling/fontSize" value="7"/>
+    <property key="labeling/fontSize" value="9"/>
     <property key="labeling/fontSizeInMapUnits" value="false"/>
     <property key="labeling/fontSizeMapUnitScale" value="0,0,0,0,0,0"/>
     <property key="labeling/fontStrikeout" value="false"/>
@@ -105,7 +105,7 @@
     <property key="labeling/obstacleType" value="0"/>
     <property key="labeling/offsetType" value="0"/>
     <property key="labeling/placeDirectionSymbol" value="0"/>
-    <property key="labeling/placement" value="4"/>
+    <property key="labeling/placement" value="0"/>
     <property key="labeling/placementFlags" value="10"/>
     <property key="labeling/plussign" value="false"/>
     <property key="labeling/predefinedPositionOrder" value="TR,TL,BR,BL,R,L,TSR,BSR"/>
@@ -213,7 +213,6 @@
   <SingleCategoryDiagramRenderer diagramType="Histogram" sizeLegend="0" attributeLegend="1">
     <DiagramCategory penColor="#000000" labelPlacementMethod="XHeight" penWidth="0" diagramOrientation="Up" sizeScale="0,0,0,0,0,0" minimumSize="0" barWidth="5" penAlpha="255" maxScaleDenominator="1e+08" backgroundColor="#ffffff" transparency="0" width="15" scaleDependency="Area" backgroundAlpha="255" angleOffset="1440" scaleBasedVisibility="0" enabled="0" height="15" lineSizeScale="0,0,0,0,0,0" sizeType="MM" lineSizeType="MM" minScaleDenominator="inf">
       <fontProperties description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
-      <attribute field="" color="#000000" label=""/>
     </DiagramCategory>
     <symbol alpha="1" clip_to_extent="1" type="marker" name="sizeSymbol">
       <layer pass="0" class="SimpleMarker" locked="0">

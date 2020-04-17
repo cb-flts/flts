@@ -13,6 +13,7 @@ from stdm.tests.data.utils import (
 
 config_path = 'D:/Temp/Templates/test_writer.stc'
 
+
 class TestConfigurationSerializer(TestCase):
     def setUp(self):
         self.config = StdmConfiguration.instance()

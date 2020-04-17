@@ -28,7 +28,7 @@ from stdm.data.configuration.exception import ConfigurationException
 from stdm.data.configfile_paths import FilePaths
 
 
-class ConfigurationUtils():
+class ConfigurationUtils:
     PROFILE = 'Profile'
     SOCIAL_TENURE = 'SocialTenure'
     CONFIGURATION = 'Configuration'
@@ -95,7 +95,7 @@ class ConfigurationUtils():
 
             status, msg, line, col = self.document.setContent(config_file_path)
             if not status:
-                error_message = u'Configuration file cannot be loaded: {0}'.\
+                error_message = u'Configuration file cannot be loaded: {0}'. \
                     format(msg)
                 self.append_log(str(error_message))
 
@@ -181,7 +181,6 @@ class ConfigurationUtils():
             self.SOCIAL_TENURE
         )
         return social_tenure_nodes
-
 
     def run(self):
         nodes = self.find_node('Entity')

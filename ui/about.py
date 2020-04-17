@@ -16,7 +16,7 @@ email                : gkahiu@gmail.com
  *                                                                         *
  ***************************************************************************/
 """
-import sys,os
+import sys, os
 
 from PyQt4.QtGui import (
     QDialog,
@@ -36,21 +36,21 @@ from stdm.utils.util import PLUGIN_DIR, version_from_metadata
 from ui_about_flts import Ui_frmAbout
 
 
-class AboutSTDMDialog(QDialog,Ui_frmAbout):
-    def __init__(self,parent=None, metadata=None):
+class AboutSTDMDialog(QDialog, Ui_frmAbout):
+    def __init__(self, parent=None, metadata=None):
         QDialog.__init__(self, parent)
         self.setupUi(self)
 
         self._metadata = metadata
 
-        #Connect signals
+        # Connect signals
         self.btnContactUs.clicked.connect(self.onContactUs)
         self.btnSTDMHome.clicked.connect(self.onSTDMHome)
 
         self._insert_metadata_info()
 
     def _insert_metadata_info(self):
-        #Insert version and build numbers respectively.
+        # Insert version and build numbers respectively.
         if not self._metadata is None:
             installed_version = self._metadata.get('version_installed', None)
         else:
@@ -64,7 +64,7 @@ class AboutSTDMDialog(QDialog,Ui_frmAbout):
         cursor.insertBlock()
         cursor.insertBlock()
 
-        #Insert installed version text
+        # Insert installed version text
         version_msg = QApplication.translate(
             'AboutSTDMDialog',
             'FLTS version'
@@ -74,7 +74,7 @@ class AboutSTDMDialog(QDialog,Ui_frmAbout):
         text_format = QTextCharFormat(char_format)
         text_format.setFontWeight(75)
         cursor.insertText(version_text, text_format)
-            
+
     def onSTDMHome(self):
         """
         Load STDM home page using the system's default browser.
@@ -88,4 +88,3 @@ class AboutSTDMDialog(QDialog,Ui_frmAbout):
         """
         contactURL = "http://www.gov.na"
         QDesktopServices.openUrl(QUrl(contactURL))
-    

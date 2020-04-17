@@ -54,6 +54,7 @@ from .exceptions import TranslatorException
 __all__ = ["SourceValueTranslator", "ValueTranslatorManager",
            "RelatedTableTranslator", "IgnoreType"]
 
+
 class IgnoreType(object):
     """
     Placeholder object that instructs the reader to ignore inserting any
@@ -71,19 +72,20 @@ class SourceValueTranslator(object):
     using the expression builder or new values (such as timestamps) that
     are not dependent on the any value from the source table.
     """
+
     def __init__(self, parent=None):
         self._parent = None
         self._db_session = STDMDb.instance().session
         self.clear()
 
-        #Primary entity
+        # Primary entity
         self.entity = None
 
     def clear(self):
         self._referencing_table = ""
         self._referenced_table = ""
 
-        #Some translators like the MultipleEnumeration require ordered items
+        # Some translators like the MultipleEnumeration require ordered items
         self._input_referenced_columns = OrderedDict()
         self._output_referenced_column = ""
         self._referencing_column = ""
@@ -257,14 +259,14 @@ class SourceValueTranslator(object):
         """
         res = False
 
-        #Check destination table
+        # Check destination table
         if self._table(self._referencing_table) is None:
             msg = QApplication.translate("SourceValueTranslator",
                                          "Target table '%s' does not exist."
                                          % (self._referencing_table))
             raise TranslatorException(msg)
 
-        #Check destination column
+        # Check destination column
         dest_columns = self._table_columns(self._referencing_table)
         referencing_col_idx = getIndex(dest_columns, self._referencing_column)
 
@@ -274,7 +276,7 @@ class SourceValueTranslator(object):
                                          % (self._referencing_column))
             raise TranslatorException(msg)
 
-        #Check link table
+        # Check link table
         if self._table(self._referenced_table) is None:
             msg = QApplication.translate("SourceValueTranslator",
                                          "Linked table '%s' does not exist."
@@ -303,10 +305,12 @@ class SourceValueTranslator(object):
 
         return Table(name, meta, autoload=True)
 
+
 class ValueTranslatorManager(object):
     """
     This class manages multiple instances of source value translators.
     """
+
     def __init__(self, parent=None):
         self._parent = None
         self._translators = {}
@@ -383,6 +387,7 @@ class RelatedTableTranslator(SourceValueTranslator):
     This class translates values from one or more columns in the referenced
     table to the specified column in the referencing table.
     """
+
     def __init__(self):
         SourceValueTranslator.__init__(self)
 
@@ -406,15 +411,15 @@ class RelatedTableTranslator(SourceValueTranslator):
             if not ref_table_col is None:
                 col_idx = getIndex(link_table_columns, ref_table_col)
 
-                #If column is found, add it to the query fields collection
+                # If column is found, add it to the query fields collection
                 if col_idx != -1:
                     # TODO use the column object to cast based on column data type
                     query_attrs[ref_table_col] = cast(val, String)
 
-        #Create link table object
+        # Create link table object
         link_table = self._table(self._referenced_table)
 
-        #Use AND operator
+        # Use AND operator
         link_table_rec = self._db_session.query(link_table).filter_by(**query_attrs).first()
 
         if link_table_rec is None:
@@ -428,6 +433,7 @@ class LookupValueTranslator(RelatedTableTranslator):
     """
     Translator for lookup values.
     """
+
     def __init__(self, **kwargs):
         super(LookupValueTranslator, self).__init__()
 
@@ -542,7 +548,7 @@ class MultipleEnumerationTranslator(SourceValueTranslator):
                                          num_cols)
             has_other_col = True
 
-        #Tuple of one or two items.The format is - (source primary enum column, enum table primary column)
+        # Tuple of one or two items.The format is - (source primary enum column, enum table primary column)
         enum_cols_pairs = list(cols_iter)
 
         source_primary_col, enum_primary_col = enum_cols_pairs[0]
@@ -558,14 +564,14 @@ class MultipleEnumerationTranslator(SourceValueTranslator):
 
         enum_vals = delimiter_sep_enums.split(self._separator)
 
-        #Get mapped enumeration class associated with the target table.
+        # Get mapped enumeration class associated with the target table.
         enum_class = self._mapped_class(self._referenced_table)
 
         if enum_class is None:
             msg = QApplication.translate("MultipleEnumerationTranslator",
-                    u"The referenced enumeration table could not be mapped "
-                    "for the '{0}' column. Values from the source table will "
-                    "not be imported to the STDM database".format(self._referencing_column))
+                                         u"The referenced enumeration table could not be mapped "
+                                         "for the '{0}' column. Values from the source table will "
+                                         "not be imported to the STDM database".format(self._referencing_column))
             parent_widget = self._parent if isinstance(self._parent, QWidget) else None
             QMessageBox.warning(parent_widget,
                                 QApplication.translate("MultipleEnumerationTranslator",
@@ -573,7 +579,7 @@ class MultipleEnumerationTranslator(SourceValueTranslator):
                                 msg)
             return IgnoreType()
 
-        #Get column type of the enumeration
+        # Get column type of the enumeration
         enum_col_type = enum_class.__mapper__.columns[enum_primary_col].type
 
         if not hasattr(enum_col_type, "enum"):
@@ -585,15 +591,15 @@ class MultipleEnumerationTranslator(SourceValueTranslator):
                                                  self._referenced_table))
             parent_widget = self._parent if isinstance(self._parent, QWidget) else None
             QMessageBox.warning(parent_widget,
-                                    QApplication.translate("MultipleEnumerationTranslator",
-                                                           "Multiple Enumeration Import"),
-                                    msg)
+                                QApplication.translate("MultipleEnumerationTranslator",
+                                                       "Multiple Enumeration Import"),
+                                msg)
 
         enum_obj = enum_col_type.enum
 
         enum_class_instances = []
 
-        #Create enum class instances and append enum symbols
+        # Create enum class instances and append enum symbols
         for e_val in enum_vals:
             if not isinstance(e_val, str) or not isinstance(e_val, unicode):
                 e_val = unicode(e_val)
@@ -606,7 +612,7 @@ class MultipleEnumerationTranslator(SourceValueTranslator):
                 enum_class_instance = enum_class()
                 setattr(enum_class_instance, enum_primary_col, enum_symbol)
 
-                #If other is defined
+                # If other is defined
                 enum_other_value = enum_obj.other_value()
                 if e_val == enum_other_value and enum_other_value != -1:
                     if has_other_col:
@@ -616,16 +622,16 @@ class MultipleEnumerationTranslator(SourceValueTranslator):
 
                     else:
                         msg = QApplication.translate("MultipleEnumerationTranslator",
-                                u"A value that represents 'Other' in the '{0}' "
-                                "table has been detected but there is no "
-                                "configuration for 'Other' in the translator. "
-                                "This value will not be imported."
-                                .format(self._referenced_table))
+                                                     u"A value that represents 'Other' in the '{0}' "
+                                                     "table has been detected but there is no "
+                                                     "configuration for 'Other' in the translator. "
+                                                     "This value will not be imported."
+                                                     .format(self._referenced_table))
                         parent_widget = self._parent if isinstance(self._parent, QWidget) else None
                         QMessageBox.warning(parent_widget,
-                                                QApplication.translate("MultipleEnumerationTranslator",
-                                                                       "Multiple Enumeration Import"),
-                                                msg)
+                                            QApplication.translate("MultipleEnumerationTranslator",
+                                                                   "Multiple Enumeration Import"),
+                                            msg)
 
                 enum_class_instances.append(enum_class_instance)
 
@@ -637,26 +643,27 @@ class SourceDocumentTranslator(SourceValueTranslator):
     Reads document paths from the source table and uploads them to the
     application document repository.
     """
+
     def __init__(self):
         SourceValueTranslator.__init__(self)
 
-        #Needs to be set prior to uploading the document
+        # Needs to be set prior to uploading the document
         self.source_document_manager = None
 
-        #Source directory
+        # Source directory
         self.source_directory = None
 
-        #Document type id
+        # Document type id
         self.document_type_id = None
 
-        #Document type name
+        # Document type name
         self.document_type = None
 
     def requires_source_document_manager(self):
         return True
 
     def _create_uploaded_docs_dir(self):
-        #Creates an 'uploaded' directory where uploaded documents are moved to.
+        # Creates an 'uploaded' directory where uploaded documents are moved to.
         uploaded_dir = QDir(self.source_directory)
         uploaded_dir.mkdir('uploaded')
 
@@ -677,7 +684,7 @@ class SourceDocumentTranslator(SourceValueTranslator):
         if self.document_type_id is None:
             msg = QApplication.translate(
                 'SourceDocumentTranslator',
-                 'Document type has not been set for the source document '
+                'Document type has not been set for the source document '
                 'translator.'
             )
             raise RuntimeError(msg)
@@ -716,13 +723,13 @@ class SourceDocumentTranslator(SourceValueTranslator):
         if not doc_file_name:
             return IgnoreType
 
-        #Separate files
+        # Separate files
         docs = doc_file_name.split(';')
 
-        #Create document container
+        # Create document container
         doc_container = QVBoxLayout()
 
-        #Register container
+        # Register container
         self.source_document_manager.registerContainer(
             doc_container,
             self.document_type_id
@@ -733,7 +740,7 @@ class SourceDocumentTranslator(SourceValueTranslator):
                 continue
 
             # Normalize slashes
-            d_name = d.replace('\\','/').strip()
+            d_name = d.replace('\\', '/').strip()
 
             # Build absolute document path
             abs_doc_path = u'{0}/{1}'.format(self.source_directory, d_name)
@@ -760,19 +767,3 @@ class SourceDocumentTranslator(SourceValueTranslator):
         # Documents are handles by the source document manager so we just
         # instruct the system to ignore the return value
         return IgnoreType
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

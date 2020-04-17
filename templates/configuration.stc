@@ -114,6 +114,7 @@
     <CodeValue value="Lodgement" code="LDG"/>
     <CodeValue value="First Assessment" code="FA"/>
     <CodeValue value="Import Plot" code="IP"/>
+    <CodeValue value="Certificate" code=""/>
    </ValueList>
    <ValueList name="check_lht_approval_status">
     <CodeValue value="Approved" code="AP"/>
@@ -136,7 +137,16 @@
     <CodeValue value="Holder Identifier" code=""/>
    </ValueList>
    <ValueList name="check_certificate_document_type">
-    <CodeValue value="General" code=""/>
+    <CodeValue value="Archive" code=""/>
+   </ValueList>
+   <ValueList name="check_lht_plot_crs">
+    <CodeValue value="EPSG:29373" code="13"/>
+    <CodeValue value="EPSG:29375" code="15"/>
+    <CodeValue value="EPSG:29377" code="17"/>
+    <CodeValue value="EPSG:29379" code="19"/>
+    <CodeValue value="EPSG:29381" code="21"/>
+    <CodeValue value="EPSG:29385" code="25"/>
+    <CodeValue value="EPSG:29383" code="23"/>
    </ValueList>
   </ValueLists>
   <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to users" proxy="False" createId="True" supportsDocuments="False" shortName="User" name="cb_user" label="User">
@@ -151,10 +161,25 @@
    <Columns>
     <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
     <Column unique="False" tip="User comment on a scheme" rowindex="0" minimum="0" maximum="1073741823" description="User comment on a scheme" index="False" name="comment" searchable="False" TYPE_INFO="TEXT" label="" mandatory="False"/>
-    <Column unique="False" tip="Identifier of the user" rowindex="-1" minimum="0" maximum="30" description="Identifier of the user" index="False" name="user_id" searchable="True" TYPE_INFO="VARCHAR" label="Scheme ID" mandatory="True"/>
+    <Column unique="False" tip="Name of the user" rowindex="-1" minimum="0" maximum="30" description="Name of the userr" index="False" name="user" searchable="True" TYPE_INFO="VARCHAR" label="User" mandatory="True"/>
     <Column unique="False" tip="Time and date of comment submission" rowindex="2" minimum="1752-09-14 00:00:00" maximum="9999-12-31 23:59:59.999999" description="Time and date of comment submission" index="False" name="timestamp" searchable="False" TYPE_INFO="DATETIME" label="" mandatory="False">
      <currentDateTime minimum="False" maximum="False"/>
     </Column>
+   </Columns>
+  </Entity>
+  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to log of the plot entity" proxy="False" createId="True" supportsDocuments="False" shortName="Plot_log" name="cb_plot_log" label="lht_plot_log">
+   <Columns>
+    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
+   </Columns>
+  </Entity>
+  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to the log of the scheme entity" proxy="False" createId="True" supportsDocuments="False" shortName="Scheme_log" name="cb_scheme_log" label="lht_scheme_log">
+   <Columns>
+    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
+   </Columns>
+  </Entity>
+  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to the log of holder entity" proxy="False" createId="True" supportsDocuments="False" shortName="Holder_log" name="cb_holder_log" label="lht_holder_log">
+   <Columns>
+    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
    </Columns>
   </Entity>
   <Entity editable="True" global="False" rowindex="-1" associative="False" description="Archive for the certificate" documentTypeLookup="check_certificate_document_type" proxy="False" createId="True" supportsDocuments="True" shortName="Certificate" name="cb_certificate" label="lht_certificate">
@@ -164,10 +189,13 @@
      <Relation name="fk_cb_plot_id_cb_certificate_plot_id"/>
     </Column>
     <Column unique="True" tip="" rowindex="1" minimum="0" maximum="30" description="Refers to the certificate number" index="False" name="certificate_number" searchable="True" TYPE_INFO="VARCHAR" label="certificate number" mandatory="True"/>
-    <Column unique="False" tip="" rowindex="2" minimum="0001-01-01 00:00:00" maximum="9999-12-31 23:59:59.999999" description="Refers to the procuction date/time of the certificate" index="False" name="production_date" searchable="False" TYPE_INFO="DATETIME" label="production date" mandatory="False">
+    <Column unique="False" tip="" rowindex="2" minimum="0" maximum="2147483647" description="Scheme identifier" index="False" name="scheme_id" searchable="False" TYPE_INFO="FOREIGN_KEY" label="scheme id" mandatory="False">
+     <Relation name="fk_cb_scheme_id_cb_certificate_scheme_id"/>
+    </Column>
+    <Column unique="False" tip="" rowindex="3" minimum="0001-01-01 00:00:00" maximum="9999-12-31 23:59:59.999999" description="Refers to the procuction date/time of the certificate" index="False" name="archive_date" searchable="False" TYPE_INFO="DATETIME" label="archive date" mandatory="False">
      <currentDateTime minimum="False" maximum="False"/>
     </Column>
-    <Column unique="False" tip="" rowindex="3" minimum="0" maximum="30" description="Refers to the user that produced the certificate" index="False" name="prod_user" searchable="True" TYPE_INFO="VARCHAR" label="prod user" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="4" minimum="0" maximum="30" description="Refers to the user that produced the certificate" index="False" name="prod_user" searchable="True" TYPE_INFO="VARCHAR" label="prod user" mandatory="False"/>
    </Columns>
   </Entity>
   <Entity editable="False" global="False" rowindex="-1" associative="False" description="" proxy="False" createId="True" supportsDocuments="False" shortName="check_tenure_type_str_attrs" name="cb_check_tenure_type_str_attrs" label="">
@@ -278,7 +306,7 @@
   <Entity editable="True" global="False" rowindex="10" associative="False" description="Refers to the holder of Land Hold Title" documentTypeLookup="check_holder_document_type" proxy="False" createId="True" supportsDocuments="True" shortName="Holder" name="cb_holder" label="lht_holder">
    <Columns>
     <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-    <Column unique="True" tip="" rowindex="0" minimum="0" maximum="999999999" description="Refers to number of the plot" index="False" name="plot_number" searchable="True" TYPE_INFO="INT" label="plot number" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="0" minimum="-2147483648" maximum="2147483647" description="Number of the plot" index="False" name="plot_number" searchable="True" TYPE_INFO="INT" label="plot_number" mandatory="False"/>
     <Column unique="False" tip="" rowindex="1" minimum="1752-09-14" maximum="7999-12-31" description="Refers to date of the transfer contract" index="False" name="transfer_contract_date" searchable="False" TYPE_INFO="DATE" label="transfer contract date" mandatory="False">
      <currentDate minimum="False" maximum="False"/>
     </Column>
@@ -395,14 +423,15 @@
     <Column unique="False" tip="" rowindex="16" minimum="0" maximum="200" description="Refers to the description of the scheme" index="False" name="scheme_description" searchable="True" TYPE_INFO="VARCHAR" label="scheme description" mandatory="True"/>
    </Columns>
   </Entity>
-  <Entity editable="True" global="False" rowindex="4" associative="False" description="Refers to the relation between holder and plot" proxy="False" createId="True" supportsDocuments="False" shortName="Holder_plot" name="cb_holder_plot" label="lht_holder_plot">
+  <Entity editable="True" global="False" rowindex="4" associative="False" description="Refers to the staing for holder and plot" proxy="False" createId="True" supportsDocuments="False" shortName="Staging_holder_plot" name="cb_staging_holder_plot" label="lht_staging_holder_plot">
    <Columns>
     <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
     <Column unique="False" tip="" rowindex="0" minimum="0" maximum="2147483647" description="Identifier number of holder" index="False" name="holder_id" searchable="False" TYPE_INFO="FOREIGN_KEY" label="holder id" mandatory="False">
-     <Relation name="fk_cb_holder_id_cb_holder_plot_holder_id"/>
+     <Relation name="fk_cb_holder_id_cb_staging_holder_plot_holder_id"/>
     </Column>
-    <Column unique="False" tip="" rowindex="1" minimum="0" maximum="2147483647" description="Plot identity number" index="False" name="plot_id" searchable="False" TYPE_INFO="FOREIGN_KEY" label="plot id" mandatory="False">
-     <Relation name="fk_cb_plot_id_cb_holder_plot_plot_id"/>
+    <Column unique="False" tip="" rowindex="1" minimum="-2147483648" maximum="2147483647" description="Plot identity number" index="False" name="plot_number" searchable="True" TYPE_INFO="INT" label="plot number" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="2" minimum="0" maximum="2147483647" description="Scheme identifier" index="False" name="scheme_id" searchable="False" TYPE_INFO="FOREIGN_KEY" label="scheme id" mandatory="False">
+     <Relation name="fk_cb_scheme_id_cb_staging_holder_plot_scheme_id"/>
     </Column>
    </Columns>
   </Entity>
@@ -431,28 +460,16 @@
     <Column unique="False" tip="" rowindex="2" minimum="0" maximum="2147483647" description="Use of the plot of land" index="False" name="use" searchable="True" TYPE_INFO="LOOKUP" label="plot use" mandatory="False">
      <Relation name="fk_cb_check_lht_plot_use_id_cb_plot_use"/>
     </Column>
-    <Column unique="False" tip="Plot number" rowindex="-1" minimum="0" maximum="6" description="" index="True" name="plot_number" searchable="True" TYPE_INFO="VARCHAR" label="" mandatory="True"/>
+    <Column unique="False" tip="Plot number" rowindex="3" minimum="0" maximum="6" description="" index="True" name="plot_number" searchable="True" TYPE_INFO="VARCHAR" label="" mandatory="True"/>
     <Column unique="False" tip="Plot area" rowindex="4" minimum="-2.225073858507201383090232717332404064219215980462331830553327416887204434813918195854283159012511020564067339731035811005152434161553460108856012385377718821130777993532002330479610147442583636071921565046942503734208375250806650616658158948720491179968591639648500635908770118304874799780887753749949451580451605050915399856582470818645113537935804992115981085766051992433352114352390148795699609591288891602992641511063466313393663477586513029371762047325631781485664350872122828637642044846811407613911477062801689853244110024161447421618567166150540154285084716752901903161322778896729707373123334086988983175067838846926092773977972858659654941091369095406136467568702398678315290680984617210924625396728515625E-308" maximum="179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368" description="Area of the plot" index="False" name="area" searchable="False" TYPE_INFO="DOUBLE" label="" mandatory="False">
      <Numeric scale="6" precision="18"/>
     </Column>
     <Column unique="False" tip="" rowindex="5" minimum="0" maximum="2147483647" description="Identifier of the scheme" index="False" name="scheme_id" searchable="False" TYPE_INFO="FOREIGN_KEY" label="" mandatory="True">
      <Relation name="fk_cb_scheme_id_cb_plot_scheme_id"/>
     </Column>
-   </Columns>
-  </Entity>
-  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to log of the plot entity" proxy="False" createId="True" supportsDocuments="False" shortName="Plot_log" name="cb_plot_log" label="lht_plot_log">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-   </Columns>
-  </Entity>
-  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to the log of the scheme entity" proxy="False" createId="True" supportsDocuments="False" shortName="Scheme_log" name="cb_scheme_log" label="lht_scheme_log">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-   </Columns>
-  </Entity>
-  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to the log of holder entity" proxy="False" createId="True" supportsDocuments="False" shortName="Holder_log" name="cb_holder_log" label="lht_holder_log">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="6" minimum="0" maximum="2147483647" description="Coordinate reference system " index="False" name="crs_id" searchable="True" TYPE_INFO="LOOKUP" label="crs id" mandatory="False">
+     <Relation name="fk_cb_check_lht_plot_crs_id_cb_plot_crs_id"/>
+    </Column>
    </Columns>
   </Entity>
   <Relations>
@@ -485,10 +502,12 @@
    <EntityRelation displayColumns="name,code" child="Scheme" showInParent="True" parent="check_plot_status" name="fk_cb_check_plot_status_id_cb_scheme_plot_status" parentColumn="id" showInChild="True" childColumn="plot_status"/>
    <EntityRelation displayColumns="name,code" child="Plot" showInParent="True" parent="check_lht_plot_use" name="fk_cb_check_lht_plot_use_id_cb_plot_use" parentColumn="id" showInChild="True" childColumn="use"/>
    <EntityRelation displayColumns="" child="Plot" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_plot_scheme_id" parentColumn="id" showInChild="True" childColumn="scheme_id"/>
+   <EntityRelation displayColumns="name,code" child="Plot" showInParent="True" parent="check_lht_plot_crs" name="fk_cb_check_lht_plot_crs_id_cb_plot_crs_id" parentColumn="id" showInChild="True" childColumn="crs_id"/>
    <EntityRelation displayColumns="name,code" child="Certificate_supporting_document" showInParent="True" parent="check_certificate_document_type" name="fk_cb_check_certificate_document_type_id_cb_certificate_supporting_document_document_type" parentColumn="id" showInChild="True" childColumn="document_type"/>
    <EntityRelation displayColumns="" child="Certificate_supporting_document" showInParent="True" parent="Certificate" name="fk_cb_certificate_id_cb_certificate_supporting_document_certificate_id" parentColumn="id" showInChild="True" childColumn="certificate_id"/>
    <EntityRelation displayColumns="" child="Certificate_supporting_document" showInParent="True" parent="supporting_document" name="fk_cb_supporting_document_id_cb_certificate_supporting_document_supporting_doc_id" parentColumn="id" showInChild="True" childColumn="supporting_doc_id"/>
    <EntityRelation displayColumns="upi" child="Certificate" showInParent="True" parent="Plot" name="fk_cb_plot_id_cb_certificate_plot_id" parentColumn="id" showInChild="True" childColumn="plot_id"/>
+   <EntityRelation displayColumns="" child="Certificate" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_certificate_scheme_id" parentColumn="id" showInChild="True" childColumn="scheme_id"/>
    <EntityRelation displayColumns="" child="check_tenure_type_str_attrs" showInParent="True" parent="social_tenure_relationship" name="fk_cb_social_tenure_relationship_id_cb_check_tenure_type_str_attrs_social_tenure_relationship_id" parentColumn="id" showInChild="True" childColumn="social_tenure_relationship_id"/>
    <EntityRelation displayColumns="" child="Relevant_auth_reg_division" showInParent="True" parent="Relevant_authority" name="fk_cb_relevant_authority_id_cb_relevant_auth_reg_division_relv_auth_id" parentColumn="id" showInChild="True" childColumn="relv_auth_id"/>
    <EntityRelation displayColumns="name,code" child="Relevant_auth_reg_division" showInParent="True" parent="check_lht_reg_division" name="fk_cb_check_lht_reg_division_id_cb_relevant_auth_reg_division_reg_division_id" parentColumn="id" showInChild="True" childColumn="reg_division_id"/>
@@ -501,8 +520,8 @@
    <EntityRelation displayColumns="" child="Scheme_comment" showInParent="True" parent="Comment" name="fk_cb_comment_id_cb_scheme_comment_comment_id" parentColumn="id" showInChild="True" childColumn="comment_id"/>
    <EntityRelation displayColumns="" child="Servitude" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_servitude_scheme_id" parentColumn="id" showInChild="True" childColumn="scheme_id"/>
    <EntityRelation displayColumns="" child="Beacon" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_beacon_scheme_id" parentColumn="id" showInChild="True" childColumn="scheme_id"/>
-   <EntityRelation displayColumns="" child="Holder_plot" showInParent="True" parent="Holder" name="fk_cb_holder_id_cb_holder_plot_holder_id" parentColumn="id" showInChild="True" childColumn="holder_id"/>
-   <EntityRelation displayColumns="" child="Holder_plot" showInParent="True" parent="Plot" name="fk_cb_plot_id_cb_holder_plot_plot_id" parentColumn="id" showInChild="True" childColumn="plot_id"/>
+   <EntityRelation displayColumns="" child="Staging_holder_plot" showInParent="True" parent="Holder" name="fk_cb_holder_id_cb_staging_holder_plot_holder_id" parentColumn="id" showInChild="True" childColumn="holder_id"/>
+   <EntityRelation displayColumns="" child="Staging_holder_plot" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_staging_holder_plot_scheme_id" parentColumn="id" showInChild="True" childColumn="scheme_id"/>
    <EntityRelation displayColumns="" child="Lis_erf" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_lis_erf_scheme_identifier" parentColumn="id" showInChild="True" childColumn="scheme_identifier"/>
    <EntityRelation displayColumns="" child="social_tenure_relationship" showInParent="True" parent="Holder" name="fk_cb_holder_id_cb_social_tenure_relationship_holder_id" parentColumn="id" showInChild="True" childColumn="holder_id"/>
    <EntityRelation displayColumns="" child="social_tenure_relationship" showInParent="True" parent="Plot" name="fk_cb_plot_id_cb_social_tenure_relationship_plot_id" parentColumn="id" showInChild="True" childColumn="plot_id"/>

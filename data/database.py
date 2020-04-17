@@ -64,51 +64,58 @@ import stdm.data
 
 metadata = MetaData()
 
-#Registry of table names and corresponding mappers
+# Registry of table names and corresponding mappers
 table_registry = defaultdict(set)
 LOGGER = logging.getLogger('stdm')
+
+
 def mapper(cls, table=None, *args, **kwargs):
     tb_mapper = _mapper(cls, table, *args, **kwargs)
     table_registry[table.name].add(tb_mapper)
 
     return tb_mapper
 
+
 Base = declarative_base(metadata=metadata)
+
 
 class Singleton(object):
     """
     Singleton class
     """
-    def __init__(self,decorated):
+
+    def __init__(self, decorated):
         self.__decorated = decorated
-        
-    def instance(self,*args,**kwargs):
-        '''
-        Returns an instance of the decorated object or creates 
+
+    def instance(self, *args, **kwargs):
+        """
+        Returns an instance of the decorated object or creates
         one if it does not exist
-        '''
+        """
         try:
             return self._instance
 
-        #Catch null property exception and create a new instance of the class
+        # Catch null property exception and create a new instance of the class
         except AttributeError:
-            self._instance = self.__decorated(*args,**kwargs)
+            self._instance = self.__decorated(*args, **kwargs)
             return self._instance
-        
-    def __call__(self,*args,**kwargs):
+
+    def __call__(self, *args, **kwargs):
         raise TypeError('Singleton must be accessed through the instance method')
-    
+
     def cleanUp(self):
-        '''
+        """
         Remove the instance of the referenced singleton class
-        '''
+        """
         del self._instance
+
 
 class NoPostGISError(Exception):
     """Raised when the PostGIS extension is not installed in the specified
     STDM database."""
     pass
-    
+
+
 @Singleton
 class STDMDb(object):
     """
@@ -119,10 +126,10 @@ class STDMDb(object):
     session = None
 
     def __init__(self):
-        #Initialize database engine
+        # Initialize database engine
         self.engine = create_engine(stdm.data.app_dbconn.toAlchemyConnection(), echo=False)
 
-        #Check for PostGIS extension
+        # Check for PostGIS extension
         self.postgis_state = self._check_spatial_extension()
 
         Session = sessionmaker(bind=self.engine)
@@ -135,7 +142,7 @@ class STDMDb(object):
         """
         Base.metadata.create_all(self.engine)
 
-    def instance(self,*args,**kwargs):
+    def instance(self, *args, **kwargs):
         """
         Dummy method. Eclipse IDE cannot handle the Singleton decorator in Python
         """
@@ -221,16 +228,16 @@ def alchemy_table_relationships(table_name):
 
     return relationship_names
 
-        
+
 class Model(object):
-    '''
+    """
     Base class that handles all basic database operations.
     All STDM entities that need to be persisted in the database
     will inherit from this class.
-    '''
+    """
     attrTranslations = OrderedDict()
-    
-    def save(self):            
+
+    def save(self):
         db = STDMDb.instance()
         db.session.add(self)
         try:
@@ -240,10 +247,10 @@ class Model(object):
             LOGGER.debug(unicode(db_error))
             raise db_error
 
-    def saveMany(self,objects = []):
-        '''
+    def saveMany(self, objects=[]):
+        """
         Save multiple objects of the same type in one go.
-        '''
+        """
         db = STDMDb.instance()
         db.session.add_all(objects)
         try:
@@ -261,7 +268,7 @@ class Model(object):
             db.session.rollback()
             LOGGER.debug(unicode(db_error))
             raise db_error
-            
+
     def delete(self):
         from stdm.data.pg_utils import set_child_dependencies_null_on_delete
 
@@ -284,12 +291,12 @@ class Model(object):
 
             raise db_error
 
-    def queryObject(self,args=[]):
-        '''
+    def queryObject(self, args=[]):
+        """
         The 'args' specifies the attributes/columns
         that will be returned in the query in a tuple;
         Else, the full model object will be returned.
-        '''
+        """
         db = STDMDb.instance()
         # raise NameError(str(self.__class__))
         try:
@@ -302,90 +309,94 @@ class Model(object):
             db.session.rollback()
             LOGGER.debug(str(db_error))
             raise db_error
-    
-    @classmethod  
-    def tr(cls,propname):
-        '''
+
+    @classmethod
+    def tr(cls, propname):
+        """
         Returns a user-friendly name for the given property name.
         :param propname: Property name.
-        '''
+        """
         if propname in cls.attrTranslations:
             return cls.attrTranslations[propname]
         else:
             return None
-    
+
     @staticmethod
     def displayMapping():
-        '''
+        """
         Returns the dictionary containing the translation mapping for the attributes.
         Base classes need to implement this method.
-        
+
         if len(Model.attrTranslations) == 0:
             raise NotImplementedError
         else:
-        '''
+        """
         return Model.attrTranslations
-                        
-class Content(Model,Base):
-    '''
+
+
+class Content(Model, Base):
+    """
     Abstract class which is implemented by contents items that need to be registered based
-    on the scope of the particular instance of STDM customization.    
-    '''
+    on the scope of the particular instance of STDM customization.
+    """
     __tablename__ = "content_base"
-    id = Column(Integer,primary_key = True)
-    name = Column(String(100), unique = True)
-    code = Column(String(100),unique = True) 
-    roles = relationship("Role", secondary = "content_roles", backref = "contents")
-    
-class Role(Model,Base):
-    '''
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), unique=True)
+    code = Column(String(100), unique=True)
+    roles = relationship("Role", secondary="content_roles", backref="contents")
+
+
+class Role(Model, Base):
+    """
     Model for the database-wide system roles. These are manually synced with the roles in the
     system catalog.
-    '''
+    """
     __tablename__ = "role"
-    id = Column(Integer,primary_key =True)
-    name = Column(String(100), unique = True)
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), unique=True)
     description = Column(String)
 
-#Table for mapping the many-to-many association of content item to system roles  
-content_roles_table = Table("content_roles", Base.metadata,
-    Column('content_base_id',Integer, ForeignKey('content_base.id'), primary_key = True),
-    Column('role_id',Integer, ForeignKey('role.id'), primary_key = True)
-)
 
-class AdminSpatialUnitSet(Model,Base):
-    '''
+# Table for mapping the many-to-many association of content item to system roles
+content_roles_table = Table("content_roles", Base.metadata,
+                            Column('content_base_id', Integer, ForeignKey('content_base.id'), primary_key=True),
+                            Column('role_id', Integer, ForeignKey('role.id'), primary_key=True)
+                            )
+
+
+class AdminSpatialUnitSet(Model, Base):
+    """
     Hierarchy of administrative units.
-    '''
+    """
     __tablename__ = "admin_spatial_unit_set"
-    id = Column(Integer,primary_key=True)
-    ParentID = Column("parent_id",Integer,ForeignKey("admin_spatial_unit_set.id"))
-    Name = Column("name",String(50))
-    Code = Column("code",String(10))
-    Children = relationship("AdminSpatialUnitSet",backref=backref("Parent",remote_side=[id]),
-                            cascade = "all, delete-orphan")
-    
-    def __init__(self,name="",code="",parent=None):
+    id = Column(Integer, primary_key=True)
+    ParentID = Column("parent_id", Integer, ForeignKey("admin_spatial_unit_set.id"))
+    Name = Column("name", String(50))
+    Code = Column("code", String(10))
+    Children = relationship("AdminSpatialUnitSet", backref=backref("Parent", remote_side=[id]),
+                            cascade="all, delete-orphan")
+
+    def __init__(self, name="", code="", parent=None):
         self.Name = name
         self.Code = code
         self.Parent = parent
-        
-    def hierarchyCode(self, separator = "/"):
-        '''
+
+    def hierarchyCode(self, separator="/"):
+        """
         Returns a string constituted of codes aggregated from the class instance, prior to which
         there are codes of the parent administrative units in the hierarchy.
-        '''
+        """
         codeList = []
         codeList.append(self.Code)
-        
-        parent = self.Parent        
+
+        parent = self.Parent
         while parent != None:
             codeList.append(parent.Code)
             parent = parent.Parent
-            
-        #Reverse the items so that the last item added becomes the prefix of the hierarchy code
+
+        # Reverse the items so that the last item added becomes the prefix of the hierarchy code
         reverseCode = list(reversed(codeList))
-            
+
         return separator.join(reverseCode)
 
     def hierarchy_names(self, separator="/"):

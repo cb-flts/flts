@@ -10,6 +10,7 @@ from .utils import (
     create_basic_profile
 )
 
+
 class TestStdmConfiguration(TestCase):
     def setUp(self):
         self.config = StdmConfiguration.instance()
@@ -40,6 +41,7 @@ class TestStdmConfiguration(TestCase):
 
     def tearDown(self):
         self.config = None
+
 
 def suite():
     suite = makeSuite(TestStdmConfiguration, 'test')
