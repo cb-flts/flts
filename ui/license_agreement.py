@@ -33,6 +33,7 @@ from notification import NotificationBar, ERROR
 
 from stdm.ui.ui_license_agreement import Ui_LicenseAgreement
 
+
 class LicenseAgreement(QDialog, Ui_LicenseAgreement):
     def __init__(self, parent=None):
         """

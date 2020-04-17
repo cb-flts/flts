@@ -23,10 +23,12 @@ from PyQt4.QtGui import *
 from stdm.ui.admin_unit_manager import AdminUnitManager
 from .admin_unit_manager import VIEW, MANAGE
 
+
 class AdminUnitSelector(QDialog):
     """
     Generic admin unit manager dialog.
     """
+
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.resize(400, 410)
@@ -37,17 +39,17 @@ class AdminUnitSelector(QDialog):
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setOrientation(Qt.Horizontal)
         self.buttonBox.setStandardButtons(
-            QDialogButtonBox.Cancel|QDialogButtonBox.Close|QDialogButtonBox.Ok
+            QDialogButtonBox.Cancel | QDialogButtonBox.Close | QDialogButtonBox.Ok
         )
         self.verticalLayout.addWidget(self.buttonBox)
-        
+
         self.selectedAdminUnit = None
-        
-        #Connect signals
+
+        # Connect signals
         self.adminUnitManager.stateChanged.connect(self.onStateChanged)
-        self.connect(self.buttonBox.button(QDialogButtonBox.Ok),SIGNAL("clicked()"),self.onAcceptDialog)
-        self.connect(self.buttonBox.button(QDialogButtonBox.Cancel),SIGNAL("clicked()"),self.onRejectDialog)
-        self.connect(self.buttonBox.button(QDialogButtonBox.Close),SIGNAL("clicked()"),self.onRejectDialog)
+        self.connect(self.buttonBox.button(QDialogButtonBox.Ok), SIGNAL("clicked()"), self.onAcceptDialog)
+        self.connect(self.buttonBox.button(QDialogButtonBox.Cancel), SIGNAL("clicked()"), self.onRejectDialog)
+        self.connect(self.buttonBox.button(QDialogButtonBox.Close), SIGNAL("clicked()"), self.onRejectDialog)
 
     def setManageMode(self, enableManage):
         """
@@ -57,17 +59,17 @@ class AdminUnitSelector(QDialog):
             self.adminUnitManager.setState(MANAGE)
         else:
             self.adminUnitManager.setState(VIEW)
-            
+
     def onStateChanged(self, isManageMode):
-        '''
+        """
         Slot raised when the state of the admin unit manager widget changes
-        '''
+        """
         if isManageMode:
             self.buttonBox.button(QDialogButtonBox.Ok).setVisible(False)
             self.buttonBox.button(QDialogButtonBox.Cancel).setVisible(False)
             self.buttonBox.button(QDialogButtonBox.Close).setVisible(True)
             title = self.tr('Manage Administrative Units')
-            
+
         else:
             self.buttonBox.button(QDialogButtonBox.Ok).setVisible(True)
             self.buttonBox.button(QDialogButtonBox.Cancel).setVisible(True)
@@ -75,29 +77,28 @@ class AdminUnitSelector(QDialog):
             title = self.tr('Select Administrative Unit')
 
         self.setWindowTitle(title)
-            
+
     def onAcceptDialog(self):
-        '''
+        """
         Slot raised on accepting administrative unit selection.
         This is raised when the dialog is in VIEW mode.
-        '''
+        """
         self.adminUnitManager.notificationBar().clear()
 
         self.selectedAdminUnit = self.adminUnitManager.selectedAdministrativeUnit()
-        
+
         if self.selectedAdminUnit is None:
             msg = self.tr('Please select an administrative unit '
                           'from the list.')
             self.adminUnitManager.notificationBar().insertWarningNotification(
                 msg
             )
-            
+
         else:
             self.accept()
-    
+
     def onRejectDialog(self):
-        '''
+        """
         Slot raised to close the dialog.
-        '''
+        """
         self.reject()
-        
