@@ -397,6 +397,7 @@ class EntityVectorLayerDbImporter(QObject):
                 fields
             )
             for ent_obj in entity_objects:
+                self._append_feat_attributes(feat, ent_obj)
                 if is_new:
                     ent_obj.save()
                 else:
@@ -407,3 +408,128 @@ class EntityVectorLayerDbImporter(QObject):
                 self.featureImported.emit((is_new, ent_obj))
 
         self.importFinished.emit()
+
+    def _append_feat_attributes(self, feat, data_object):
+        """
+        Enables subclasses to append additional attribute values to the
+        data_object from the input feature.
+        Default implementation does nothing.
+        :param feat: Input feature containing additional values to be
+        appended to the data_object.
+        :type feat: QgsFeature
+        :param data_object: SQLAlchemy data object to which additional
+        attribute values will be appended prior to saving or updating.
+        :type data_object: object
+        """
+        pass
+
+
+class HolderPlotNumberDbImporter(EntityVectorLayerDbImporter):
+    """
+    Imports holder data as well as updates the linked staging table
+    with the corresponding plot numbers. It checks if there is an existing
+    plot number within the same scheme before importing the plot number
+    otherwise it skips the addition of a new record.
+    """
+    def __init__(
+            self,
+            vector_layer,
+            column_mapping=None,
+            unique_cols=None,
+            parent=None
+    ):
+        super(HolderPlotNumberDbImporter, self).__init__(
+            'Holder',
+            vector_layer,
+            column_mapping,
+            unique_cols,
+            parent
+        )
+        self._plot_number_col_name = 'plot_number'
+        self._has_plot_number_col = self._check_source_has_plot_number()
+        self._staging_table_cls = self._plot_staging_table_model()
+
+    def _check_source_has_plot_number(self):
+        # Checks if source vector layer has plot number column.
+        field_map = self.vector_layer.dataProvider().fieldNameMap()
+        field_names = field_map.keys()
+        if self._plot_number_col_name in field_names:
+            return True
+
+        return False
+
+    def _plot_staging_table_model(self):
+        # Returns the SQLAlchemy class corresponding to the staging table.
+        table_name = 'cb_staging_holder_plot'
+        curr_profile = current_profile()
+        staging_table_entity = curr_profile.entity_by_name(table_name)
+        if not staging_table_entity:
+            return None
+
+        return entity_model(staging_table_entity)
+
+    def feature_plot_number(self, feat):
+        """
+        Extracts the plot number value from the given input feature. If the
+        source vector layer does not have a plot_number column, then an
+        empty string is returned.
+        :param feat: Input feature.
+        :type feat: QgsFeature
+        :return: Returns the value of the plot number in the given input
+        feature or an empty string if the layer does not contain a
+        plot_number column.
+        :rtype: str
+        """
+        if not self._has_plot_number_col:
+            return ''
+
+        return feat.attribute(self._plot_number_col_name)
+
+    def has_plot_number_column(self):
+        """
+        :return: Returns True if the source vector layer has a plot_number
+        column.
+        :rtype: bool
+        """
+        return self._has_plot_number_col
+
+    def _append_feat_attributes(self, feat, data_object):
+        # Append the plot_number to the data_object
+        if not self._has_plot_number_col:
+            return
+
+        # No point of adding the plot number if the value is empty
+        plot_num = self.feature_plot_number(feat)
+        if not plot_num:
+            return
+
+        # Get scheme object
+        schemes = self.extra_attribute_value('cb_scheme_collection')
+        if len(schemes) == 0:
+            return
+
+        scheme = schemes[0]
+
+        # Check if there is an existing plot number within the given scheme
+        stg_plot_obj = self._staging_table_cls()
+        stg_plot = stg_plot_obj.queryObject().filter(
+            self._staging_table_cls.plot_number == plot_num,
+            self._staging_table_cls.scheme_id == scheme.id
+        ).first()
+
+        # If there is even one plot with the same plot number within the
+        # given scheme then exit
+        if stg_plot:
+            return
+
+        if not hasattr(data_object, 'cb_staging_holder_plot_collection'):
+            return
+
+        # Create new record for the staging table
+        stg_plot_obj.plot_number = plot_num
+        stg_plot_obj.scheme_id = scheme.id
+
+        # Now append it to our data object
+        holder_plot_numbers = data_object.cb_staging_holder_plot_collection
+        holder_plot_numbers.append(stg_plot_obj)
+        data_object.cb_staging_holder_plot_collection = holder_plot_numbers

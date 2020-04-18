@@ -61,7 +61,7 @@ from stdm.data.flts.validators import (
     ValidatorException
 )
 from stdm.data.flts.db_importer import (
-    EntityVectorLayerDbImporter
+    HolderPlotNumberDbImporter
 )
 from stdm.settings import current_profile
 from stdm.data.configuration import entity_model
@@ -654,8 +654,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         )
 
         # Create holder importer
-        self._holder_importer = EntityVectorLayerDbImporter(
-            self._holder_entity,
+        self._holder_importer = HolderPlotNumberDbImporter(
             ds,
             unique_cols=['holder_identifier'],
             parent=self
