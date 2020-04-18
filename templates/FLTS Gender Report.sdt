@@ -1,0 +1,148 @@
+<Composer title="FLTS Gender Report" visible="1">
+ <Composition resizeToContentsMarginLeft="0" snapping="0" showPages="1" guidesVisible="1" resizeToContentsMarginTop="0" worldFileMap="" alignmentSnap="1" printResolution="300" paperWidth="210" gridVisible="0" snapGridOffsetX="0" smartGuides="1" snapGridOffsetY="0" resizeToContentsMarginRight="0" snapTolerancePixels="5" printAsRaster="0" generateWorldFile="0" paperHeight="297" numPages="1" snapGridResolution="10" resizeToContentsMarginBottom="0">
+  <symbol alpha="1" clip_to_extent="1" type="fill" name="">
+   <layer pass="0" class="SimpleFill" locked="0">
+    <prop k="border_width_map_unit_scale" v="0,0,0,0,0,0"/>
+    <prop k="color" v="255,255,255,255"/>
+    <prop k="joinstyle" v="miter"/>
+    <prop k="offset" v="0,0"/>
+    <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
+    <prop k="offset_unit" v="MM"/>
+    <prop k="outline_color" v="0,0,0,255"/>
+    <prop k="outline_style" v="no"/>
+    <prop k="outline_width" v="0.26"/>
+    <prop k="outline_width_unit" v="MM"/>
+    <prop k="style" v="solid"/>
+   </layer>
+  </symbol>
+  <ComposerLabel valign="128" marginX="1" marginY="1" labelText="__________________________________________________________________________________________________________" htmlState="0" halign="4">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="278.367" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="0.269476" y="278.367" visibility="1" zValue="27" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="210" outlineWidth="0.3" excludeFromExports="0" uuid="{fb33b8ee-1898-496d-9a6b-f68150ba28a3}" height="6.2" itemRotation="0" frame="false" pagex="0.269476">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="128" marginX="1" marginY="1" labelText="__________________________________________________________________________________________________________" htmlState="0" halign="4">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="35.3146" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="0.179" y="35.3146" visibility="1" zValue="25" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="210" outlineWidth="0.3" excludeFromExports="0" uuid="{fbd31aa0-9bd7-4777-9fed-d2f9ba1fe09d}" height="6.2" itemRotation="0" frame="false" pagex="0.179">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="This report is based on the Land Hold Title" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="275.267" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="66.4095" y="275.267" visibility="1" zValue="23" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="77.7199" outlineWidth="0.3" excludeFromExports="0" uuid="{a7a15922-4fea-4ec3-a586-066d485c3d30}" height="6.2" itemRotation="0" frame="false" pagex="66.4095">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="Gender" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,11,-1,5,75,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="31.0704" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="96.63" y="31.0704" visibility="1" zValue="19" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="16.7401" outlineWidth="0.3" excludeFromExports="0" uuid="{240585a6-1657-44d0-ac9f-843cf5494ed4}" height="8.48843" itemRotation="0" frame="false" pagex="96.63">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="128" marginX="1" marginY="1" labelText="__________________________________________________________________________________________________________" htmlState="0" halign="4">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="16.5646" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="0.269476" y="16.5646" visibility="1" zValue="15" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="210" outlineWidth="0.3" excludeFromExports="0" uuid="{0785b358-e5fc-4b34-8852-ca6ebe6c5ad6}" height="6.2" itemRotation="0" frame="false" pagex="0.269476">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="[cb_holder_vw_lht_gender.user_time_text]" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,1,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="286.8" page="1" id="{47d36943-74cc-4aff-a553-86fe550cbc2c}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="8.92766" y="286.8" visibility="1" zValue="14" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="88.3208" outlineWidth="0.3" excludeFromExports="0" uuid="{47d36943-74cc-4aff-a553-86fe550cbc2c}" height="6.2" itemRotation="0" frame="false" pagex="8.92766">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="CB-FLTS REPORT" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,12,-1,5,75,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="22.7645" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="84.4817" y="22.7645" visibility="1" zValue="8" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="41.3943" outlineWidth="0.3" excludeFromExports="0" uuid="{669b73fc-6811-4015-95f5-1499314dd28d}" height="8.48843" itemRotation="0" frame="false" pagex="84.4817">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="[cb_holder_vw_lht_gender.male]" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,75,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="84.2259" page="1" id="{b35db32b-e69a-44c9-aff6-c279ff41f826}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="96.9485" y="84.2259" visibility="1" zValue="8" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="59.5572" outlineWidth="0.3" excludeFromExports="0" uuid="{b35db32b-e69a-44c9-aff6-c279ff41f826}" height="8.04191" itemRotation="0" frame="false" pagex="96.9485">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="Total Male Holders:" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="84.2259" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="53.4943" y="84.2259" visibility="1" zValue="7" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="43.4542" outlineWidth="0.3" excludeFromExports="0" uuid="{d71b8837-0c56-4b94-9356-277c8123a100}" height="8.04191" itemRotation="0" frame="false" pagex="53.4943">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="Total Female Holders:" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="69.7479" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="53.4943" y="69.7479" visibility="1" zValue="6" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="43.6042" outlineWidth="0.3" excludeFromExports="0" uuid="{90c3c2c5-3884-43c9-a8a2-e7dcb340f617}" height="7.74191" itemRotation="0" frame="false" pagex="53.4943">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="[cb_holder_vw_lht_gender.female]" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,75,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="69.7479" page="1" id="{fe657065-44f4-4d2e-b159-bf203408a14c}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="97.0985" y="69.7479" visibility="1" zValue="5" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="59.4072" outlineWidth="0.3" excludeFromExports="0" uuid="{fe657065-44f4-4d2e-b159-bf203408a14c}" height="7.74191" itemRotation="0" frame="false" pagex="97.0985">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="Total Registered Holders:" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="54.4327" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="53.6443" y="54.4327" visibility="1" zValue="4" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="43.6042" outlineWidth="0.3" excludeFromExports="0" uuid="{05cad4da-4c08-43ed-8eaf-2d75e0919159}" height="7.44191" itemRotation="0" frame="false" pagex="53.6443">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="[cb_holder_vw_lht_gender.total_registered_holders]" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,75,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="54.4327" page="1" id="{fcc5d746-2f64-4551-a255-cce4d28610a6}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="97.2485" y="54.4327" visibility="1" zValue="3" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="59.1072" outlineWidth="0.3" excludeFromExports="0" uuid="{fcc5d746-2f64-4551-a255-cce4d28610a6}" height="7.44191" itemRotation="0" frame="false" pagex="97.2485">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <customproperties/>
+ </Composition>
+ <DataSource category="View" name="cb_holder_vw_lht_gender" referencedTable="cb_holder">
+  <DataField name="female" itemid="{fe657065-44f4-4d2e-b159-bf203408a14c}"/>
+  <DataField name="male" itemid="{b35db32b-e69a-44c9-aff6-c279ff41f826}"/>
+  <DataField name="total_registered_holders" itemid="{fcc5d746-2f64-4551-a255-cce4d28610a6}"/>
+  <DataField name="user_time_text" itemid="{47d36943-74cc-4aff-a553-86fe550cbc2c}"/>
+  <SpatialFields/>
+  <Photos/>
+  <Tables/>
+  <Charts/>
+  <QRCodes/>
+ </DataSource>
+</Composer>
