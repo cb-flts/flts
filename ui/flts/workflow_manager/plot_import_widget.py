@@ -32,7 +32,7 @@ from stdm.ui.flts.workflow_manager.config import (
     TabIcons,
 )
 from stdm.ui.flts.workflow_manager.data_service import PlotSTRDataService
-from stdm.ui.flts.workflow_manager.plot import(
+from stdm.ui.flts.workflow_manager.plot import (
     ImportPlot,
     PlotFile,
     PlotPreview,

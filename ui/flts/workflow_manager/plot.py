@@ -27,6 +27,7 @@ from PyQt4.QtCore import (
     QIODevice,
     QVariant
 )
+from PyQt4.QtGui import QMessageBox
 from qgis.core import (
     QgsCoordinateTransform,
     QgsFeature,
@@ -41,6 +42,9 @@ from qgis.core import (
 from qgis.utils import iface
 from sqlalchemy import exc
 from stdm.ui.flts.workflow_manager.data import Save
+
+from stdm.settings import current_profile
+from stdm.data.configuration import entity_model
 
 NAME, IMPORT_AS, DELIMITER, HEADER_ROW, CRS_ID, \
 GEOM_FIELD, GEOM_TYPE = range(7)
@@ -1546,6 +1550,111 @@ class ImportPlot:
         self._crs_id = crs_id
         self._geom_column = 0
 
+    def populate_plot_workflow(self):
+        """
+        Update the third assessment workflow
+        """
+        # Current profile
+        curr_p = current_profile()
+        # Entities
+        scheme_workflow_entity = curr_p.entity
+        scheme_entity = curr_p.entity('Scheme')
+        workflow_lookup = curr_p.entity(
+            'check_lht_workflow'
+        )
+        approval_lookup = curr_p.entity(
+            'check_lht_approval_status'
+        )
+        sch_workflow_entity = curr_p.entity(
+            'Scheme_workflow'
+        )
+
+        # Check if entity exists
+        if workflow_lookup is None:
+            QMessageBox.critical(
+                self,
+                self.tr('Missing workflow Entity'),
+                self.tr("The workflow entity is missing in the "
+                        "profile.")
+            )
+
+        if approval_lookup is None:
+            QMessageBox.critical(
+                self,
+                self.tr('Missing approval Entity'),
+                self.tr("The approval entity is missing in the "
+                        "profile.")
+            )
+
+        if sch_workflow_entity is None:
+            QMessageBox.critical(
+                self,
+                self.tr('Missing scheme workflow Entity'),
+                self.tr("The scheme workflow entity is missing in the "
+                        "profile.")
+            )
+
+        # Models
+        scheme_model = entity_model(scheme_entity)
+        workflow_lookup_model = entity_model(
+            workflow_lookup
+        )
+        approval_lookup_model = entity_model(
+            approval_lookup
+        )
+        sch_workflow_model = entity_model(
+            sch_workflow_entity
+        )
+
+        # Check if model exists
+        if workflow_lookup_model is None:
+            QMessageBox.critical(
+                self,
+                self.tr('Workflow Entity Model'),
+                self.tr("The workflow entity model could not be generated.")
+            )
+
+        if approval_lookup_model is None:
+            QMessageBox.critical(
+                self,
+                self.tr('Workflow Entity Model'),
+                self.tr("The approval entity model could not be generated.")
+            )
+
+        if sch_workflow_model is None:
+            QMessageBox.critical(
+                self,
+                self.tr('Scheme Workflow Entity Model'),
+                self.tr("The scheme workflow entity model could not be "
+                        "generated.")
+            )
+
+        # Entity objects
+        scheme_obj = scheme_model()
+        chk_workflow_obj = workflow_lookup_model()
+        chk_approval_obj = approval_lookup_model()
+        scheme_workflow_obj = sch_workflow_model()
+
+        # Get last lodged scheme ID
+        scheme_res = scheme_obj.queryObject().order_by(
+            scheme_model.id.desc()
+        ).first()
+
+        # Filter the lookup IDs based on values
+        workflow_res = chk_workflow_obj.queryObject().filter(
+            workflow_lookup_model.value == 'Import Plot'
+        ).one()
+
+        approval_lodge_res = chk_approval_obj.queryObject().filter(
+            approval_lookup_model.value == 'Approved'
+        ).one()
+
+        # Save details
+        scheme_workflow_obj.scheme_id = scheme_res.id
+        scheme_workflow_obj.workflow_id = workflow_res.id
+        scheme_workflow_obj.approval_id = approval_lodge_res.id
+        scheme_workflow_obj.save()
+
     def save(self):
         """
         Imports plots data into the database
@@ -1560,6 +1669,7 @@ class ImportPlot:
                 self._model.results,
                 self._data_service
             ).save()
+            self.populate_plot_workflow()
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e
         else:
