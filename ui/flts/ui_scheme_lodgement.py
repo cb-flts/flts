@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_scheme_lodgement.ui'
 #
-# Created: Sat Mar 14 01:30:06 2020
+# Created: Sun Apr 19 07:18:00 2020
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -46,10 +46,6 @@ class Ui_ldg_wzd(object):
         self.wizardPage1.setObjectName(_fromUtf8("wizardPage1"))
         self.gridLayout_4 = QtGui.QGridLayout(self.wizardPage1)
         self.gridLayout_4.setObjectName(_fromUtf8("gridLayout_4"))
-        self.vlNotification = QtGui.QVBoxLayout()
-        self.vlNotification.setContentsMargins(-1, -1, -1, 10)
-        self.vlNotification.setObjectName(_fromUtf8("vlNotification"))
-        self.gridLayout_4.addLayout(self.vlNotification, 0, 0, 1, 1)
         self.label_desc = QtGui.QLabel(self.wizardPage1)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -194,6 +190,10 @@ class Ui_ldg_wzd(object):
         self.label_mandatory = QtGui.QLabel(self.wizardPage1)
         self.label_mandatory.setObjectName(_fromUtf8("label_mandatory"))
         self.gridLayout_4.addWidget(self.label_mandatory, 18, 0, 1, 1)
+        self.vlNotification = QtGui.QVBoxLayout()
+        self.vlNotification.setContentsMargins(-1, -1, -1, 10)
+        self.vlNotification.setObjectName(_fromUtf8("vlNotification"))
+        self.gridLayout_4.addLayout(self.vlNotification, 0, 0, 1, 2)
         ldg_wzd.addPage(self.wizardPage1)
         self.wizardPage = QtGui.QWizardPage()
         self.wizardPage.setObjectName(_fromUtf8("wizardPage"))
@@ -219,8 +219,6 @@ class Ui_ldg_wzd(object):
         self.tbw_documents.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
         self.tbw_documents.setSelectionMode(QtGui.QAbstractItemView.NoSelection)
         self.tbw_documents.setObjectName(_fromUtf8("tbw_documents"))
-        # self.tbw_documents.setColumnCount(0)
-        # self.tbw_documents.setRowCount(0)
         self.gridLayout.addWidget(self.tbw_documents, 2, 0, 1, 2)
         self.vlNotification_docs = QtGui.QVBoxLayout()
         self.vlNotification_docs.setContentsMargins(-1, -1, -1, 10)
@@ -247,8 +245,6 @@ class Ui_ldg_wzd(object):
         self.gridLayout_3.setObjectName(_fromUtf8("gridLayout_3"))
         self.tw_hld_prv = HoldersTableView(self.wizardPage2)
         self.tw_hld_prv.setObjectName(_fromUtf8("tw_hld_prv"))
-        # self.tw_hld_prv.setColumnCount(0)
-        # self.tw_hld_prv.setRowCount(0)
         self.gridLayout_3.addWidget(self.tw_hld_prv, 4, 0, 1, 3)
         self.lnEdit_hld_path = QtGui.QLineEdit(self.wizardPage2)
         self.lnEdit_hld_path.setEnabled(True)

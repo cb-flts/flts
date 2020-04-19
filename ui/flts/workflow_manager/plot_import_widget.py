@@ -461,7 +461,8 @@ class PlotImportWidget(QWidget):
                     format(self._import_counter, import_type.lower())
                 self.notif_bar.insertWarningNotification(msg)
                 return
-            msg = "Successfully imported {0} {1}".\
+            msg = "Successfully imported {0} {1}, the third examination can " \
+                  "commence.".\
                 format(self._import_counter, import_type.lower())
             self.notif_bar.insertInformationNotification(msg)
             if import_type == "Plots":
@@ -485,7 +486,7 @@ class PlotImportWidget(QWidget):
             plot_numbers,
             self._scheme_id
         )
-        plot_str.save()
+        # plot_str.save()
 
     @staticmethod
     def _import_type_columns(import_type):

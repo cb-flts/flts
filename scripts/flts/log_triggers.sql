@@ -39,7 +39,6 @@ CREATE TABLE cb_holder_log (
   "stamp" timestamp(6),
   "user_id" text,
   "id" int4,
-  "plot_number" int4,
   "transfer_contract_date" date,
   "plot_use" int4,
   "holder_first_name" varchar(50),
@@ -160,7 +159,7 @@ $cb_plot_log$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION insert_timestamp() RETURNS TRIGGER AS $insert_timestamp$
     BEGIN
         NEW.timestamp = NOW();
-				RETURN NEW;
+		RETURN NEW;
     END;
 
 $insert_timestamp$ LANGUAGE plpgsql;
@@ -180,7 +179,7 @@ AFTER INSERT OR UPDATE OR DELETE ON cb_holder
 --     FOR EACH ROW EXECUTE PROCEDURE cb_plot_num_to_int();
 
 CREATE TRIGGER cb_plot_log
-AFTER INSERT OR UPDATE ON cb_plot
+AFTER INSERT OR UPDATE OR DELETE ON cb_plot
     FOR EACH ROW EXECUTE PROCEDURE cb_plot_log();
 
 CREATE TRIGGER comment_timestamp
