@@ -148,6 +148,9 @@
     <CodeValue value="EPSG:29385" code="25"/>
     <CodeValue value="EPSG:29383" code="23"/>
    </ValueList>
+   <ValueList name="check_plot_document_type">
+    <CodeValue value="Field Book" code=""/>
+   </ValueList>
   </ValueLists>
   <Entity editable="True" global="False" rowindex="-1" associative="False" description="Refers to users" proxy="False" createId="True" supportsDocuments="False" shortName="User" name="cb_user" label="User">
    <Columns>
@@ -450,7 +453,7 @@
     </Column>
    </Columns>
   </Entity>
-  <Entity editable="True" global="False" rowindex="7" associative="False" description="Refers to the Plot of land" proxy="False" createId="True" supportsDocuments="False" shortName="Plot" name="cb_plot" label="lht_plot">
+  <Entity editable="True" global="False" rowindex="7" associative="False" description="Refers to the Plot of land" documentTypeLookup="check_plot_document_type" proxy="False" createId="True" supportsDocuments="True" shortName="Plot" name="cb_plot" label="lht_plot">
    <Columns>
     <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
     <Column unique="False" tip="" rowindex="0" minimum="0" maximum="32" description="Unique parcel identifier" index="False" name="upi" searchable="True" TYPE_INFO="VARCHAR" label="upi" mandatory="False"/>
@@ -525,6 +528,9 @@
    <EntityRelation displayColumns="" child="Lis_erf" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_lis_erf_scheme_identifier" parentColumn="id" showInChild="True" childColumn="scheme_identifier"/>
    <EntityRelation displayColumns="" child="social_tenure_relationship" showInParent="True" parent="Holder" name="fk_cb_holder_id_cb_social_tenure_relationship_holder_id" parentColumn="id" showInChild="True" childColumn="holder_id"/>
    <EntityRelation displayColumns="" child="social_tenure_relationship" showInParent="True" parent="Plot" name="fk_cb_plot_id_cb_social_tenure_relationship_plot_id" parentColumn="id" showInChild="True" childColumn="plot_id"/>
+   <EntityRelation displayColumns="name,code" child="Plot_supporting_document" showInParent="True" parent="check_plot_document_type" name="fk_cb_check_plot_document_type_id_cb_plot_supporting_document_document_type" parentColumn="id" showInChild="True" childColumn="document_type"/>
+   <EntityRelation displayColumns="" child="Plot_supporting_document" showInParent="True" parent="Plot" name="fk_cb_plot_id_cb_plot_supporting_document_plot_id" parentColumn="id" showInChild="True" childColumn="plot_id"/>
+   <EntityRelation displayColumns="" child="Plot_supporting_document" showInParent="True" parent="supporting_document" name="fk_cb_supporting_document_id_cb_plot_supporting_document_supporting_doc_id" parentColumn="id" showInChild="True" childColumn="supporting_doc_id"/>
   </Relations>
   <SocialTenure layerDisplay="" tenureTypeList="check_tenure_type" spatialUnit="Plot" supportsMultipleParties="True" party="Holder">
    <SpatialUnitTenureMappings>
