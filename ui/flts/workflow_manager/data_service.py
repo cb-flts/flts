@@ -1361,12 +1361,12 @@ class PlotSTRDataService:
         :return: Plot identifiers
         :rtype: Dictionary
         """
-        columns = ["plot_number", "id"]
+        columns = ["plot_number", "scheme_id"]
         filters = {
             "scheme_id": [self._scheme_id],
             "plot_number": plot_numbers
         }
-        return self.filter_in("Plot", filters, columns).all()
+        return self.filter_in("Staging_holder_plot", filters, columns).all()
 
     def holder_ids(self, plot_numbers):
         """
@@ -1374,8 +1374,8 @@ class PlotSTRDataService:
         :return: Holder identifiers
         :rtype: Dictionary
         """
-        filters = {"plot_number": plot_numbers}
-        return self.filter_in("Holder", filters).all()
+        filters = {"holder_id": plot_numbers}
+        return self.filter_in("Staging_holder_plot", filters).all()
 
     def filter_in(self, entity_name, filters, columns=None):
         """

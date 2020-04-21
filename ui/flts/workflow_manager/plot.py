@@ -1796,7 +1796,7 @@ class SavePlotSTR:
         results = [
             (int(plot_number), id_)
             for plot_number, id_ in results
-            if plot_number.isdigit()
+            # if plot_number.isdigit()
         ]
         return dict(results)
 

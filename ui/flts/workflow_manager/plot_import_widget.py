@@ -486,7 +486,7 @@ class PlotImportWidget(QWidget):
             plot_numbers,
             self._scheme_id
         )
-        # plot_str.save()
+        plot_str.save()
 
     @staticmethod
     def _import_type_columns(import_type):
