@@ -1711,6 +1711,7 @@ class ImportPlot:
         """
         try:
             import_items = {}
+            self.source_crs_lookup_id()
             source_srid = str(self._crs_id.split(":")[1])
             destination_srid = str(self._data_service.geom_srid)
             for row, data in enumerate(self._model.results):
