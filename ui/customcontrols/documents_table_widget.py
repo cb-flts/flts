@@ -749,6 +749,15 @@ class CmisDocumentUploadThread(QThread):
         self._file_path = path
         self._doc_type = doc_type
 
+    @property
+    def file_path(self):
+        """
+        :return: Returns the file path for the document that is being
+        attempted to be uploaded.
+        :rtype: str
+        """
+        return self._file_path
+
     def run(self):
         # Upload the document content through the doc mapper
         try:
@@ -777,6 +786,14 @@ class CmisDocumentDeleteThread(QThread):
         self._doc_mapper = cmis_doc_mapper
         self._doc_type = doc_type
         self._doc_uuid = doc_uuid
+
+    @property
+    def document_uuid(self):
+        """
+        :return: Returns the document's unique identified.
+        :rtype: str
+        """
+        return self._doc_uuid
 
     def run(self):
         # Delete the document.

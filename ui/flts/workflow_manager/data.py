@@ -520,12 +520,13 @@ class Save(DataRoutine):
             count = 0
             if not self._valid_save_items(self._save_items):
                 self._set_save_items()
+
             if self._entity_items:
                 for entity_name, items in self._entity_items.iteritems():
                     model = self._data_service.entity_model_(entity_name)
                     entity_obj = model()
-                    model = [model(**columns) for columns in items]
-                    entity_obj.saveMany(model)
+                    save_items = [model(**col_values) for col_values in items]
+                    entity_obj.saveMany(save_items)
                     count += len(items)
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             raise e

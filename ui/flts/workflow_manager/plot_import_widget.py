@@ -41,6 +41,10 @@ from stdm.ui.flts.workflow_manager.plot import (
 from stdm.ui.flts.workflow_manager.model import WorkflowManagerModel
 from stdm.ui.flts.workflow_manager.delegates.plot_file_delegate import PlotFileDelegate
 from stdm.ui.flts.workflow_manager.components.plot_import_component import PlotImportComponent
+from stdm.ui.flts.workflow_manager.field_book_manager import FieldBookManager
+from stdm.network.cmis_manager import (
+    CmisDocumentMapperException
+)
 
 
 NAME, IMPORT_AS, DELIMITER, HEADER_ROW, CRS_ID, \
@@ -131,6 +135,30 @@ class PlotImportWidget(QWidget):
         _selection_model = self._preview_table_view.selectionModel()
         _selection_model.selectionChanged.connect(self._on_preview_select)
         QTimer.singleShot(0, self._set_file_path)
+        self._scheme_number = scheme_number
+        self._init_field_book_manager()
+
+    def _init_field_book_manager(self):
+        # Initialize object for managing the upload of field books
+        # We need to force the data service to cache the data model class and
+        # corresponding one for document models so that they are in sync.
+        service_id = 'Plots'
+        entity_name = 'Plot'
+        self._set_preview_data_service(service_id)
+        plot_service = self._preview_data_service[service_id]
+
+        # Force plot model to be cached
+        plot_service.entity_model_(entity_name)
+        doc_cls = plot_service.document_model_cls(entity_name)
+
+        # Use the cached document model class in the field book manager
+        self._field_bk_mgr = FieldBookManager(doc_cls, self)
+        self._field_bk_mgr.uploaded.connect(
+            self._on_field_bk_uploaded
+        )
+        self._field_bk_mgr.removed.connect(
+            self._on_field_bk_removed
+        )
 
     def _set_file_path(self):
         """
@@ -155,12 +183,23 @@ class PlotImportWidget(QWidget):
         )
         if fpath and fpath not in self._plot_file.file_paths:
             try:
+                # Check if its a PDF and can be uploaded i.e. no other
+                # existing field books
+                if self._plot_file.is_pdf(fpath) and \
+                        not self._can_upload_field_book():
+                    return
+
                 self._plot_file.set_file_path(fpath)
                 set_last_document_path(fpath)
+
                 if not self.model.results:
                     self._load(self.model, self._plot_file)
                 else:
                     self._insert_file()
+
+                # If field book then validate and upload in the background
+                if self._plot_file.is_pdf(fpath):
+                    self._upload_field_book(fpath)
             except(IOError, OSError, Exception) as e:
                 self._show_critical_message(
                     "Workflow Manager - Plot Add Files",
@@ -245,6 +284,7 @@ class PlotImportWidget(QWidget):
         """
         self._enable_widgets(self._toolbar_buttons)
         self._enable_crs_button()
+        self._enable_disable_preview_import_buttons()
 
     def _remove(self):
         """
@@ -255,7 +295,7 @@ class PlotImportWidget(QWidget):
         if not fpath or not self._ok_to_remove(fpath):
             return
         if self._import_counter != 0:
-            self._remove_file()
+            self._remove_file(True)
             self._plot_preview.remove_error(fpath)
 
     def _ok_to_remove(self, fpath):
@@ -325,6 +365,29 @@ class PlotImportWidget(QWidget):
             self._set_preview_groupbox_title(settings[NAME])
             self._set_preview_models(fpath)
             self._previewed[fpath] = fpath
+        else:
+            self._on_preview_field_book(fpath)
+
+    def _on_preview_field_book(self, path):
+        # Loads a window for previewing the field book.
+        status = self._field_bk_mgr.upload_status(path)
+        self.notif_bar.clear()
+
+        if status == -1:
+            msg = '{0} could not be found in the list of uploaded ' \
+                  'documents'.format(path)
+            self.notif_bar.insertWarningNotification(msg)
+        elif status == FieldBookManager.NOT_UPLOADED:
+            msg = 'Field book is currently being uploaded, please try again ' \
+                  'in a few moments'
+            self.notif_bar.insertInformationNotification(msg)
+        elif status == FieldBookManager.ERROR:
+            err = self._field_bk_mgr.upload_error_message(path)
+            msg = 'Error in uploading field book: {0}'.format(err)
+            self.notif_bar.insertWarningNotification(msg)
+        elif status == FieldBookManager.SUCCESS:
+            self.notif_bar.insertSuccessNotification('Success!')
+            self._previewed[path] = path
 
     def _clear_feature(self):
         """
@@ -365,6 +428,55 @@ class PlotImportWidget(QWidget):
         """
         service = self._plot_preview_service(import_type)
         return service(self._profile, self._scheme_id)
+
+    def _can_upload_field_book(self):
+        # Checks if a field book can be uploaded.
+        if not self._field_bk_mgr.is_active:
+            msg = 'Field books cannot be uploaded at this time as there are ' \
+                  'issues in connecting to the CMIS Server.'
+            self._show_critical_message(
+                'Uploading Field Book',
+                msg
+            )
+            return False
+
+        field_bk_count = self._field_bk_mgr.field_book_count()
+        if field_bk_count > 0:
+            self._show_critical_message(
+                'Existing Field Book',
+                'Only one field book can be uploaded for a scheme, please '
+                'remove the current one and try again.')
+            return False
+
+        return True
+
+    def _upload_field_book(self, file_path):
+        # Uploads the field book to the CMIS server temp directory
+        # First check if there are prior uploads of the field book
+        self._field_bk_mgr.upload_field_book(file_path)
+
+    def _on_field_bk_uploaded(self, upload_info):
+        # Slot raised when a field book has been uploaded to the CMIS
+        # server temp repository.
+        file_path = upload_info[0]
+        status = upload_info[1]
+        # To insert additional operations required from the upload status
+
+    def _on_field_bk_removed(self, remove_info):
+        # Slot raised when a document is removed from the CMIS server.
+        file_path = remove_info[0]
+        success = remove_info[1]
+        err_msg = remove_info[2]
+        if success:
+            msg = '\'{0}\' has been successfully removed from the document ' \
+                  'repository'.format(file_path)
+            self.notif_bar.insertSuccessNotification(msg)
+        else:
+            msg = 'Error in removing \'{0}\': {1}'.format(
+                file_path,
+                err_msg
+            )
+            self.notif_bar.insertErrorNotification(msg)
 
     def _crs_not_set(self, row):
         """
@@ -421,13 +533,23 @@ class PlotImportWidget(QWidget):
         settings = self._file_settings(row)
         import_type = settings.get(IMPORT_AS)
         fpath = self.model.results[row].get("fpath")
+
         if self._previewed_message(fpath) or \
                 self._import_error_message(fpath) or \
                 not self._ok_to_import(index, import_type):
             return
+
+        # Notify about import process of field book
+        if self._plot_file.is_pdf(fpath):
+            msg = 'The field book will not be imported separately but rather ' \
+                  'together with the plots when they are being uploaded.'
+            self.notif_bar.clear()
+            self.notif_bar.insertInformationNotification(msg)
+            return
+
         self._import_plot()
         if self._import_counter != 0:
-            self._remove_file()
+            self._remove_file(False)
 
     def _import_plot(self):
         """
@@ -445,11 +567,18 @@ class PlotImportWidget(QWidget):
         import_type = settings.get(IMPORT_AS)
         data_service = self._preview_data_service[import_type]
         columns = self._import_type_columns(import_type)
+
         try:
+            # Move field book to permanent plot directory in CMIS server
+            doc_data_models = self._field_bk_mgr.persist_documents(
+                self._scheme_number
+            )
             import_plot = ImportPlot(
-                model, self._scheme_id, data_service, columns, crs_id
+                model, self._scheme_id, data_service, columns, crs_id,
+                doc_data_models
             )
             self._import_counter = import_plot.save()
+
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             self._show_critical_message(
                 "Workflow Manager - Plot Import",
@@ -563,13 +692,36 @@ class PlotImportWidget(QWidget):
             )
             return True
 
-    def _remove_file(self):
+    def _remove_field_book(self, path):
+        # Deletes the previously uploaded field book from the repository
+        self.notif_bar.clear()
+        status = self._field_bk_mgr.upload_status(path)
+        if status == -1:
+            return
+
+        elif status == FieldBookManager.ERROR:
+            msg = 'The field book was not uploaded successfully hence it will ' \
+                  'not be removed from the document repository'
+            self.notif_bar.insertWarningNotification(msg)
+
+        elif status == FieldBookManager.NOT_UPLOADED:
+            msg = 'There is an ongoing upload operation, please try again ' \
+                  'in a few moments.'
+            self.notif_bar.insertWarningNotification(msg)
+
+        elif status == FieldBookManager.SUCCESS:
+            self._field_bk_mgr.remove_field_book(path)
+
+    def _remove_file(self, user_action=True):
         """
-        Removes plot import file and its settings from table view
+        Removes plot import file and its settings from table view.
+        If user_action is True and the document is a field book, then the
+        document will be deleted from the repository.
         """
         index = self._current_index(self._file_table_view)
         if index is None:
             return
+
         row = index.row()
         fpath = self.model.results[row].get("fpath")
         if self._plot_preview:
@@ -580,6 +732,11 @@ class PlotImportWidget(QWidget):
         self._remove_dirty(fpath)
         self._plot_file.remove_filepath(fpath)
         self._enable_crs_button()
+
+        # If field book and user_action then delete field book
+        if self._plot_file.is_pdf(fpath) and user_action:
+            self._remove_field_book(fpath)
+
         if not self.model.results:
             self.model.reset()
             self._disable_widgets(self._toolbar_buttons)
@@ -703,6 +860,23 @@ class PlotImportWidget(QWidget):
         items = self.model.results[row].get("items")
         items[CRS_ID] = None
         self.model.setData(index, value)
+
+    def _enable_disable_preview_import_buttons(self):
+        # Enable or disable the preview and import buttons if the field book
+        # manager is active or inactive respectively.
+        fpath = self._selected_file()
+        if not fpath:
+            return
+        if self._plot_file.is_pdf(fpath):
+            if not self._field_bk_mgr.is_active:
+                status = False
+            else:
+                status = True
+        else:
+            status = True
+
+        self._preview_button.setEnabled(status)
+        self._import_button.setEnabled(status)
 
     def _enable_crs_button(self):
         """

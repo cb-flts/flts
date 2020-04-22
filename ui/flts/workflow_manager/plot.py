@@ -480,6 +480,8 @@ class Plot(object):
         if file_extension == "pdf":
             return True
 
+        return False
+
     def _geometry(self, wkt):
         """
         Returns geometry and geometry type given WKT data
@@ -1541,7 +1543,15 @@ class ImportPlot:
     """
     Imports plot data
     """
-    def __init__(self, model, scheme_id, data_service, col_keys, crs_id):
+    def __init__(
+            self,
+            model,
+            scheme_id,
+            data_service,
+            col_keys,
+            crs_id,
+            document_models=None
+    ):
         self._model = model
         self._scheme_id = scheme_id
         self._data_service = data_service
@@ -1549,6 +1559,32 @@ class ImportPlot:
         self._col_keys = col_keys
         self._crs_id = crs_id
         self._geom_column = 0
+
+        # SQLAlchemy document objects obtained from CmisDocumentMapper
+        if not document_models:
+            self._doc_data_models = []
+        else:
+            self._doc_data_models = document_models
+
+    @property
+    def document_data_models(self):
+        """
+        :return: Returns a collection of SQLAlchemy data objects
+        corresponding to the document properties to be saved in the database.
+        :rtype: list
+        """
+        return self._doc_data_models
+
+    @document_data_models.setter
+    def document_data_models(self, models):
+        """
+        Sets the SQLAlchemy data objects that are to be associated with the
+        plots in the current session.
+        :param models: A collection of SQLAlchemy data objects corresponding
+        to the document properties to be saved in the database.
+        :type models: list
+        """
+        self._doc_data_models = models
 
     def populate_plot_workflow(self):
         """
@@ -1696,6 +1732,11 @@ class ImportPlot:
                         value = "SRID={0};{1}".format(destination_srid, value)
                     items.append([option.column, value, option.entity])
                 items.append(self._scheme_items())
+
+                # Append document data models if specified
+                if len(self._doc_data_models) > 0:
+                    items.append(self._supporting_doc_items())
+
                 import_items[row] = items
             return import_items
         except (AttributeError, KeyError, Exception) as e:
@@ -1725,6 +1766,10 @@ class ImportPlot:
         """
         option = self._save_options["SCHEME_ID"]
         return list((option.column, self._scheme_id, option.entity))
+
+    def _supporting_doc_items(self):
+        # Returns a list of SQLAlchemy document data models.
+        return ['documents', self._doc_data_models, 'Plot']
 
 
 class SavePlotSTR:

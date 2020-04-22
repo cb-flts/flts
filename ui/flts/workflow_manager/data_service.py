@@ -50,6 +50,30 @@ class DataService:
     """
     __metaclass__ = ABCMeta
 
+    def __init__(self):
+        # Container for reusing the same entity_model_cls as that for
+        # supporting documents.
+        # Key:entity name, Value: tuple(entity_model_cls,entity_doc_model_cls)
+        self._entity_model_cache = {}
+
+    def document_model_cls(self, entity_name):
+        """
+        Gets the document model class for an entity with the given name.
+        Entity_model function should have been called prior so that the model
+        class can be stored in the cache.
+        :param entity_name: Short name of the entity.
+        :type entity_name: str
+        :return: Returns the document model class for an entity with the given
+        name or None if not found.
+        :rtype: object
+        """
+        if not entity_name in self._entity_model_cache:
+            return None
+
+        model, doc_model = self._entity_model_cache[entity_name]
+
+        return doc_model
+
     @abstractmethod
     def columns(self):
         """
@@ -93,8 +117,21 @@ class DataService:
         :return model: Entity model
         :rtype model: DeclarativeMeta
         """
+        if not entity:
+            return
+
         try:
-            model = entity_model(entity)
+            # Check if model is already in the cache
+            if entity.short_name in self._entity_model_cache:
+                model, doc_model = self._entity_model_cache[entity.short_name]
+            else:
+                # Generate new and save to cache
+                model, doc_model = entity_model(
+                    entity,
+                    with_supporting_document=True
+                )
+                self._entity_model_cache[entity.short_name] = model, doc_model
+
             return model
         except AttributeError as e:
             raise e
@@ -107,6 +144,7 @@ class SchemeDataService(DataService):
     Scheme data model service
     """
     def __init__(self, current_profile, widget_obj_name, parent):
+        super(SchemeDataService, self).__init__()
         self._profile = current_profile
         self.entity_name = "Scheme"
         self._parent = parent
@@ -302,6 +340,7 @@ class DocumentDataService(DataService):
     Scheme supporting documents data model service
     """
     def __init__(self, current_profile, scheme_id):
+        super(DocumentDataService, self).__init__()
         self._profile = current_profile
         self._scheme_id = scheme_id
         self.entity_name = "supporting_document"
@@ -413,6 +452,7 @@ class HolderDataService(DataService):
     Scheme holders data model service
     """
     def __init__(self, current_profile, scheme_id):
+        super(HolderDataService, self).__init__()
         self._profile = current_profile
         self._scheme_id = scheme_id
         self.entity_name = "Scheme"
@@ -503,6 +543,7 @@ class CommentDataService(DataService):
     Comment Manager data model service
     """
     def __init__(self, current_profile, scheme_id):
+        super(CommentDataService, self).__init__()
         self._profile = current_profile
         self._scheme_id = scheme_id
         self.entity_name = "Scheme"
@@ -611,6 +652,7 @@ class PlotViewerDataService(DataService):
     Scheme plot viewer data model service
     """
     def __init__(self, current_profile, scheme_id):
+        super(PlotViewerDataService, self).__init__()
         self._profile = current_profile
         self._scheme_id = scheme_id
         self.entity_name = "Plot"
@@ -702,6 +744,7 @@ class BeaconViewerDataService(DataService):
     Scheme beacon viewer data model service
     """
     def __init__(self, current_profile, scheme_id):
+        super(BeaconViewerDataService, self).__init__()
         self._profile = current_profile
         self._scheme_id = scheme_id
         self.entity_name = "Beacon"
@@ -793,6 +836,7 @@ class ServitudeViewerDataService(DataService):
     Scheme servitude viewer data model service
     """
     def __init__(self, current_profile, scheme_id):
+        super(ServitudeViewerDataService, self).__init__()
         self._profile = current_profile
         self._scheme_id = scheme_id
         self.entity_name = "Servitude"
@@ -938,6 +982,7 @@ class PlotPreviewDataService(DataService):
     Scheme plot import preview data model service
     """
     def __init__(self, current_profile, scheme_id):
+        super(PlotPreviewDataService, self).__init__()
         self._profile = current_profile
         self._scheme_id = scheme_id
         self._plot_config = PlotImportPreviewConfig()
@@ -1102,6 +1147,7 @@ class ServitudePreviewDataService(DataService):
     Scheme servitude import preview data model service
     """
     def __init__(self, current_profile, scheme_id):
+        super(ServitudePreviewDataService, self).__init__()
         self._profile = current_profile
         self._servitude_config = ServitudeImportPreviewConfig()
         self._table_model_icons = TableModelIcons()
@@ -1204,6 +1250,7 @@ class BeaconPreviewDataService(DataService):
     Scheme beacon import preview data model service
     """
     def __init__(self, current_profile, scheme_id):
+        super(BeaconPreviewDataService, self).__init__()
         self._profile = current_profile
         self._beacon_config = BeaconImportPreviewConfig()
         self._table_model_icons = TableModelIcons()
