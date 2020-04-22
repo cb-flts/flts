@@ -442,12 +442,13 @@ class PlotImportWidget(QWidget):
         model = self._preview_models[fpath]
         settings = self._file_settings(row)
         crs_id = settings.get(CRS_ID)
+        srid_id = None
         import_type = settings.get(IMPORT_AS)
         data_service = self._preview_data_service[import_type]
         columns = self._import_type_columns(import_type)
         try:
             import_plot = ImportPlot(
-                model, self._scheme_id, data_service, columns, crs_id
+                model, self._scheme_id, data_service, columns, crs_id, srid_id
             )
             self._import_counter = import_plot.save()
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
