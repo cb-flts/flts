@@ -632,6 +632,7 @@ class UniqueParcelIdentifier:
             return plot_id
         except ValueError:
             return
+
     @property
     def wkt_plot_numbers(self):
         """
@@ -1017,12 +1018,12 @@ class PlotPreview(Plot):
             if not geom_type:
                 self._set_invalid_tip(column, "Geometry type not allowed")
             elif geom_type != self._settings.geom_type:
-                tip = "Mismatch with set geometry type ({})".\
+                tip = "Mismatch with set geometry type ({})". \
                     format(self._settings.geom_type)
                 self._set_invalid_tip(column, tip)
             elif self._import_type.get(self._settings.geom_type) != \
                     self._settings.import_as:
-                tip = "Mismatch with set import type ({})".\
+                tip = "Mismatch with set import type ({})". \
                     format(self._settings.import_as)
                 self._set_invalid_tip(column, tip)
             return value
@@ -1593,7 +1594,6 @@ class ImportPlot:
         # Current profile
         curr_p = current_profile()
         # Entities
-        scheme_workflow_entity = curr_p.entity
         scheme_entity = curr_p.entity('Scheme')
         workflow_lookup = curr_p.entity(
             'check_lht_workflow'
@@ -1691,6 +1691,30 @@ class ImportPlot:
         scheme_workflow_obj.approval_id = approval_lodge_res.id
         scheme_workflow_obj.save()
 
+    def source_crs_lookup_id(self):
+        """
+        Returns id for the lookup plot source crs value
+        :return: CRS lookup id
+        :rtype: Integer
+        """
+        # Current profile
+        curr_p = current_profile()
+        # Lookup
+        crs_lookup = curr_p.entity(
+            'check_lht_plot_crs'
+        )
+        # crs lookup model
+        crs_lookup_model = entity_model(crs_lookup)
+        # CRS lookup object
+        crs_lookup_obj = crs_lookup_model()
+        # Filter the lookup ID based on values
+        crs_res = crs_lookup_obj.queryObject().filter(
+            crs_lookup_model.value == self._crs_id
+        ).one()
+
+        self._srid_id = crs_res.id
+        return self._srid_id
+
     def save(self):
         """
         Imports plots data into the database
@@ -1719,6 +1743,7 @@ class ImportPlot:
         """
         try:
             import_items = {}
+            self.source_crs_lookup_id()
             source_srid = str(self._crs_id.split(":")[1])
             destination_srid = str(self._data_service.geom_srid)
             for row, data in enumerate(self._model.results):
@@ -1732,7 +1757,7 @@ class ImportPlot:
                         value = "SRID={0};{1}".format(destination_srid, value)
                     items.append([option.column, value, option.entity])
                 items.append(self._scheme_items())
-
+                items.append(self._srid_items())
                 # Append document data models if specified
                 if len(self._doc_data_models) > 0:
                     items.append(self._supporting_doc_items())
@@ -1770,6 +1795,15 @@ class ImportPlot:
     def _supporting_doc_items(self):
         # Returns a list of SQLAlchemy document data models.
         return ['documents', self._doc_data_models, 'Plot']
+
+    def _srid_items(self):
+        """
+        Return ids of SRID
+        :return: SRID items
+        :rtype: List
+        """
+        option = self._save_options["SRID_ID"]
+        return list((option.column, self._srid_id, option.entity))
 
 
 class SavePlotSTR:
@@ -1841,7 +1875,7 @@ class SavePlotSTR:
         results = [
             (int(plot_number), id_)
             for plot_number, id_ in results
-            if plot_number.isdigit()
+            # if plot_number.isdigit()
         ]
         return dict(results)
 

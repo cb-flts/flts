@@ -707,7 +707,7 @@ class ColumnSettings:
         return column
 
 
-GEOMETRY, PARCEL_NUM, UPI_NUM, AREA = range(4)
+GEOMETRY, PARCEL_NUM, UPI_NUM, AREA, SRID_ID = range(5)
 GEOMETRY_PT, X_PT, Y_PT = range(3)
 Column = namedtuple('Column', ['name', 'type', 'flag'])
 Icon = namedtuple('Icon', ['icon', 'size'])
@@ -1352,6 +1352,9 @@ configurations = {
             ),
             "SCHEME_ID": SaveColumn(
                 column='scheme_id', value=None, entity='Plot'
+            ),
+            "SRID_ID": SaveColumn(
+                column="crs_id", value=None, entity='Plot'
             )
         },
         'beacon_import_save': {
