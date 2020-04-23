@@ -42,9 +42,7 @@ from stdm.ui.flts.workflow_manager.model import WorkflowManagerModel
 from stdm.ui.flts.workflow_manager.delegates.plot_file_delegate import PlotFileDelegate
 from stdm.ui.flts.workflow_manager.components.plot_import_component import PlotImportComponent
 from stdm.ui.flts.workflow_manager.field_book_manager import FieldBookManager
-from stdm.network.cmis_manager import (
-    CmisDocumentMapperException
-)
+from stdm.ui.flts.workflow_manager.pdf_viewer_widget import PDFViewerWidget
 
 
 NAME, IMPORT_AS, DELIMITER, HEADER_ROW, CRS_ID, \
@@ -372,7 +370,20 @@ class PlotImportWidget(QWidget):
             msg = 'Error in uploading field book: {0}'.format(err)
             self.notif_bar.insertWarningNotification(msg)
         elif status == FieldBookManager.SUCCESS:
-            self.notif_bar.insertSuccessNotification('Success!')
+            doc_uuid = self._field_bk_mgr.document_uuid(path)
+            doc_name = self._field_bk_mgr.document_name(path)
+            if not doc_uuid or not doc_name:
+                msg = 'An error occurred, the field book cannot be previewed.'
+                self.notif_bar.insertWarningNotification(msg)
+                return
+
+            pdf_viewer = PDFViewerWidget(
+                doc_uuid,
+                doc_name
+            )
+            pdf_viewer.view_document()
+
+            # Flag the field book as viewed
             self._previewed[path] = path
 
     def _clear_feature(self):

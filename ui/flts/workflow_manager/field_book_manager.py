@@ -289,6 +289,11 @@ class FieldBookManager(QObject):
         cmis_props = doc.getProperties()
         return cmis_props['cmis:versionSeriesId']
 
+    def _doc_name_from_doc(self, doc):
+        # Returns the name of the given document
+        cmis_props = doc.getProperties()
+        return cmis_props['cmis:name']
+
     def document_from_file_path(self, path):
         """
         Gets the cmislib document object from the file path. This only
@@ -297,8 +302,45 @@ class FieldBookManager(QObject):
         :type path: str
         :return: Returns the cmislib document object from the given file if
         it has been successfully uploaded, else None.
+        :rtype: cmislib.domain.Document
         """
         return self._uploaded_docs.get(path, None)
+
+    def document_uuid(self, file_path):
+        """
+        Gets the document identifier from the cmislib document indexed by the
+        given source file path. This only applies for those documents that
+        had been successfully uploaded.
+        :param file_path: File path of the source document.
+        :type file_path: str
+        :return: Returns the document identifier from the cmislib document
+        indexed by the given source file path, else an empty string if the
+        document was not successfully uploaded.
+        :rtype: str
+        """
+        if file_path in self._uploaded_docs:
+            doc = self.document_from_file_path(file_path)
+            return self._uuid_from_doc(doc)
+
+        return ''
+
+    def document_name(self, file_path):
+        """
+        Gets the document name from the cmislib document indexed by the
+        given source file path. This only applies for those documents that
+        had been successfully uploaded.
+        :param file_path: File path of the source document.
+        :type file_path: str
+        :return: Returns the document name from the cmislib document
+        indexed by the given source file path, else an empty string if the
+        document was not successfully uploaded.
+        :rtype: str
+        """
+        if file_path in self._uploaded_docs:
+            doc = self.document_from_file_path(file_path)
+            return self._doc_name_from_doc(doc)
+
+        return ''
 
     def file_path_from_uuid(self, uuid):
         """
