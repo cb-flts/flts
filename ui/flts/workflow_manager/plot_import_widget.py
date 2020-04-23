@@ -136,23 +136,9 @@ class PlotImportWidget(QWidget):
         _selection_model.selectionChanged.connect(self._on_preview_select)
         QTimer.singleShot(0, self._set_file_path)
         self._scheme_number = scheme_number
-        self._init_field_book_manager()
 
-    def _init_field_book_manager(self):
-        # Initialize object for managing the upload of field books
-        # We need to force the data service to cache the data model class and
-        # corresponding one for document models so that they are in sync.
-        service_id = 'Plots'
-        entity_name = 'Plot'
-        self._set_preview_data_service(service_id)
-        plot_service = self._preview_data_service[service_id]
-
-        # Force plot model to be cached
-        plot_service.entity_model_(entity_name)
-        doc_cls = plot_service.document_model_cls(entity_name)
-
-        # Use the cached document model class in the field book manager
-        self._field_bk_mgr = FieldBookManager(doc_cls, self)
+        # Object for managing the upload of field book
+        self._field_bk_mgr = FieldBookManager(self)
         self._field_bk_mgr.uploaded.connect(
             self._on_field_bk_uploaded
         )
@@ -543,12 +529,28 @@ class PlotImportWidget(QWidget):
         if self._plot_file.is_pdf(fpath):
             msg = 'The field book will not be imported separately but rather ' \
                   'together with the plots when they are being uploaded.'
-            self.notif_bar.clear()
-            self.notif_bar.insertInformationNotification(msg)
+            self._show_critical_message(
+                'Field Book Upload',
+                msg
+            )
             return
+
+        else:
+            # Checks if a field book has been uploaded
+            if not self._contains_field_book():
+                msg = 'Plots cannot be imported without an accompanying field ' \
+                      'book, please add one and try again.'
+                self._show_critical_message(
+                    'Plots Import',
+                    msg
+                )
+                return
 
         self._import_plot()
         if self._import_counter != 0:
+            self._remove_file(False)
+            # Select and remove field book
+            self._select_field_book()
             self._remove_file(False)
 
     def _import_plot(self):
@@ -571,12 +573,13 @@ class PlotImportWidget(QWidget):
 
         try:
             # Move field book to permanent plot directory in CMIS server
-            doc_data_models = self._field_bk_mgr.persist_documents(
-                self._scheme_number
+            sch_fld_bk_id = self._field_bk_mgr.persist_documents(
+                self._scheme_number,
+                self._scheme_id
             )
             import_plot = ImportPlot(
                 model, self._scheme_id, data_service, columns, crs_id,
-                srid_id, doc_data_models
+                srid_id, sch_fld_bk_id
             )
             self._import_counter = import_plot.save()
 
@@ -903,6 +906,44 @@ class PlotImportWidget(QWidget):
             return
         fpath = self.model.results[index.row()].get("fpath")
         return fpath
+
+    def _select_field_book(self):
+        # Loops through the files in the view and selects the first field
+        # book it encounters. Returns True if field book found and selected.
+        file_count = self.model.rowCount()
+        selection_model = self._file_table_view.selectionModel()
+
+        if file_count == 0:
+            return False
+
+        status = False
+        for r in range(file_count):
+            fpath = self.model.results[r].get("fpath")
+            if self._plot_file.is_pdf(fpath):
+                sel_index = self.model.index(r, 0)
+                selection_model.select(
+                    sel_index,
+                    QItemSelectionModel.ClearAndSelect
+                )
+                status = True
+                break
+
+        return status
+
+    def _contains_field_book(self):
+        # Checks if the file view contains a field book.
+        file_count = self.model.rowCount()
+        if file_count == 0:
+            return False
+
+        status = False
+        for r in range(file_count):
+            fpath = self.model.results[r].get("fpath")
+            if self._plot_file.is_pdf(fpath):
+                status = True
+                break
+
+        return status
 
     @staticmethod
     def _crs_authority_id():

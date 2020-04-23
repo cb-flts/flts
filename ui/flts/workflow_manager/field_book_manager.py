@@ -42,6 +42,7 @@ class FieldBookManager(QObject):
     module.
     """
     FIELD_BOOK_DOC = 'Field Book'
+    SCHEME_FIELD_BOOK_ENTITY = 'Scheme_Field_Book'
 
     # Upload state
     NOT_UPLOADED, SUCCESS, ERROR = range(3)
@@ -49,10 +50,11 @@ class FieldBookManager(QObject):
     # Signals
     uploaded = pyqtSignal(tuple) # (path, successful(bool))
     removed = pyqtSignal(tuple) # (path, successful(bool), err_msg)
+    # Emitted when documents have been successfully persisted
+    persisted = pyqtSignal()
 
-    def __init__(self, doc_model_cls, parent=None):
+    def __init__(self, parent=None):
         super(FieldBookManager, self).__init__(parent)
-        self._doc_model_cls = doc_model_cls
 
         # Stores the upload status of each document with the source file path
         # as the key
@@ -68,8 +70,6 @@ class FieldBookManager(QObject):
         # Flag for checking if there is an active document upload/removal
         self._has_active_operation = False
 
-        self._plt_entity_name = 'Plot'
-
         # Messages as to why the manager is not active
         self._error_msgs = []
         curr_profile = current_profile()
@@ -79,14 +79,20 @@ class FieldBookManager(QObject):
             )
             return
 
-        plot_entity = curr_profile.entity(
-            self._plt_entity_name
+        scheme_fk_entity = curr_profile.entity(
+            self.SCHEME_FIELD_BOOK_ENTITY
         )
-        if not plot_entity:
+        if not scheme_fk_entity:
             self._error_msgs.append(
-                'Plot entity not found'
+                'Scheme field book entity not found'
             )
             return
+
+        # Get model classes
+        self._schm_fld_bk, self._doc_model_cls = entity_model(
+            scheme_fk_entity,
+            with_supporting_document=True
+        )
 
         cmis_mgr = CmisManager()
         conn_status = cmis_mgr.connect()
@@ -98,12 +104,12 @@ class FieldBookManager(QObject):
         self._field_bk_doc_mapper = CmisEntityDocumentMapper(
             cmis_manager=cmis_mgr,
             doc_model_cls=self._doc_model_cls,
-            entity_name=self._plt_entity_name
+            entity_name=self.SCHEME_FIELD_BOOK_ENTITY
         )
 
         # Get the name of the lookup table containing the document types associated with
         # the plot entity
-        field_bk_table = plot_entity.supporting_doc.document_type_entity.name
+        field_bk_table = scheme_fk_entity.supporting_doc.document_type_entity.name
 
         # Get the primary key, name and code of the plot document type in the lookup
         cert_doc_types = export_data(field_bk_table)
@@ -383,18 +389,37 @@ class FieldBookManager(QObject):
 
         delete_thread.start()
 
-    def persist_documents(self, scheme_number):
+    def _save_scheme_field_book_meta(self, scheme_id):
+        # Save the scheme field book to the database.
+        scheme_field_bk = self._schm_fld_bk
+
+    def persist_documents(self, scheme_number, scheme_id):
         """
-        Moves the plot supporting documents to the permanent plot directory
-        in the CMIS server.
+        Creates a record for the scheme survey documents and moves the plot
+        supporting documents to the permanent plot directory in the CMIS
+        server.
         :param scheme_number: Number of the scheme that will also be used to
         name the documents.
         :type scheme_number: str
-        :return: Returns a list of document SQLAlchemy objects for attaching
-        to the main entity object for saving in the database.
-        :rtype: list
+        :param scheme_id: Primary key of the referenced scheme whose field
+        book will be stored.
+        :type scheme_id: int
+        :return: Returns the primary key of the record in the scheme field
+        book table that represents the stored documents. This primary key
+        should be attached to the plot records.
+        :rtype: int
         """
-        return self._field_bk_doc_mapper.persist_documents(scheme_number)
+        doc_objects = self._field_bk_doc_mapper.persist_documents(scheme_number)
+        scheme_field_bk = self._schm_fld_bk()
+        scheme_field_bk.scheme_id = scheme_id
+        scheme_field_bk.documents = doc_objects
+        scheme_field_bk.save()
+        self.reset()
+
+        # Emit signal to indicate that the process is complete
+        self.persisted.emit()
+
+        return scheme_field_bk.id
 
     def remove_field_book(self, path):
         """
