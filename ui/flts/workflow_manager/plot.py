@@ -1791,9 +1791,21 @@ class SavePlotSTR:
     def __init__(self, data_service, saved_plots, plot_numbers, scheme_id=None):
         self._data_service = data_service
         self._saved_plots = saved_plots
-        self._plot_numbers = plot_numbers
+        self._plot_numbers = self._curated_plot_numbers(plot_numbers)
         self._scheme_id = scheme_id
         self._save_options = data_service.save_columns
+
+    def _curated_plot_numbers(self, plot_numbers):
+        """
+        Removes the zero prefix from the plot number
+        """
+        plot_nums = []
+        for pn in plot_numbers:
+            try:
+                plot_nums.append(str(int(pn)))
+            except ValueError:
+                pass
+        return plot_nums
 
     def save(self):
         """
@@ -1848,6 +1860,7 @@ class SavePlotSTR:
         :return: Plot identifiers
         :rtype: Dictionary
         """
+        # List
         results = self._data_service.plot_ids(self._plot_numbers)
         results = [
             (int(plot_number), id_)
@@ -1862,25 +1875,14 @@ class SavePlotSTR:
         :return: Holder identifiers
         :rtype: Dictionary
         """
-        results = self._data_service.holder_ids(self._int_plot_numbers())
+        # List
+        results = self._data_service.holder_ids(self._plot_numbers)
         results = [
             (int(plot_number), id_)
-            for plot_number, id_ in
-            self._scheme_holders(results)
+            for plot_number, id_ in results
+            # self._scheme_holders(results)
         ]
         return dict(results)
-
-    def _int_plot_numbers(self):
-        """
-        Converts plot numbers to integer
-        :return plot_numbers: List of plot numbers
-        :return plot_numbers: List
-        """
-        plot_numbers = []
-        for plot_number in self._plot_numbers:
-            if plot_number.isdigit():
-                plot_numbers.append(int(plot_number))
-        return plot_numbers
 
     @staticmethod
     def _to_int(value):
