@@ -53,6 +53,9 @@ USER_PLUGIN_DIR = QDesktopServices.storageLocation(QDesktopServices.HomeLocation
 LOG_DIR = u'{0}/logs'.format(USER_PLUGIN_DIR)
 LOG_FILE_PATH = LOG_DIR + '/stdm_log'
 
+# Search
+SEARCH_DIR = u'{0}/search'.format(USER_PLUGIN_DIR)
+
 
 def setup_logger():
     from stdm.settings.registryconfig import debug_logging
@@ -138,6 +141,17 @@ def copy_holders_configuration():
     copy_status = holders_conf_file.copy(holders_conf_dest)
 
 
+def setup_search():
+    # Create search directory if it does not exist
+    search_folder = QDir()
+    if not search_folder.exists(SEARCH_DIR):
+        status = search_folder.mkpath(SEARCH_DIR)
+
+        # Log directory could not be created
+        if not status:
+            raise IOError('Search directory for FLTS could not be created.')
+
+
 def copy_search_configuration():
     """
     Copies the configuration file containing the search settings to the
@@ -169,6 +183,9 @@ def classFactory(iface):
 
     # Copy the holders mapping config file
     copy_holders_configuration()
+
+    # Create Search folder
+    setup_search()
 
     # Copy the search settings file
     copy_search_configuration()
