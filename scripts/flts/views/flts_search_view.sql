@@ -4,11 +4,11 @@ CREATE OR REPLACE VIEW cb_vw_plot_search AS
     cb_plot.upi,
     cb_plot.geom,
     cb_plot.plot_number,
-    cb_check_lht_plot_use.value AS plot_use,
+--     cb_check_lht_plot_use.value AS plot_use,
     cb_plot.area,
     cb_scheme.scheme_name
    FROM cb_plot
-     JOIN cb_check_lht_plot_use ON cb_check_lht_plot_use.id = cb_plot.use
+--      JOIN cb_check_lht_plot_use ON cb_check_lht_plot_use.id = cb_plot.use
      JOIN cb_scheme ON cb_scheme.id = cb_plot.scheme_id;
 
 CREATE OR REPLACE VIEW cb_vw_holder_search AS
