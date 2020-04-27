@@ -77,7 +77,8 @@ CREATE TABLE cb_plot_log (
   "plot_number" varchar(6),
   "area" numeric(18,6),
   "scheme_id" int4,
-  "crs_id" int4
+  "crs_id" int4,
+  "scheme_field_book_id" int4
 )
 ;
 
@@ -164,6 +165,14 @@ CREATE OR REPLACE FUNCTION insert_timestamp() RETURNS TRIGGER AS $insert_timesta
 
 $insert_timestamp$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION flts_plot_num_to_numeric() RETURNS TRIGGER AS $flts_plot_num_to_numeric$
+    BEGIN
+        UPDATE cb_plot SET plot_number=(plot_number::INTEGER)::TEXT;
+		RETURN NULL;
+    END;
+
+$flts_plot_num_to_numeric$ LANGUAGE plpgsql;
+
 --- TRIGGERS
 
 CREATE TRIGGER cb_scheme_log
@@ -179,7 +188,7 @@ AFTER INSERT OR UPDATE OR DELETE ON cb_holder
 --     FOR EACH ROW EXECUTE PROCEDURE cb_plot_num_to_int();
 
 CREATE TRIGGER cb_plot_log
-AFTER INSERT OR UPDATE OR DELETE ON cb_plot
+AFTER UPDATE OR DELETE ON cb_plot
     FOR EACH ROW EXECUTE PROCEDURE cb_plot_log();
 
 CREATE TRIGGER comment_timestamp
@@ -189,5 +198,9 @@ BEFORE INSERT OR UPDATE ON cb_comment
 CREATE TRIGGER insert_workflow_timestamp
 BEFORE INSERT OR UPDATE ON cb_scheme_workflow
     FOR EACH ROW EXECUTE PROCEDURE insert_timestamp();
+
+CREATE TRIGGER plot_num_to_numeric
+AFTER INSERT ON cb_plot
+    FOR EACH ROW EXECUTE PROCEDURE flts_plot_num_to_numeric();
 
 ---- TODO Add exception handling

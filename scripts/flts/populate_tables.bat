@@ -9,6 +9,9 @@ SET POPULATE="%USERPROFILE%\.qgis2\python\plugins\stdm\scripts\flts\populate_rel
 SET FUNC="%USERPROFILE%\.qgis2\python\plugins\stdm\scripts\flts\landhold_certificate_utils.sql"
 SET TRIGGER="%USERPROFILE%\.qgis2\python\plugins\stdm\scripts\flts\log_triggers.sql"
 SET CERT_VW="%USERPROFILE%\.qgis2\python\plugins\stdm\scripts\flts\views\flts_cert_template_view.sql"
+SET VW1="%USERPROFILE%\.qgis2\python\plugins\stdm\scripts\flts\views\flts_report_disability_template_view.sql"
+SET VW2="%USERPROFILE%\.qgis2\python\plugins\stdm\scripts\flts\views\flts_report_gender_template_view.sql"
+SET VW3="%USERPROFILE%\.qgis2\python\plugins\stdm\scripts\flts\views\flts_report_marital_status_view.sql"
 SET SEARCH_VW="%USERPROFILE%\.qgis2\python\plugins\stdm\scripts\flts\views\flts_search_view.sql"
 SET SCRIPT_DIR="%USERPROFILE%\.qgis2\python\plugins\stdm\scripts\flts"
 SET PSQL_DIR="C:\Program Files\PostgreSQL\%PG_VERSION%\bin\"
@@ -19,6 +22,9 @@ psql.exe -e -h %PG_HOST% -p %PG_PORT% -U %PG_USER% -d %DB_NAME% -a -f %POPULATE%
 psql.exe -e -h %PG_HOST% -p %PG_PORT% -U %PG_USER% -d %DB_NAME% -a -f %FUNC%  > %SCRIPT_DIR%\output.txt
 psql.exe -e -h %PG_HOST% -p %PG_PORT% -U %PG_USER% -d %DB_NAME% -a -f %TRIGGER%  > %SCRIPT_DIR%\output.txt
 psql.exe -e -h %PG_HOST% -p %PG_PORT% -U %PG_USER% -d %DB_NAME% -a -f %CERT_VW%  > %SCRIPT_DIR%\output.txt
+psql.exe -e -h %PG_HOST% -p %PG_PORT% -U %PG_USER% -d %DB_NAME% -a -f %VW1%  > %SCRIPT_DIR%\output.txt
+psql.exe -e -h %PG_HOST% -p %PG_PORT% -U %PG_USER% -d %DB_NAME% -a -f %VW2%  > %SCRIPT_DIR%\output.txt
+psql.exe -e -h %PG_HOST% -p %PG_PORT% -U %PG_USER% -d %DB_NAME% -a -f %VW3%  > %SCRIPT_DIR%\output.txt
 psql.exe -e -h %PG_HOST% -p %PG_PORT% -U %PG_USER% -d %DB_NAME% -a -f %SEARCH_VW%  > %SCRIPT_DIR%\output.txt
 DEL %SCRIPT_DIR%\output.txt
 cd %SCRIPT_DIR%
