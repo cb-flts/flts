@@ -185,6 +185,14 @@
     <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
    </Columns>
   </Entity>
+  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Proxy container for the field book related to plots in a scheme" documentTypeLookup="check_scheme_field_book_document_type" proxy="False" createId="True" supportsDocuments="True" shortName="Scheme_Field_Book" name="cb_scheme_field_book" label="">
+   <Columns>
+    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="0" minimum="0" maximum="2147483647" description="Foreign key to scheme id" index="False" name="scheme_id" searchable="False" TYPE_INFO="FOREIGN_KEY" label="" mandatory="True">
+     <Relation name="fk_cb_scheme_id_cb_scheme_field_book_scheme_id"/>
+    </Column>
+   </Columns>
+  </Entity>
   <Entity editable="True" global="False" rowindex="-1" associative="False" description="Archive for the certificate" documentTypeLookup="check_certificate_document_type" proxy="False" createId="True" supportsDocuments="True" shortName="Certificate" name="cb_certificate" label="lht_certificate">
    <Columns>
     <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
@@ -309,7 +317,6 @@
   <Entity editable="True" global="False" rowindex="10" associative="False" description="Refers to the holder of Land Hold Title" documentTypeLookup="check_holder_document_type" proxy="False" createId="True" supportsDocuments="True" shortName="Holder" name="cb_holder" label="lht_holder">
    <Columns>
     <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="0" minimum="-2147483648" maximum="2147483647" description="Number of the plot" index="False" name="plot_number" searchable="True" TYPE_INFO="INT" label="plot_number" mandatory="False"/>
     <Column unique="False" tip="" rowindex="1" minimum="1752-09-14" maximum="7999-12-31" description="Refers to date of the transfer contract" index="False" name="transfer_contract_date" searchable="False" TYPE_INFO="DATE" label="transfer contract date" mandatory="False">
      <currentDate minimum="False" maximum="False"/>
     </Column>
@@ -432,7 +439,7 @@
     <Column unique="False" tip="" rowindex="0" minimum="0" maximum="2147483647" description="Identifier number of holder" index="False" name="holder_id" searchable="False" TYPE_INFO="FOREIGN_KEY" label="holder id" mandatory="False">
      <Relation name="fk_cb_holder_id_cb_staging_holder_plot_holder_id"/>
     </Column>
-    <Column unique="False" tip="" rowindex="1" minimum="-2147483648" maximum="2147483647" description="Plot identity number" index="False" name="plot_number" searchable="True" TYPE_INFO="INT" label="plot number" mandatory="False"/>
+    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="Plot identity number" index="False" name="plot_number" searchable="True" TYPE_INFO="INT" label="plot number" mandatory="False"/>
     <Column unique="False" tip="" rowindex="2" minimum="0" maximum="2147483647" description="Scheme identifier" index="False" name="scheme_id" searchable="False" TYPE_INFO="FOREIGN_KEY" label="scheme id" mandatory="False">
      <Relation name="fk_cb_scheme_id_cb_staging_holder_plot_scheme_id"/>
     </Column>
@@ -478,14 +485,6 @@
     </Column>
    </Columns>
   </Entity>
-  <Entity editable="True" global="False" rowindex="-1" associative="False" description="Proxy container for the field book related to plots in a scheme" documentTypeLookup="check_scheme_field_book_document_type" proxy="False" createId="True" supportsDocuments="True" shortName="Scheme_Field_Book" name="cb_scheme_field_book" label="">
-   <Columns>
-    <Column unique="False" tip="" rowindex="-1" minimum="-2147483648" maximum="2147483647" description="" index="False" name="id" searchable="True" TYPE_INFO="SERIAL" label="" mandatory="False"/>
-    <Column unique="False" tip="" rowindex="-1" minimum="0" maximum="2147483647" description="Foreign key to scheme id" index="False" name="scheme_id" searchable="False" TYPE_INFO="FOREIGN_KEY" label="" mandatory="True">
-     <Relation name="fk_cb_scheme_id_cb_scheme_field_book_scheme_id"/>
-    </Column>
-   </Columns>
-  </Entity>
   <Relations>
    <EntityRelation displayColumns="name,code" child="social_tenure_relationship_supporting_document" showInParent="True" parent="check_social_tenure_relationship_document_type" name="fk_cb_check_social_tenure_relationship_document_type_id_cb_social_tenure_relationship_supporting_document_document_type" parentColumn="id" showInChild="True" childColumn="document_type"/>
    <EntityRelation displayColumns="" child="social_tenure_relationship_supporting_document" showInParent="True" parent="social_tenure_relationship" name="fk_cb_social_tenure_relationship_id_cb_social_tenure_relationship_supporting_document_social_tenure_relationship_id" parentColumn="id" showInChild="True" childColumn="social_tenure_relationship_id"/>
@@ -514,9 +513,14 @@
    <EntityRelation displayColumns="name,code" child="Scheme" showInParent="True" parent="check_lht_region" name="fk_cb_check_lht_region_id_cb_scheme_region" parentColumn="id" showInChild="True" childColumn="region"/>
    <EntityRelation displayColumns="name,code" child="Scheme" showInParent="True" parent="check_lht_reg_division" name="fk_cb_check_lht_reg_division_id_cb_scheme_registration_division" parentColumn="id" showInChild="True" childColumn="registration_division"/>
    <EntityRelation displayColumns="name,code" child="Scheme" showInParent="True" parent="check_plot_status" name="fk_cb_check_plot_status_id_cb_scheme_plot_status" parentColumn="id" showInChild="True" childColumn="plot_status"/>
+   <EntityRelation displayColumns="name,code" child="Scheme_Field_Book_supporting_document" showInParent="True" parent="check_scheme_field_book_document_type" name="fk_cb_check_scheme_field_book_document_type_id_cb_scheme_field_book_supporting_document_document_type" parentColumn="id" showInChild="True" childColumn="document_type"/>
+   <EntityRelation displayColumns="" child="Scheme_Field_Book_supporting_document" showInParent="True" parent="Scheme_Field_Book" name="fk_cb_scheme_field_book_id_cb_scheme_field_book_supporting_document_scheme_field_book_id" parentColumn="id" showInChild="True" childColumn="scheme_field_book_id"/>
+   <EntityRelation displayColumns="" child="Scheme_Field_Book_supporting_document" showInParent="True" parent="supporting_document" name="fk_cb_supporting_document_id_cb_scheme_field_book_supporting_document_supporting_doc_id" parentColumn="id" showInChild="True" childColumn="supporting_doc_id"/>
+   <EntityRelation displayColumns="scheme_name" child="Scheme_Field_Book" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_scheme_field_book_scheme_id" parentColumn="id" showInChild="True" childColumn="scheme_id"/>
    <EntityRelation displayColumns="name,code" child="Plot" showInParent="True" parent="check_lht_plot_use" name="fk_cb_check_lht_plot_use_id_cb_plot_use" parentColumn="id" showInChild="True" childColumn="use"/>
    <EntityRelation displayColumns="" child="Plot" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_plot_scheme_id" parentColumn="id" showInChild="True" childColumn="scheme_id"/>
    <EntityRelation displayColumns="name,code" child="Plot" showInParent="True" parent="check_lht_plot_crs" name="fk_cb_check_lht_plot_crs_id_cb_plot_crs_id" parentColumn="id" showInChild="True" childColumn="crs_id"/>
+   <EntityRelation displayColumns="scheme_id" child="Plot" showInParent="True" parent="Scheme_Field_Book" name="fk_cb_scheme_field_book_id_cb_plot_scheme_field_book_id" parentColumn="id" showInChild="True" childColumn="scheme_field_book_id"/>
    <EntityRelation displayColumns="name,code" child="Certificate_supporting_document" showInParent="True" parent="check_certificate_document_type" name="fk_cb_check_certificate_document_type_id_cb_certificate_supporting_document_document_type" parentColumn="id" showInChild="True" childColumn="document_type"/>
    <EntityRelation displayColumns="" child="Certificate_supporting_document" showInParent="True" parent="Certificate" name="fk_cb_certificate_id_cb_certificate_supporting_document_certificate_id" parentColumn="id" showInChild="True" childColumn="certificate_id"/>
    <EntityRelation displayColumns="" child="Certificate_supporting_document" showInParent="True" parent="supporting_document" name="fk_cb_supporting_document_id_cb_certificate_supporting_document_supporting_doc_id" parentColumn="id" showInChild="True" childColumn="supporting_doc_id"/>
@@ -539,11 +543,6 @@
    <EntityRelation displayColumns="" child="Lis_erf" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_lis_erf_scheme_identifier" parentColumn="id" showInChild="True" childColumn="scheme_identifier"/>
    <EntityRelation displayColumns="" child="social_tenure_relationship" showInParent="True" parent="Holder" name="fk_cb_holder_id_cb_social_tenure_relationship_holder_id" parentColumn="id" showInChild="True" childColumn="holder_id"/>
    <EntityRelation displayColumns="" child="social_tenure_relationship" showInParent="True" parent="Plot" name="fk_cb_plot_id_cb_social_tenure_relationship_plot_id" parentColumn="id" showInChild="True" childColumn="plot_id"/>
-   <EntityRelation displayColumns="name,code" child="Scheme_Field_Book_supporting_document" showInParent="True" parent="check_scheme_field_book_document_type" name="fk_cb_check_scheme_field_book_document_type_id_cb_scheme_field_book_supporting_document_document_type" parentColumn="id" showInChild="True" childColumn="document_type"/>
-   <EntityRelation displayColumns="" child="Scheme_Field_Book_supporting_document" showInParent="True" parent="Scheme_Field_Book" name="fk_cb_scheme_field_book_id_cb_scheme_field_book_supporting_document_scheme_field_book_id" parentColumn="id" showInChild="True" childColumn="scheme_field_book_id"/>
-   <EntityRelation displayColumns="" child="Scheme_Field_Book_supporting_document" showInParent="True" parent="supporting_document" name="fk_cb_supporting_document_id_cb_scheme_field_book_supporting_document_supporting_doc_id" parentColumn="id" showInChild="True" childColumn="supporting_doc_id"/>
-   <EntityRelation displayColumns="scheme_name" child="Scheme_Field_Book" showInParent="True" parent="Scheme" name="fk_cb_scheme_id_cb_scheme_field_book_scheme_id" parentColumn="id" showInChild="True" childColumn="scheme_id"/>
-   <EntityRelation displayColumns="scheme_id" child="Plot" showInParent="True" parent="Scheme_Field_Book" name="fk_cb_scheme_field_book_id_cb_plot_scheme_field_book_id" parentColumn="id" showInChild="True" childColumn="scheme_field_book_id"/>
   </Relations>
   <SocialTenure layerDisplay="" tenureTypeList="check_tenure_type" spatialUnit="Plot" supportsMultipleParties="True" party="Holder">
    <SpatialUnitTenureMappings>

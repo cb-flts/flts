@@ -1,0 +1,148 @@
+<Composer title="FLTS Marital Report" visible="1">
+ <Composition resizeToContentsMarginLeft="0" snapping="0" showPages="1" guidesVisible="1" resizeToContentsMarginTop="0" worldFileMap="" alignmentSnap="1" printResolution="300" paperWidth="210" gridVisible="0" snapGridOffsetX="0" smartGuides="1" snapGridOffsetY="0" resizeToContentsMarginRight="0" snapTolerancePixels="5" printAsRaster="0" generateWorldFile="0" paperHeight="297" numPages="1" snapGridResolution="10" resizeToContentsMarginBottom="0">
+  <symbol alpha="1" clip_to_extent="1" type="fill" name="">
+   <layer pass="0" class="SimpleFill" locked="0">
+    <prop k="border_width_map_unit_scale" v="0,0,0,0,0,0"/>
+    <prop k="color" v="255,255,255,255"/>
+    <prop k="joinstyle" v="miter"/>
+    <prop k="offset" v="0,0"/>
+    <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
+    <prop k="offset_unit" v="MM"/>
+    <prop k="outline_color" v="0,0,0,255"/>
+    <prop k="outline_style" v="no"/>
+    <prop k="outline_width" v="0.26"/>
+    <prop k="outline_width_unit" v="MM"/>
+    <prop k="style" v="solid"/>
+   </layer>
+  </symbol>
+  <ComposerLabel valign="128" marginX="1" marginY="1" labelText="__________________________________________________________________________________________________________" htmlState="0" halign="4">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="277.423" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="0" y="277.423" visibility="1" zValue="27" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="210" outlineWidth="0.3" excludeFromExports="0" uuid="{06bb6951-8c22-4708-bba1-ca278015087c}" height="6.2" itemRotation="0" frame="false" pagex="0">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="128" marginX="1" marginY="1" labelText="__________________________________________________________________________________________________________" htmlState="0" halign="4">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="23.2139" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="0" y="23.2139" visibility="1" zValue="24" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="210" outlineWidth="0.3" excludeFromExports="0" uuid="{5cd71f2c-964d-4dbb-ac5b-de7c1ace87fa}" height="6.2" itemRotation="0" frame="false" pagex="0">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="This report is based on the Land Hold Title" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="274.323" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="66.1401" y="274.323" visibility="1" zValue="23" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="77.7199" outlineWidth="0.3" excludeFromExports="0" uuid="{a466c084-256c-47c0-afb2-ed621a3c090a}" height="6.2" itemRotation="0" frame="false" pagex="66.1401">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="Marital Status" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,11,-1,5,75,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="18.9697" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="87.3354" y="18.9697" visibility="1" zValue="18" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="35.5107" outlineWidth="0.3" excludeFromExports="0" uuid="{a5abd5f2-50af-4480-8e28-5e8251bbdc1b}" height="8.48843" itemRotation="0" frame="false" pagex="87.3354">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="128" marginX="1" marginY="1" labelText="__________________________________________________________________________________________________________" htmlState="0" halign="4">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="4.46383" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="0.0906748" y="4.46383" visibility="1" zValue="14" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="210" outlineWidth="0.3" excludeFromExports="0" uuid="{0bc50f8f-8ad8-430a-bd26-91a3de0aef3e}" height="6.2" itemRotation="0" frame="false" pagex="0.0906748">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="[cb_holder_vw_lht_report_marital_status_template.user_time_text]" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,1,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="286.261" page="1" id="{4e9bb37c-e79d-40ee-bf45-3ca8238b4861}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="4.05803" y="286.261" visibility="1" zValue="14" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="96.1284" outlineWidth="0.3" excludeFromExports="0" uuid="{4e9bb37c-e79d-40ee-bf45-3ca8238b4861}" height="6.2" itemRotation="0" frame="false" pagex="4.05803">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="[cb_holder_vw_lht_report_marital_status_template.married_holders]" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,75,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="77.7093" page="1" id="{86ad2305-8448-407f-a933-ba84c3eba4f4}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="95.7729" y="77.7093" visibility="1" zValue="7" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="59.9511" outlineWidth="0.3" excludeFromExports="0" uuid="{86ad2305-8448-407f-a933-ba84c3eba4f4}" height="10.7052" itemRotation="0" frame="false" pagex="95.7729">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="CB-FLTS REPORT" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,12,-1,5,75,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="10.6638" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="84.3029" y="10.6638" visibility="1" zValue="7" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="41.3943" outlineWidth="0.3" excludeFromExports="0" uuid="{0a4432a3-718c-4304-9d0c-62b4295a7373}" height="8.48843" itemRotation="0" frame="false" pagex="84.3029">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="[cb_holder_vw_lht_report_marital_status_template.unmarried_holders]" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,75,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="61.2921" page="1" id="{0c0f5ca9-785a-4616-a0b8-6d36ee3f85e5}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="95.7729" y="61.2921" visibility="1" zValue="6" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="59.9511" outlineWidth="0.3" excludeFromExports="0" uuid="{0c0f5ca9-785a-4616-a0b8-6d36ee3f85e5}" height="10.7052" itemRotation="0" frame="false" pagex="95.7729">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="[cb_holder_vw_lht_report_marital_status_template.total_registered_holders]" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,75,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="45.3273" page="1" id="{1d6b337e-a200-413e-8e66-8ef35854c35b}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="95.7729" y="45.3273" visibility="1" zValue="5" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="59.9511" outlineWidth="0.3" excludeFromExports="0" uuid="{1d6b337e-a200-413e-8e66-8ef35854c35b}" height="10.7052" itemRotation="0" frame="false" pagex="95.7729">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="Total married holders:" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="77.8593" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="54.276" y="77.8593" visibility="1" zValue="4" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="41.3469" outlineWidth="0.3" excludeFromExports="0" uuid="{9d54675d-334b-43a2-836e-bf18eadbdc2e}" height="10.4052" itemRotation="0" frame="false" pagex="54.276">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="Total unmarried holders:" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="61.4421" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="54.276" y="61.4421" visibility="1" zValue="3" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="41.3469" outlineWidth="0.3" excludeFromExports="0" uuid="{608851c6-d5b8-4c18-b84f-d3f259353309}" height="10.4052" itemRotation="0" frame="false" pagex="54.276">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="Total registered holders:" htmlState="0" halign="1">
+   <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="45.4773" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="54.276" y="45.4773" visibility="1" zValue="2" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="41.3469" outlineWidth="0.3" excludeFromExports="0" uuid="{4fd5d9d5-1bb3-4f6e-ac65-b00299b73268}" height="10.4052" itemRotation="0" frame="false" pagex="54.276">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <customproperties/>
+ </Composition>
+ <DataSource category="View" name="cb_holder_vw_lht_report_marital_status_template" referencedTable="cb_holder">
+  <DataField name="user_time_text" itemid="{4e9bb37c-e79d-40ee-bf45-3ca8238b4861}"/>
+  <DataField name="total_registered_holders" itemid="{1d6b337e-a200-413e-8e66-8ef35854c35b}"/>
+  <DataField name="married_holders" itemid="{86ad2305-8448-407f-a933-ba84c3eba4f4}"/>
+  <DataField name="unmarried_holders" itemid="{0c0f5ca9-785a-4616-a0b8-6d36ee3f85e5}"/>
+  <SpatialFields/>
+  <Photos/>
+  <Tables/>
+  <Charts/>
+  <QRCodes/>
+ </DataSource>
+</Composer>
