@@ -36,7 +36,7 @@ from stdm.settings.registryconfig import (
 from stdm.settings.search_config import SearchConfigurationRegistry
 
 from .ui_user_shortcut import Ui_UserShortcutDialog
-from ..notification import NotificationBar,ERROR
+from ..notification import NotificationBar, ERROR
 
 
 class UserShortcutDialog(QDialog, Ui_UserShortcutDialog):
@@ -133,7 +133,6 @@ class UserShortcutDialog(QDialog, Ui_UserShortcutDialog):
         # Container of list items based on category
         self._scheme_items = []
         self._certificate_items = []
-        self._notification_items = []
         self._report_items = []
         self._search_items = []
 
@@ -165,13 +164,17 @@ class UserShortcutDialog(QDialog, Ui_UserShortcutDialog):
             QIcon(':/plugins/stdm/images/icons/flts_scheme_import_plot.png'),
             self.tr('Import Plots')
         )
+        self.lsi_design_certificate = QListWidgetItem(
+            QIcon(':/plugins/stdm/images/icons/flts_document_designer.png'),
+            self.tr('Design Certificate')
+        )
         self.lsi_print_certificate = QListWidgetItem(
-            QIcon(':/plugins/stdm/images/icons/flts_certificate_print.png'),
-            self.tr('Print')
+            QIcon(':/plugins/stdm/images/icons/flts_document_generator.png'),
+            self.tr('Generate Certificate')
         )
         self.lsi_scan_certificate = QListWidgetItem(
             QIcon(':/plugins/stdm/images/icons/flts_certificate_scan.png'),
-            self.tr('Scan')
+            self.tr('Upload Certificate')
         )
         self.lsi_search = QListWidgetItem(
             QIcon(':/plugins/stdm/images/icons/flts_search.png'),
@@ -185,13 +188,13 @@ class UserShortcutDialog(QDialog, Ui_UserShortcutDialog):
             QIcon(':/plugins/stdm/images/icons/flts_search_plot.png'),
             self.tr('Plot')
         )
+        self.lsi_design_report = QListWidgetItem(
+            QIcon(':/plugins/stdm/images/icons/flts_document_designer.png'),
+            self.tr('Design Report')
+        )
         self.lsi_report = QListWidgetItem(
             QIcon(':/plugins/stdm/images/icons/flts_report.png'),
-            self.tr('Generate')
-        )
-        self.lsi_scheme_notification = QListWidgetItem(
-            QIcon(':/plugins/stdm/images/icons/flts_notification.png'),
-            self.tr('Notifications')
+            self.tr('Generate Report')
         )
 
         # Assign unique identifier to the list item
@@ -201,11 +204,11 @@ class UserShortcutDialog(QDialog, Ui_UserShortcutDialog):
         self.lsi_second_examination.setData(Qt.UserRole, 'EXM2_SCM')
         self.lsi_third_examination.setData(Qt.UserRole, 'EXM3_SCM')
         self.lsi_import_plots.setData(Qt.UserRole, 'PLT_SCM')
-        self.lsi_print_certificate.setData(Qt.UserRole, 'P_CRT')
+        self.lsi_design_certificate.setData(Qt.UserRole, 'D_CRT')
+        self.lsi_design_report.setData(Qt.UserRole, 'D_CRT')
         self.lsi_scan_certificate.setData(Qt.UserRole, 'S_CRT')
-        self.lsi_scheme_notification.setData(Qt.UserRole, 'NTF_SCM')
+        self.lsi_report.setData(Qt.UserRole, 'G_RPT')
         self.lsi_search.setData(Qt.UserRole, 'SRC')
-        self.lsi_report.setData(Qt.UserRole, 'RPT')
 
         # Assigning items to the scheme items
         self._scheme_items.append(self.lsi_lodge_scheme)
@@ -214,16 +217,16 @@ class UserShortcutDialog(QDialog, Ui_UserShortcutDialog):
         self._scheme_items.append(self.lsi_second_examination)
         self._scheme_items.append(self.lsi_third_examination)
         self._scheme_items.append(self.lsi_import_plots)
-        self._scheme_items.append(self.lsi_scheme_notification)
 
         # Certificate items
-        self._certificate_items.append(self.lsi_print_certificate)
+        self._certificate_items.append(self.lsi_design_certificate)
         self._certificate_items.append(self.lsi_scan_certificate)
 
         # Search items adapted from items in the registry
         self._search_items = self._search_list_items()
 
         # Report items
+        self._report_items.append(self.lsi_design_report)
         self._report_items.append(self.lsi_report)
 
     def _search_list_items(self):
@@ -294,8 +297,6 @@ class UserShortcutDialog(QDialog, Ui_UserShortcutDialog):
             self._load_category_items(self._report_items)
         elif cat_code == 'SRC':
             self._load_category_items(self._search_items)
-        elif cat_code == 'NTF':
-            self._load_category_items(self._notification_items)
 
     def on_category_list_item_db_clicked(self, item):
         # Load dialog based on specified action

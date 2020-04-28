@@ -1824,7 +1824,7 @@ class STDMQGISLoader(object):
             return
         title = QApplication.translate(
             "STDMPlugin",
-            "STDM Document Designer"
+            "FLTS Document Designer"
         )
         documentComposer = self.iface.createNewComposer(
             title
@@ -2295,6 +2295,12 @@ class STDMQGISLoader(object):
                 self.third_examination()
             elif action_code == 'PLT_SCM':
                 self.import_plots()
+            elif action_code == 'D_CRT':
+                self.onDocumentDesigner()
+            elif action_code == 'G_CRT':
+                self.onDocumentGenerator()
+            elif action_code == 'G_RPT':
+                self.onReportGenerator()
             # For search-related items, extract the data source name
             elif action_code.find(shortcut_dlg.search_item_prefix) != -1:
                 data_source = action_code.split(shortcut_dlg.search_item_prefix)
