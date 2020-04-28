@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_scheme_lodgement.ui'
 #
-# Created: Sun Apr 19 07:18:00 2020
+# Created: Tue Apr 28 15:18:43 2020
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -313,7 +313,7 @@ class Ui_ldg_wzd(object):
 
     def retranslateUi(self, ldg_wzd):
         ldg_wzd.setWindowTitle(_translate("ldg_wzd", "Lodgement of Scheme", None))
-        self.label_desc.setText(_translate("ldg_wzd", "<html><head/><body><p>Enter scheme information below. Please note the scheme and SG numbers will be automatically generated</p></body></html>", None))
+        self.label_desc.setText(_translate("ldg_wzd", "<html><head/><body><p>Enter scheme information below. Please note the scheme number will be automatically generated.</p></body></html>", None))
         self.label_region.setText(_translate("ldg_wzd", "<html><head/><body><p>Region <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
         self.label_rel_auth_type.setText(_translate("ldg_wzd", "<html><head/><body><p>Type of Relevant Authority <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
         self.label_rel_auth_name.setText(_translate("ldg_wzd", "<html><head/><body><p>Name of Relevant Authority <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
