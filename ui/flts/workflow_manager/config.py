@@ -736,17 +736,7 @@ configurations = {
         {
             Column(
                 name='User', type="text", flag=(Qt.DisplayRole,)
-            ): {'cb_user': 'user_name'}
-        },
-        {
-            Column(
-                name='First Name', type="text", flag=(Qt.DisplayRole,)
-            ): {'cb_user': 'first_name'}
-        },
-        {
-            Column(
-                name='Last Name', type="text", flag=(Qt.DisplayRole,)
-            ): {'cb_user': 'last_name'}
+            ): 'user'
         },
         {Column(
             name='Post Date', type="datetime", flag=(Qt.DisplayRole,)
@@ -1329,13 +1319,13 @@ configurations = {
         'comment_save': [
             SaveColumn(
                 column='comment', value=None, entity='Comment'
+            ),
+            SaveColumn(
+                column='user', value='', entity='Comment'
+            ),
+            SaveColumn(
+                column='timestamp', value=datetime.datetime.now(), entity='Comment'
             )
-            # SaveColumn(
-            #     column='user_id', value=8, entity='Comment'
-            # )
-            # SaveColumn(
-            #     column='timestamp', value=datetime.now(), entity='Comment'
-            # )
         ],
         'plot_import_save': {
             GEOMETRY: SaveColumn(

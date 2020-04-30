@@ -6,6 +6,7 @@ from stdm.ui.flts.workflow_manager.data import (
     Load,
     Save
 )
+from stdm import data
 from stdm.ui.flts.workflow_manager.config import CommentButtonIcons
 from stdm.ui.flts.workflow_manager.components.pagination_component import PaginationComponent
 from stdm.ui.flts.workflow_manager.model import WorkflowManagerModel
@@ -16,10 +17,11 @@ class Comment(object):
     """
     Comment factory
     """
-    def __init__(self, comment):
-        self.comment,  self.user_name, self.first_name, \
-        self.last_name, self.timestamp = comment
 
+    def __init__(self, comment):
+        self.user_name = data.app_dbconn.User.UserName
+        self.comment, self.user_name, self.timestamp = comment
+        
 
 class CommentManagerWidget(QWidget, Ui_CommentManagerWidget):
     """
@@ -104,15 +106,14 @@ class CommentManagerWidget(QWidget, Ui_CommentManagerWidget):
         for comment in self._comments:
             html += (
                 "<p style='{0} margin-right:10px;margin-left:10px;margin-bottom:0px;color:#14171a;'>"
-                "<span style='font-weight:bold;color:#385898'>{1} {2}</span>"
-                "<span style='font-weight:lighter;'>&nbsp;&nbsp;{3} at {4}</span>"
+                "<span style='font-weight:bold;color:#385898'>{1}</span>"
+                "<span style='font-weight:lighter;'>&nbsp;&nbsp;{2} at {3}</span>"
                 "</p>"
                 "<p style='{0} margin-top:5px;margin-right:10px;margin-left:10px;color:#14171a;'>"
-                "{5}"
+                "{4}"
                 "</p><hr>".format(
                     font,
-                    comment.first_name,
-                    comment.last_name,
+                    comment.user_name,
                     comment.timestamp.toString(CommentManagerWidget.DATE_FORMAT),
                     comment.timestamp.toString(CommentManagerWidget.TIME_FORMAT),
                     comment.comment
@@ -160,6 +161,7 @@ class CommentManagerWidget(QWidget, Ui_CommentManagerWidget):
         new_comment = self.newCommentTextEdit.toPlainText()
         if not new_comment.strip():
             return
+        user_name = data.app_dbconn.User.UserName
         columns = {}
         save_items = {}
         lookup = self._data_service.lookups
@@ -167,6 +169,8 @@ class CommentManagerWidget(QWidget, Ui_CommentManagerWidget):
         for option in self._get_config_option(save_columns):
             if option.column == lookup.COMMENT_COLUMN:
                 columns[option.column] = new_comment
+            elif type(option.value) is str:
+                columns[option.column] = user_name
             elif type(option.value) is datetime:
                 columns[option.column] = datetime.now()
             else:
@@ -175,7 +179,7 @@ class CommentManagerWidget(QWidget, Ui_CommentManagerWidget):
         save_items[entity_name] = [columns]
         return save_items
 
-    @ staticmethod
+    @staticmethod
     def _get_config_option(config):
         """
         Returns save/update configuration options
@@ -246,7 +250,6 @@ class CommentManagerWidget(QWidget, Ui_CommentManagerWidget):
             self._scheme_items.iteritems()
         }
 
-
     def _show_question_message(self, msg):
         """
         Message box to communicate a question
@@ -254,10 +257,10 @@ class CommentManagerWidget(QWidget, Ui_CommentManagerWidget):
         :type msg: String
         """
         if QMessageBox.question(
-            self,
-            self.tr('Comment Manager'),
-            self.tr(msg),
-            QMessageBox.Yes | QMessageBox.No
+                self,
+                self.tr('Comment Manager'),
+                self.tr(msg),
+                QMessageBox.Yes | QMessageBox.No
         ) == QMessageBox.No:
             return False
         return True
