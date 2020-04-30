@@ -1323,8 +1323,8 @@ class STDMQGISLoader(object):
         self.toolbarLoader.addContent(self.schemeEstablishmentCntGroup)
         self.toolbarLoader.addContent(self.firstExaminationCntGroup)
         self.toolbarLoader.addContent(self.secondExaminationCntGroup)
-        self.toolbarLoader.addContent(self.thirdExaminationCntGroup)
         self.toolbarLoader.addContent(self.importPlotsCntGroup)
+        self.toolbarLoader.addContent(self.thirdExaminationCntGroup)
         self.toolbarLoader.addContent(self.schemeRevisionCntGroup)
 
         self.toolbarLoader.addContent(self._action_separator())
@@ -1607,25 +1607,25 @@ class STDMQGISLoader(object):
                 self.check_spatial_tables(True)
 
     def onActionAuthorised(self, name):
-        '''
+        """
         This slot is raised when a toolbar action
         is authorised for access by the currently
         logged in user.
-        '''
+        """
         pass
 
     def manageAccounts(self):
-        '''
+        """
         Slot for showing the user and
         role accounts management window
-        '''
+        """
         frmUserAccounts = manageAccountsDlg(self)
         frmUserAccounts.exec_()
 
     def contentAuthorization(self):
-        '''
+        """
         Slot for showing the content authorization dialog
-        '''
+        """
         frmAuthContent = contentAuthDlg(self)
         frmAuthContent.exec_()
 
@@ -1734,8 +1734,9 @@ class STDMQGISLoader(object):
             self.loadModules()
 
     def load_config_wizard(self):
-        '''
-        '''
+        """
+        Load the configuration wizard.
+        """
         self.wizard = ConfigWizard(
             self.iface.mainWindow()
         )
@@ -1754,19 +1755,19 @@ class STDMQGISLoader(object):
                                  )
 
     def changePassword(self):
-        '''
+        """
         Slot for changing password
-        '''
+        """
         # Load change password dialog
         frmPwdDlg = changePwdDlg(self)
         frmPwdDlg.exec_()
 
     def newSTR(self):
-        '''
+        """
         Slot for showing the wizard for
         defining a new social
         tenure relationship
-        '''
+        """
         try:
 
             str_editor = STREditor()
@@ -1783,10 +1784,10 @@ class STDMQGISLoader(object):
             )
 
     def onManageAdminUnits(self):
-        '''
+        """
         Slot for showing administrative
         unit selector dialog.
-        '''
+        """
 
         if self.current_profile is None:
             self.default_profile()
@@ -1910,19 +1911,19 @@ class STDMQGISLoader(object):
         exportData.exec_()
 
     def onToggleSpatialUnitManger(self, toggled):
-        '''
+        """
         Slot raised on toggling to activate/deactivate
         editing, and load corresponding
         spatial tools.
-        '''
+        """
         self.spatialLayerManager.setChecked(False)
         pass
 
     def onViewSTR(self):
-        '''
+        """
         Slot for showing widget that enables users to browse
         existing STRs.
-        '''
+        """
         if self.current_profile == None:
             self.default_profile()
             return
@@ -1939,9 +1940,9 @@ class STDMQGISLoader(object):
                 self.viewSTRWin.setFocus()
 
     def isSTDMLayer(self, layer):
-        '''
+        """
         Return whether the layer is an STDM layer.
-        '''
+        """
         if layer.id() in pg_layerNamesIDMapping().reverse:
             return True
         return False
@@ -2322,7 +2323,7 @@ class STDMQGISLoader(object):
         Docks Scheme establishment workflow manager widget
         """
         workflow_manager = WorkflowManagerWidget(
-            "Scheme Establishment Workflow Manager",
+            "Scheme Establishment",
             "schemeEstablishment",
             Qt.BottomDockWidgetArea
         )
@@ -2334,7 +2335,7 @@ class STDMQGISLoader(object):
         Docks First Examination workflow manager widget
         """
         workflow_manager = WorkflowManagerWidget(
-            "First Workflow Manager",
+            "First Examination",
             "firstExamination",
             Qt.BottomDockWidgetArea
         )
@@ -2346,7 +2347,7 @@ class STDMQGISLoader(object):
         Docks Second Examination workflow manager widget
         """
         workflow_manager = WorkflowManagerWidget(
-            "Second Workflow Manager",
+            "Second Examination",
             "secondExamination",
             Qt.BottomDockWidgetArea
         )
@@ -2358,7 +2359,7 @@ class STDMQGISLoader(object):
         Docks Third Examination workflow manager widget
         """
         workflow_manager = WorkflowManagerWidget(
-            "Third Workflow Manager",
+            "Third Examination",
             "thirdExamination",
             Qt.LeftDockWidgetArea
         )
@@ -2370,7 +2371,7 @@ class STDMQGISLoader(object):
         Docks Revise Scheme workflow manager widget
         """
         workflow_manager = WorkflowManagerWidget(
-            "Revise Workflow Manager",
+            "Scheme Revision",
             "schemeLodgement",
             Qt.BottomDockWidgetArea
         )
@@ -2382,7 +2383,7 @@ class STDMQGISLoader(object):
         Docks Import Plot workflow manager widget
         """
         workflow_manager = WorkflowManagerWidget(
-            "Plot Import Workflow Manager",
+            "Plot Import",
             "importPlot",
             Qt.LeftDockWidgetArea
         )
