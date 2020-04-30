@@ -529,6 +529,10 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
         self._enable_widget([
             self.searchEdit, self.filterComboBox, self.searchButton
         ])
+        # Hide widgets
+        self.searchEdit.hide()
+        self.filterComboBox.hide()
+        self.searchButton.hide()
 
     def _disable_search(self):
         """
@@ -537,6 +541,10 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
         self._disable_widget([
             self.searchEdit, self.filterComboBox, self.searchButton
         ])
+        # Hide widgets
+        self.searchEdit.hide()
+        self.filterComboBox.hide()
+        self.searchButton.hide()
 
     def _replace_tab(self, index, widget, label):
         """
