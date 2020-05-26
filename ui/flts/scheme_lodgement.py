@@ -67,7 +67,7 @@ from stdm.settings import current_profile
 from stdm.data.configuration import entity_model
 from stdm.data.mapping import MapperMixin
 from ui_scheme_lodgement import Ui_ldg_wzd
-from ..notification import NotificationBar, ERROR
+from ..notification import NotificationBar
 
 
 class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
@@ -80,7 +80,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         QWizard.__init__(self, parent)
 
         self.setupUi(self)
-        # self.page_title()
         # Equate number of pages in wizard to page IDs
         self._num_pages = len(self.pageIds())
         self._base_win_title = self.windowTitle()
@@ -212,7 +211,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
         # Block area
         self.radio_sq_meters.setChecked(True)
-
         self.dbl_spinbx_block_area.setSuffix(" Sq.m")
         self.dbl_spinbx_block_area.setDecimals(0)
         self.radio_hectares.toggled.connect(
@@ -235,16 +233,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
         # Specify MapperMixin widgets
         self.register_col_widgets()
-
-    def _tooltips(self, widget, tip):
-        """
-        Show tooltips on widgets
-        :param tip:
-        :return: str
-        """
-        widget.setToolTip(
-            self.tr(tip)
-        )
 
     def _populate_combo(self, cbo, lookup_name):
         """
@@ -271,8 +259,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
                              'cb_check_lht_relevant_authority')
         self._populate_combo(self.cbx_lro,
                              'cb_check_lht_land_rights_office')
-        # self._populate_combo(self.cbx_reg_div,
-        #                      'cb_check_lht_reg_division')
 
         # Sort region combobox items
         self.cbx_region.model().sort(0)
@@ -432,6 +418,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
         for regdiv in reg_divs:
             self.cbx_reg_div.addItem(regdiv[1], regdiv[0])
+            print(regdiv[1], regdiv[0])
 
         # Select the first item automatically if there is only one division
         if self.cbx_reg_div.count() == 2:
@@ -1021,44 +1008,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             pseudoname='Scheme Description'
         )
 
-    def create_notification(self):
-        """
-        Create a notification once the Scheme lodgement is completed.
-        """
-        # Notification entity
-        notif_entity = self.curr_p.entity('Notification')
-
-        # Check if entity exists
-        if notif_entity is None:
-            QMessageBox.critical(
-                self,
-                self.tr('Missing Notification Entity'),
-                self.tr("The notification entity is missing in the "
-                        "profile.")
-            )
-            self.reject()
-
-        notification_model = entity_model(notif_entity)
-
-        # Check if model exists
-        if notification_model is None:
-            QMessageBox.critical(
-                self,
-                self.tr('Notification Entity Model'),
-                self.tr("The notification entity model could not be generated.")
-            )
-            self.reject()
-
-        notif_entity_obj = notification_model()
-
-        # Get the table columns and add mapping
-        notif_entity_obj.status = 1
-        notif_entity_obj.source_user_id = 1
-        notif_entity_obj.target_user_id = 2
-        notif_entity_obj.content = 'Lodgement'
-        notif_entity_obj.timestamp = strftime("%m-%d-%Y %H:%M:%S")
-        notif_entity_obj.save()
-
     def validate_num_plots(self):
         """
         Check whether the number of plots is zero
@@ -1313,7 +1262,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         # Get scheme db object for manual saving to database.
         self.submit(True)
         scheme_obj = self.model()
-        scheme_obj.plot_status = 2  # TODO: Add plot status as foreign key
+        scheme_obj.plot_status = 2
         QgsApplication.processEvents()
 
         pg_dlg.setLabelText(self.tr(
