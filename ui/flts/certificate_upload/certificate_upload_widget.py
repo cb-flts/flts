@@ -17,11 +17,11 @@ email                : stdm@unhabitat.org
  *                                                                         *
  ***************************************************************************/
 """
+from PyQt4.QtCore import QDir
 from PyQt4.QtGui import (
     QWidget,
     QMessageBox,
-    QFileDialog,
-    QDirModel
+    QFileDialog
 )
 
 from stdm.network.cmis_manager import (
@@ -34,15 +34,16 @@ from stdm.ui.notification import NotificationBar, ERROR
 from stdm.ui.flts.certificate_upload.certificate_table_model import CertificateTableModel
 from stdm.ui.flts.certificate_upload.certificate_upload_handler import CertificateUploadHandler
 from stdm.ui.flts.certificate_upload.certificate_validator import CertificateValidator
-from ui_flts_certificate_upload import Ui_FltsCertUploadWidget
+from stdm.ui.flts.certificate_upload.ui_flts_certificate_upload import Ui_FltsCertUploadWidget
 
 
 class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
     """
     Parent widget containing all the widgets for uploading the certificates.
     """
+
     def __init__(self, parent=None):
-        super(QWidget, self).__init__(parent)
+        super(CertificateUploadWidget, self).__init__(parent)
         self.setupUi(self)
         self.notif_bar = NotificationBar(
             self.vlNotification
@@ -54,6 +55,13 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self._cert_upload = CertificateUploadHandler()
         self._cert_validator = CertificateValidator()
 
+        # Connecting signals
+        self.btn_select_folder.clicked.connect(
+            self.on_select_folder()
+        )
+        self.btn_upload_certificate.clicked.connect(
+            self._on_upload_certificates
+        )
         self.btn_close.clicked.connect(self.close)
 
     def _check_cmis_connection(self):
@@ -82,7 +90,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         QMessageBox.critical(
             self,
             self.tr(
-                'Error'
+                'Certificate Upload Error'
             ),
             message
         )
@@ -96,6 +104,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self.btn_select_folder.setEnabled(enable)
         self.cbo_scheme_number.setEnabled(enable)
         self.btn_upload_certificate.setEnabled(enable)
+        self.tbvw_certificate.setEnabled(enable)
 
     def _populate_schemes(self):
         """
@@ -117,22 +126,48 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             # combobox
             for s in schm_data:
                 self.cbo_scheme_number.addItem(s.scheme_number, s.id)
+            # Sort region combobox items
+            self.cbo_scheme_number.model().sort(0)
 
-    def load_certificates_from_folder(self, folder):
+    def on_select_folder(self):
         """
-        Get the path of the folder containing the certificates.
-        :param folder: Folder containing the certificates.
-        :type folder: str
-        :return: Returns the name of the folder containing the certificates.
-        :rtype: str
+        Slot raised when the select folder button is clicked
         """
-        if not folder:
-            folder = QFileDialog.getExistingDirectory(
+        # Check if combobox has scheme selected.
+        if not self.cbo_scheme_number.currentText():
+            self.notif_bar.clear()
+            self.notif_bar.insertWarningNotification(
+                self.tr(
+                    "Scheme value must be selected first."
+                )
+            )
+        else:
+            cert_dir = QFileDialog.getExistingDirectory(
                 self,
                 caption="Browse Certificates Source Folder"
             )
+            return cert_dir
 
-        return str(folder)
+    def certificate_name_from_directory(self, cert_name):
+        """
+        Get certificate name from the selected directory.
+        :param cert_name: Name of the certificate in the selected directory.
+        :type cert_name: str
+        :return: Returns the name of the certificate in the directory.
+        :rtype: str
+        """
+        # Use PDF as the default filter
+        filters = ['*.pdf']
+
+        crt_dir = self.on_select_folder()
+
+        file_info = QDir(crt_dir).entryInfoList(filters)
+
+        for crt in file_info:
+            if not cert_name:
+                cert_name = crt.fileName()
+
+                return cert_name
 
     def _populate_table_view(self, filename):
         """
@@ -199,5 +234,3 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         Update the icons in the table widget based on the status of
         upload.
         """
-
-

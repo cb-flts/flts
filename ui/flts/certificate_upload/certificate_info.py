@@ -27,8 +27,12 @@ class CertificateInfo(object):
     # Validation status
     CAN_UPLOAD, CANNOT_UPLOAD, UNDEFINED = range(0, 3)
 
+    # Upload status
+    NOT_UPLOADED, SUCCESS, ERROR = range(3)
+
     def __init__(self, **kwargs):
         self.certificate_number = kwargs.pop('certificate_number', '')
         self.description = kwargs.pop('description', '')
         self.filename = kwargs.pop('filename', '')
-        self.status = kwargs.pop('status', CertificateInfo.UNDEFINED)
+        self.validation_status = kwargs.pop('validation_status', CertificateInfo.UNDEFINED)
+        self.upload_status = kwargs.pop('upload_status', CertificateInfo.NOT_UPLOADED)
