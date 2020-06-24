@@ -127,14 +127,14 @@ class CertificateValidator(QThread):
 
         if not cert_obj:
             cert_info.validation_status = CertificateInfo.CANNOT_UPLOAD
-            cert_info.description = 'Certificate number does not exist in the' \
-                                    ' database.'
+            cert_info.validation_description = 'Certificate number does not exist in the' \
+                                               ' database.'
         else:
             upload_status = cert_obj.is_uploaded
             if not upload_status:
                 cert_info.validation_status = CertificateInfo.CAN_UPLOAD
             else:
                 cert_info.validation_status = CertificateInfo.CANNOT_UPLOAD
-                cert_info.description = 'Certificate has already been uploaded.'
+                cert_info.validation_description = 'Certificate has already been uploaded.'
 
         self.validated.emit(cert_info)

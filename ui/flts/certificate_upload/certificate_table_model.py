@@ -49,8 +49,12 @@ class CertificateTableModel(QAbstractTableModel):
         :param cert_info: List of certificate items.
         :type cert_info: list
         """
-        if not cert_info:
-            self._cert_info_items = cert_info
+        self.clear()
+        self._cert_info_items = cert_info
+
+    @property
+    def headers(self):
+        return self._headers
 
     def columnCount(self, index=QModelIndex()):
         """
@@ -77,7 +81,7 @@ class CertificateTableModel(QAbstractTableModel):
 
         return None
 
-    def data(self, index, role):
+    def data(self, index, role=Qt.DisplayRole):
         """
         Returns the data stored in the given role for an item referred to by
         the index.
@@ -87,27 +91,29 @@ class CertificateTableModel(QAbstractTableModel):
 
         row = index.row()
         col = index.column()
-        result = self._cert_info_items[row]
+
         if row < 0 or row >= len(self._cert_info_items):
             return None
 
+        cert_info = self._cert_info_items[row]
+
         if role == Qt.DisplayRole:
             if col == 0:
-                return result
+                return cert_info.certificate_number
 
         if role == Qt.ToolTipRole:
             if col == 1:
-                if result.validation_status:
-                    return result.validation_status
-                elif result.upload_status:
-                    return result.upload_status
+                if cert_info.validation_status:
+                    return cert_info.cert_validation_status
+                elif cert_info.upload_status:
+                    return cert_info.cert_upload_status
 
         if role == Qt.DecorationRole:
             if col == 1:
-                if result.validation_status:
-                    return result.validation_status
-                elif result.upload_status:
-                    return result.upload_status
+                if cert_info.validation_status:
+                    return cert_info.validation_status_icon
+                elif cert_info.upload_status:
+                    return cert_info.upload_status_icon
 
         return None
 
@@ -134,9 +140,5 @@ class CertificateTableModel(QAbstractTableModel):
         """
         Removes any previous certificate information items in the model.
         """
-        self.beginResetModel()
         self.removeRows(0, len(self._cert_info_items))
         self._cert_info_items = []
-        self._headers = []
-        self.endResetModel()
-
