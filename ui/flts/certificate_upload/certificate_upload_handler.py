@@ -78,7 +78,7 @@ class CertificateUploadHandler(QObject):
         self._cert_doc_mapper = CmisEntityDocumentMapper(
             cmis_manager=self._cmis_mngr,
             doc_model_cls=self._cert_doc_model,
-            entity_name=self.CERT_ENTITY_NAME
+            # entity_name=self.CERT_ENTITY_NAME
         )
 
         # Error messages as to why the upload handler is not responsive

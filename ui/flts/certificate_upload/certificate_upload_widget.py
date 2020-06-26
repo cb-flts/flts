@@ -57,12 +57,14 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
 
         # Connecting signals
         self.btn_select_folder.clicked.connect(
-            self.on_select_folder()
+            self.on_select_folder
         )
         self.btn_upload_certificate.clicked.connect(
             self._on_upload_certificates
         )
         self.btn_close.clicked.connect(self.close)
+
+        self.tbvw_certificate.setModel(self._cert_model)
 
     def _check_cmis_connection(self):
         """
@@ -158,24 +160,26 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         # Use PDF as the default filter
         filters = ['*.pdf']
-
+        # Get the certificates directory
         crt_dir = self.on_select_folder()
-
+        # Create a list of PDF documents in the directory
         file_info = QDir(crt_dir).entryInfoList(filters)
-
+        # Loop through the list of PDF files in the directory and return the
+        # name of the certificate
         for crt in file_info:
             if not cert_name:
                 cert_name = crt.fileName()
 
                 return cert_name
 
-    def _populate_table_view(self, filename):
+    def _populate_table_view(self, cert_info_items):
         """
         Populate table view with the list of certificates that have been
         loaded from the folder.
-        :param filename: List of certificates in the folder.
-        :type filename: list
+        :param cert_info_items: List of certificates in the folder.
+        :type cert_info_items: list
         """
+        # Clear previous items in the model.
 
     def _validate_items(self, cert_info):
         """
