@@ -21,7 +21,8 @@ from PyQt4.QtCore import QDir
 from PyQt4.QtGui import (
     QWidget,
     QMessageBox,
-    QFileDialog
+    QFileDialog,
+    QStringListModel
 )
 
 from stdm.network.cmis_manager import (
@@ -62,6 +63,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self.btn_upload_certificate.clicked.connect(
             self._on_upload_certificates
         )
+
+        # self.btn_upload_certificate.clicked.connect()
         self.btn_close.clicked.connect(self.close)
 
         self.tbvw_certificate.setModel(self._cert_model)
@@ -154,32 +157,51 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         Get certificate name from the selected directory.
         :param cert_name: Name of the certificate in the selected directory.
-        :type cert_name: str
+        :type cert_name: Str
         :return: Returns the name of the certificate in the directory.
-        :rtype: str
+        :rtype: Str
         """
-        # Use PDF as the default filter
-        filters = ['*.pdf']
-        # Get the certificates directory
-        crt_dir = self.on_select_folder()
-        # Create a list of PDF documents in the directory
-        file_info = QDir(crt_dir).entryInfoList(filters)
-        # Loop through the list of PDF files in the directory and return the
-        # name of the certificate
-        for crt in file_info:
-            if not cert_name:
-                cert_name = crt.fileName()
+        pdf_filter = '.pdf'
+        # get a list of PDF documents in the directory
+        file_info = QDir(self.on_select_folder()).entryInfoList(
+            QDir.NoDot | QDir.NoDotDot | QDir.Files
+        )
+        # Get list of file names from the selected directory
+        file_name = [cert.fileName() for cert in file_info]
+        # Check if list contains file names
+        if len(file_name) == 0:
+            msg = self.tr(
+                'There are no files in the selected directory.'
+            )
+            self.show_error_message(msg)
+        elif len(file_name) > 0:
+            # Check if list contains PDF files
+            if not any(pdf_filter in string for string in file_name):
+                msg = self.tr(
+                    'There are no PDF files in the selected directory.'
+                )
+                self.show_error_message(msg)
+            else:
+                for file_ in file_name:
+                    if not cert_name:
+                        # Assign variable to file name without PDF extension
+                        cert_name = file_.split(pdf_filter)[0]
 
                 return cert_name
 
-    def _populate_table_view(self, cert_info_items):
+    def _populate_table_view(self, filenames):
         """
         Populate table view with the list of certificates that have been
         loaded from the folder.
-        :param cert_info_items: List of certificates in the folder.
-        :type cert_info_items: list
+        :param filenames: List of certificates in the folder.
+        :type filenames: list
         """
         # Clear previous items in the model.
+        self._cert_model.clear()
+        model = self._cert_model(
+            self.certificate_name_from_directory(filenames)
+        )
+        self.tbvw_certificate.setModel(model)
 
     def _validate_items(self, cert_info):
         """
