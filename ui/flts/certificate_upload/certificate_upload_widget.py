@@ -17,12 +17,14 @@ email                : stdm@unhabitat.org
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QDir
+from PyQt4.QtCore import (
+    QDir
+)
 from PyQt4.QtGui import (
     QWidget,
     QMessageBox,
     QFileDialog,
-    QStringListModel
+    QStandardItem
 )
 
 from stdm.network.cmis_manager import (
@@ -37,6 +39,9 @@ from stdm.ui.flts.certificate_upload.certificate_upload_handler import Certifica
 from stdm.ui.flts.certificate_upload.certificate_validator import CertificateValidator
 from stdm.ui.flts.certificate_upload.ui_flts_certificate_upload import Ui_FltsCertUploadWidget
 
+VIEW_IMG = ':/plugins/stdm/images/icons/flts_view_file.png'
+# TODO Set Icon sizes to 16 x 16
+
 
 class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
     """
@@ -50,13 +55,19 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             self.vlNotification
         )
         self._cmis_mngr = CmisManager()
-        self._check_cmis_connection()
 
         self._cert_model = CertificateTableModel()
         self._cert_upload = CertificateUploadHandler()
         self._cert_validator = CertificateValidator()
 
+        self._enable_controls(False)
+
+        self._check_cmis_connection()
+
         # Connecting signals
+        self.cbo_scheme_number.currentIndexChanged.connect(
+            self.on_cbo_scheme_changed
+        )
         self.btn_select_folder.clicked.connect(
             self.on_select_folder
         )
@@ -67,7 +78,23 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         # self.btn_upload_certificate.clicked.connect()
         self.btn_close.clicked.connect(self.close)
 
-        self.tbvw_certificate.setModel(self._cert_model)
+        self._cert_model.clear()
+
+        # std = QStandardItem('hempire', 'fiona', 'faith', 'george')
+        #TODO Test with a raw model
+
+        self.tbvw_certificate.setModel(std)
+
+    def _enable_controls(self, enable):
+        """
+        Enable or disable UI controls.
+        :param enable: Status of the controls.
+        :type enable: bool
+        """
+        self.btn_select_folder.setEnabled(enable)
+        self.cbo_scheme_number.setEnabled(enable)
+        self.btn_upload_certificate.setEnabled(enable)
+        self.tbvw_certificate.setEnabled(enable)
 
     def _check_cmis_connection(self):
         """
@@ -83,33 +110,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             self.show_error_message(msg)
             self._enable_controls(False)
         else:
-            self._enable_controls(True)
+            self.cbo_scheme_number.setEnabled(True)
             self._populate_schemes()
-
-    def show_error_message(self, message):
-        """
-        Show custom error message depending on the process.
-        :param message: Error message to be shown.
-        :type message: str
-        """
-        QMessageBox.critical(
-            self,
-            self.tr(
-                'Certificate Upload Error'
-            ),
-            message
-        )
-
-    def _enable_controls(self, enable):
-        """
-        Enable or disable UI controls.
-        :param enable: Status of the controls.
-        :type enable: bool
-        """
-        self.btn_select_folder.setEnabled(enable)
-        self.cbo_scheme_number.setEnabled(enable)
-        self.btn_upload_certificate.setEnabled(enable)
-        self.tbvw_certificate.setEnabled(enable)
 
     def _populate_schemes(self):
         """
@@ -133,6 +135,15 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
                 self.cbo_scheme_number.addItem(s.scheme_number, s.id)
             # Sort region combobox items
             self.cbo_scheme_number.model().sort(0)
+
+    def on_cbo_scheme_changed(self):
+        """
+        Slot raised when the scheme selection combobox is changed.
+        """
+        if not self.cbo_scheme_number.currentText():
+            self.btn_select_folder.setEnabled(False)
+        else:
+            self.btn_select_folder.setEnabled(True)
 
     def on_select_folder(self):
         """
@@ -162,7 +173,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         :rtype: Str
         """
         pdf_filter = '.pdf'
-        # get a list of PDF documents in the directory
+        # Get a list of files in the directory
         file_info = QDir(self.on_select_folder()).entryInfoList(
             QDir.NoDot | QDir.NoDotDot | QDir.Files
         )
@@ -198,10 +209,29 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         # Clear previous items in the model.
         self._cert_model.clear()
-        model = self._cert_model(
-            self.certificate_name_from_directory(filenames)
+        if not filenames:
+            filenames = []
+
+        for file_ in filenames:
+            filenames.append(
+                self.certificate_name_from_directory(file_)
+                )
+        model = QStandardItemModel(filenames)
+        self._cert_model.setModel(model)
+
+    def show_error_message(self, message):
+        """
+        Show custom error message depending on the process.
+        :param message: Error message to be shown.
+        :type message: str
+        """
+        QMessageBox.critical(
+            self,
+            self.tr(
+                'Certificate Upload Error'
+            ),
+            message
         )
-        self.tbvw_certificate.setModel(model)
 
     def _validate_items(self, cert_info):
         """

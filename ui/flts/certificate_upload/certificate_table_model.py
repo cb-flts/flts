@@ -40,6 +40,10 @@ class CertificateTableModel(QAbstractTableModel):
 
     @property
     def cert_info_items(self):
+        """
+        :return: Returns a list of certificate info items.
+        :rtype: list
+        """
         return self._cert_info_items
 
     @cert_info_items.setter
@@ -54,6 +58,9 @@ class CertificateTableModel(QAbstractTableModel):
 
     @property
     def headers(self):
+        """
+        :return: Returns horizontal headers.
+        """
         return self._headers
 
     def columnCount(self, index=QModelIndex()):
@@ -103,19 +110,33 @@ class CertificateTableModel(QAbstractTableModel):
 
         if role == Qt.ToolTipRole:
             if col == 1:
-                if cert_info.validation_status:
-                    return cert_info.cert_validation_status
-                elif cert_info.upload_status:
-                    return cert_info.cert_upload_status
+                if cert_info.validation_status != CertificateInfo.NOT_UPLOADED:
+                    return CertificateInfo.cert_validation_status()
+                elif cert_info.upload_status != CertificateInfo.UNDEFINED:
+                    return CertificateInfo.cert_upload_status()
 
         if role == Qt.DecorationRole:
             if col == 1:
-                if cert_info.validation_status:
-                    return cert_info.validation_status_icon
-                elif cert_info.upload_status:
-                    return cert_info.upload_status_icon
+                if cert_info.validation_status != CertificateInfo.NOT_UPLOADED:
+                    return CertificateInfo.validation_status_icon()
+                elif cert_info.upload_status != CertificateInfo.UNDEFINED:
+                    return CertificateInfo.upload_status_icon()
 
         return None
+
+    def setData(self, index, value, role=Qt.EditRole):
+        """
+        Sets the role data for the item at a given index to value.
+        """
+        if index.isValid() and (len(self._cert_info_items) > index.row() >= 0):
+            cert_info = self._cert_info_items[index.row()]
+            column = index.column()
+            if role == Qt.EditRole:
+                cert_info[column] = value
+            self.dataChanged.emit(index, index)
+            return True
+
+        return False
 
     def insertRows(self, position, count=1, index=QModelIndex()):
         """
