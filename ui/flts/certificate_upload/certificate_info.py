@@ -18,7 +18,6 @@ email                : stdm@unhabitat.org
  *                                                                         *
  ***************************************************************************/
 """
-
 from PyQt4.QtGui import QIcon
 
 
@@ -33,20 +32,23 @@ class CertificateInfo(object):
     NOT_UPLOADED, SUCCESS, ERROR = range(0, 3)
 
     def __init__(self, **kwargs):
-        self.upload_status = CertificateInfo.UNDEFINED
-        self.validation_status = CertificateInfo.NOT_UPLOADED
+        self.upload_status = CertificateInfo.NOT_UPLOADED
+        self.validation_status = CertificateInfo.UNDEFINED
         self.certificate_number = kwargs.pop('certificate_number', '')
-        self.validation_description = kwargs.pop('validation_description', '')
-        self.upload_description = kwargs.pop('upload_description', '')
+        self.validation_description = ''
+        self.upload_description = ''
         self.filename = kwargs.pop('filename', '')
         # Icons representing state of the certificate
         self.icons = {
-            'error': QIcon(":/plugins/stdm/images/icons/flts_error.png"),
-            'warning': QIcon(":/plugins/stdm/images/icons/warning.png"),
-            'success': QIcon(":/plugins/stdm/images/icons/success.png")
+            'cannot_upload': QIcon(":/plugins/stdm/images/icons/flts_cert_cannot_upload.png"),
+            'undefined': QIcon(":/plugins/stdm/images/icons/flts_cert_undefined.png"),
+            'can_upload': QIcon(":/plugins/stdm/images/icons/flts_cert_can_upload.png"),
+            'error': QIcon(":/plugins/stdm/images/icons/flts_cert_upload_error.png"),
+            'not_uploaded': QIcon(":/plugins/stdm/images/icons/flts_success.png"),
+            'success': QIcon(":/plugins/stdm/images/icons/flts_cert_success.png"),
         }
 
-    def cert_upload_status(self):
+    def upload_status_text(self):
         """
         Returns upload status description of the certificate corresponding to
         the upload status value.
@@ -55,14 +57,14 @@ class CertificateInfo(object):
         """
         status = self.upload_status
         upload_desc = self.upload_description
-        if status == CertificateInfo.CANNOT_UPLOAD:
-            upload_desc = 'Cannot upload'
+        if status == CertificateInfo.NOT_UPLOADED:
+            upload_desc = 'Not uploaded'
         elif status == CertificateInfo.SUCCESS:
             upload_desc = 'Successfully uploaded'
 
         return upload_desc
 
-    def cert_validation_status(self):
+    def validation_status_text(self):
         """
         Returns validation status description of the certificate corresponding
         to the validation status value.
@@ -71,8 +73,8 @@ class CertificateInfo(object):
         """
         status = self.validation_status
         valid_desc = self.validation_description
-        if status == CertificateInfo.CANNOT_UPLOAD:
-            valid_desc = 'Cannot Upload'
+        if status == CertificateInfo.UNDEFINED:
+            valid_desc = 'Not validated'
         elif status == CertificateInfo.CAN_UPLOAD:
             valid_desc = 'Can Upload'
 
@@ -83,12 +85,14 @@ class CertificateInfo(object):
         Returns validation status icon of the certificate corresponding
         to the validation status value.
         :return: Returns the upload status icon.
-        :rtype: QIcon, str
+        :rtype: QIcon
         """
         upload_icon = None
         upload_status = self.upload_status
         if upload_status == CertificateInfo.ERROR:
             upload_icon = self.icons.get('error')
+        elif upload_status == CertificateInfo.NOT_UPLOADED:
+            upload_icon = self.icons.get('not_uploaded')
         elif upload_status == CertificateInfo.SUCCESS:
             upload_icon = self.icons.get('success')
 
@@ -99,13 +103,15 @@ class CertificateInfo(object):
         Returns validation status icon of the certificate corresponding
         to the validation status value.
         :return: Returns the validation status icon.
-        :rtype: QIcon, str
+        :rtype: QIcon
         """
         validation_icon = None
         validation_status = self.validation_status
         if validation_status == CertificateInfo.CANNOT_UPLOAD:
             validation_icon = self.icons.get('warning')
+        elif validation_status == CertificateInfo.UNDEFINED:
+            validation_icon = self.icons.get('undefined')
         elif validation_status == CertificateInfo.CAN_UPLOAD:
-            validation_icon = self.icons.get('success')
+            validation_icon = self.icons.get('can_upload')
 
         return validation_icon
