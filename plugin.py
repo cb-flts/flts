@@ -60,6 +60,7 @@ from ui.flts.workflow_manager.dock_widget_factory import DockWidgetFactory
 from ui.flts.workflow_manager.workflow_manager_widget import WorkflowManagerWidget
 from stdm.ui.flts.search.default_search_config import FltsSearchConfigurationLoader
 from stdm.ui.flts.search.search_widgets import FltsSearchDockWidget
+from stdm.ui.flts.certificate_upload.certificate_upload_widget import CertificateUploadWidget
 from stdm.settings.search_config import SearchConfigurationRegistry
 
 from stdm.ui.view_str import ViewSTRWidget
@@ -183,6 +184,7 @@ class STDMQGISLoader(object):
         copy_startup()
         self.dock_widget = None
         self.search_dock_widget = None
+        self.cert_upload_widget = None
 
     def initGui(self):
         # Initial actions on starting up the application
@@ -992,8 +994,8 @@ class STDMQGISLoader(object):
                                        self.iface.mainWindow())
 
         self.reportGeneratorAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_report.png"), \
-                                       QApplication.translate("ReportGeneratorAction", "Report Generator"),
-                                       self.iface.mainWindow())
+                                          QApplication.translate("ReportGeneratorAction", "Report Generator"),
+                                          self.iface.mainWindow())
 
         self.wzdAct = QAction(QIcon(":/plugins/stdm/images/icons/flts_database_designer.png"), \
                               QApplication.translate("ConfigWizard", "Configuration Wizard"), self.iface.mainWindow())
@@ -1104,7 +1106,7 @@ class STDMQGISLoader(object):
         self.options_act.triggered.connect(self.on_sys_options)
         self.docDesignerAct.triggered.connect(self.onDocumentDesigner)
         self.docGeneratorAct.triggered.connect(self.onDocumentGenerator)
-        self.reportGeneratorAct.triggered.connect(self.onReportGenerator)
+        self.reportGeneratorAct.triggered.connect(self.on_cert_upload)
         self.wzdAct.triggered.connect(self.load_config_wizard)
         # self.viewSTRAct.triggered.connect(self.onViewSTR)
 
@@ -1116,11 +1118,10 @@ class STDMQGISLoader(object):
         self.thirdExaminationAct.triggered.connect(self.third_examination)
         self.importPlotsAct.triggered.connect(self.import_plots)
         self.schemeRevisionAct.triggered.connect(self.revise_scheme)
-        #self.printCertificateAct.triggered.connect(self.print_certificate)
+        # self.printCertificateAct.triggered.connect(self.print_certificate)
         # self.scanCertificateAct.triggered.connect(self.scan_certificate)
         # self.searchAct.triggered.connect(self.flts_search)
         # self.reportAct.triggered.connect(self.flts_report)
-
 
         # Create content items
         # STDM
@@ -2049,7 +2050,7 @@ class STDMQGISLoader(object):
                 widget.close()
                 # TODO state when layer is dirty
                 # if no:
-                    # return
+                # return
 
         try:
             self.stdmInitToolbar.removeAction(self.logoutAct)
@@ -2389,3 +2390,13 @@ class STDMQGISLoader(object):
         )
         self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
         self.dock_widget.show_dock_widget()
+
+    def on_cert_upload(self):
+        """
+        Certificate upload
+        """
+        if not self.cert_upload_widget:
+            self.cert_upload_widget = CertificateUploadWidget()
+
+        self.cert_upload_widget.show()
+        self.cert_upload_widget.raise_()
