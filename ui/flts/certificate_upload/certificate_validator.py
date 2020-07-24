@@ -59,7 +59,8 @@ class CertificateValidator(QThread):
         :param cert_info: List of certificate items.
         :type cert_info: list
         """
-        if not cert_info:
+        num_certs = len(cert_info)
+        if num_certs > 0:
             self._cert_info = cert_info
 
     def run(self):
@@ -71,7 +72,7 @@ class CertificateValidator(QThread):
     def validate(self):
         """
         Performs validation process of the certificate information for each
-         individual certificate in the list of certificates.
+        individual certificate in the list of certificates.
         """
         for cert_info in self._cert_info:
             self._validate_cert_info(cert_info)
@@ -84,6 +85,29 @@ class CertificateValidator(QThread):
         validation session.
         """
         self._cert_info = []
+
+    def _validate_cert_info(self, cert_info):
+        """
+        Checks if certificate can be uploaded by checking if the certificate
+        :param cert_info: Certificate information items.
+        :type cert_info: tuple
+        """
+        cert_obj = self._query_by_cert_number(
+            cert_info.certificate_number
+        )
+
+        if not cert_obj:
+            cert_info.validation_status = CertificateInfo.CANNOT_UPLOAD
+            cert_info.validation_description = 'Certificate number does not exist in the' \
+                                               ' database.'
+        else:
+            if not cert_obj.is_uploaded:
+                cert_info.validation_status = CertificateInfo.CAN_UPLOAD
+            else:
+                cert_info.validation_status = CertificateInfo.CANNOT_UPLOAD
+                cert_info.validation_description = 'Certificate has already been uploaded.'
+
+        self.validated.emit(cert_info)
 
     def _query_by_cert_number(self, cert_number):
         """
@@ -114,27 +138,3 @@ class CertificateValidator(QThread):
             return None
         else:
             return result
-
-    def _validate_cert_info(self, cert_info):
-        """
-        Checks if certificate can be uploaded by checking if the certificate
-        :param cert_info: Certificate information items.
-        :type cert_info: tuple
-        """
-        cert_obj = self._query_by_cert_number(
-            cert_info.certificate_number
-        )
-
-        if not cert_obj:
-            cert_info.validation_status = CertificateInfo.CANNOT_UPLOAD
-            cert_info.validation_description = 'Certificate number does not exist in the' \
-                                               ' database.'
-        else:
-            upload_status = cert_obj.is_uploaded
-            if not upload_status:
-                cert_info.validation_status = CertificateInfo.CAN_UPLOAD
-            else:
-                cert_info.validation_status = CertificateInfo.CANNOT_UPLOAD
-                cert_info.validation_description = 'Certificate has already been uploaded.'
-
-        self.validated.emit(cert_info)

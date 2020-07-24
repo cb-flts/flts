@@ -53,8 +53,11 @@ class CertificateTableModel(QAbstractTableModel):
         :param cert_info: List of certificate items.
         :type cert_info: list
         """
-        self.clear()
-        self._cert_info_items = cert_info
+        num_certs = len(cert_info)
+        if num_certs > 0:
+            self.clear()
+            self._cert_info_items = cert_info
+            self.insertRows(0, num_certs)
 
     @property
     def headers(self):
@@ -93,50 +96,93 @@ class CertificateTableModel(QAbstractTableModel):
         Returns the data stored in the given role for an item referred to by
         the index.
         """
+        # Check if index of data is valid
         if not index.isValid():
             return None
 
+        # Define the row and column
         row = index.row()
         col = index.column()
 
+        # Check if row number exceeds number of cert info items or is less
+        # than zero
         if row < 0 or row >= len(self._cert_info_items):
             return None
 
         cert_info = self._cert_info_items[row]
 
+        # Model display role that handles certificate number
         if role == Qt.DisplayRole:
             if col == 0:
                 return cert_info.certificate_number
 
+        # Model tooltip role that handles tooltips for upload and validation
+        # statuses.
         if role == Qt.ToolTipRole:
             if col == 1:
-                if cert_info.validation_status != CertificateInfo.NOT_UPLOADED:
-                    return CertificateInfo.cert_validation_status()
-                elif cert_info.upload_status != CertificateInfo.UNDEFINED:
-                    return CertificateInfo.cert_upload_status()
+                if cert_info.upload_status == CertificateInfo.NOT_UPLOADED:
+                    return cert_info.validation_status_text()
+                else:
+                    return cert_info.upload_status_text()
 
+        # Model decoration role that handles rendering icons for upload and
+        # validation statuses.
         if role == Qt.DecorationRole:
             if col == 1:
-                if cert_info.validation_status != CertificateInfo.NOT_UPLOADED:
-                    return CertificateInfo.validation_status_icon()
-                elif cert_info.upload_status != CertificateInfo.UNDEFINED:
-                    return CertificateInfo.upload_status_icon()
+                if cert_info.upload_status == CertificateInfo.NOT_UPLOADED:
+                    return cert_info.validation_status_icon()
+                else:
+                    return cert_info.upload_status_icon()
 
         return None
 
-    def setData(self, index, value, role=Qt.EditRole):
+    def _notify_cert_status_changed(self, cert_number):
         """
-        Sets the role data for the item at a given index to value.
+        Emit signal when certificate status changes for a certificate number.
+        :param cert_number: Certificate number that status is to be changed.
+        :type cert_number: str
         """
-        if index.isValid() and (len(self._cert_info_items) > index.row() >= 0):
-            cert_info = self._cert_info_items[index.row()]
-            column = index.column()
-            if role == Qt.EditRole:
-                cert_info[column] = value
-            self.dataChanged.emit(index, index)
-            return True
+        # Get the list of cert info indexes
+        cert_idx_items = self.match(
+            self.index(0, 0),
+            Qt.DisplayRole,
+            cert_number,
+            1,
+            Qt.MatchFixedString
+        )
 
-        return False
+        # Check if the list is empty
+        if len(cert_idx_items) == 0:
+            return
+
+        cert_idx = cert_idx_items[0]
+        cert_row = cert_idx.row()
+        icon_idx = self.index(cert_row, 1)
+
+        # Check if the icon index is valid
+        if not icon_idx.isValid():
+            return
+
+        # Emit signal
+        self.dataChanged.emit(icon_idx, icon_idx)
+
+    def update_validation_status(self, cert_number):
+        """
+        Update the validation status of the certificate.
+        :param cert_number: Certificate number that validation status to be
+        changed.
+        :type cert_number: str
+        """
+        self._notify_cert_status_changed(cert_number)
+
+    def update_upload_status(self, cert_number):
+        """
+        Update the upload status of the certificate.
+        :param cert_number: Certificate number that validation status to be
+        changed.
+        :type cert_number: str
+        """
+        self._notify_cert_status_changed(cert_number)
 
     def insertRows(self, position, count=1, index=QModelIndex()):
         """

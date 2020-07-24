@@ -30,6 +30,7 @@ COMPOSER_OUTPUT = 'ComposerOutputs'
 COMPOSER_TEMPLATE = 'ComposerTemplates'
 CURRENT_PROFILE = 'CurrentProfile'
 LAST_SUPPORTING_DOC_PATH = 'LastDocumentPath'
+SCANNED_CERTIFICATE_PATH = 'ScannedCertificatePath'
 SHOW_LICENSE = 'ShowLicense'
 WIZARD_RUN = 'wizardRun'
 CONFIG_UPDATED = 'ConfigUpdated'
@@ -176,6 +177,14 @@ def last_document_path():
     return registry_value(LAST_SUPPORTING_DOC_PATH)
 
 
+def scanned_certificate_path():
+    """
+    :return: Returns the latest path used for uploading scanned certificate.
+    :rtype: str
+    """
+    return registry_value(SCANNED_CERTIFICATE_PATH)
+
+
 def debug_logging():
     """
     :return: Returns whether debug logging has been enabled.
@@ -208,6 +217,15 @@ def set_last_document_path(path):
     :type path: str
     """
     set_registry_value(LAST_SUPPORTING_DOC_PATH, path)
+
+
+def set_scanned_certificate_path(path):
+    """
+    Sets the latest path used for uploading scanned certificates.
+    :param path: Supporting documents path
+    :type path: str
+    """
+    set_registry_value(SCANNED_CERTIFICATE_PATH, path)
 
 
 def enable_stdm():

@@ -156,7 +156,7 @@ class FieldBookManager(QObject):
         # Clears any documents used in any previous sessions.
         self._document_upload_status = {}
         self._uploaded_docs = {}
-        self._document_upload_error= {}
+        self._document_upload_error = {}
 
     def upload_plot_supporting_document(self, path, document_type):
         """

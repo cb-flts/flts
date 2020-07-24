@@ -18,18 +18,27 @@ email                : stdm@unhabitat.org
  ***************************************************************************/
 """
 from PyQt4.QtCore import (
+    Qt,
     QDir
 )
 from PyQt4.QtGui import (
     QWidget,
     QMessageBox,
     QFileDialog,
-    QStandardItem
+    QStandardItem,
+    QIcon,
+    QProgressDialog,
+    QProgressBar,
+    QHeaderView
 )
 
 from stdm.network.cmis_manager import (
     CmisManager,
     CmisDocumentMapperException
+)
+from stdm.settings.registryconfig import (
+    scanned_certificate_path,
+    set_scanned_certificate_path
 )
 from stdm.data.pg_utils import export_data
 
@@ -38,9 +47,8 @@ from stdm.ui.flts.certificate_upload.certificate_table_model import CertificateT
 from stdm.ui.flts.certificate_upload.certificate_upload_handler import CertificateUploadHandler
 from stdm.ui.flts.certificate_upload.certificate_validator import CertificateValidator
 from stdm.ui.flts.certificate_upload.ui_flts_certificate_upload import Ui_FltsCertUploadWidget
-
-VIEW_IMG = ':/plugins/stdm/images/icons/flts_view_file.png'
-# TODO Set Icon sizes to 16 x 16
+from stdm.ui.flts.certificate_upload.certificate_info import CertificateInfo
+from stdm.ui.flts.workflow_manager.pdf_viewer_widget import PDFViewerWidget
 
 
 class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
@@ -54,14 +62,39 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self.notif_bar = NotificationBar(
             self.vlNotification
         )
+
+        # Disables the maximize button
+        self.setWindowFlags(Qt.WindowMinimizeButtonHint)
+
+        # Set the certificate status text label
+        self._status_txt = self.lbl_status.text()
+
+        # CMIS Manager
         self._cmis_mngr = CmisManager()
+        # Certificate table model
+        self._cert_model = CertificateTableModel(parent=self)
+        # Set the table view model
+        self.tbvw_certificate.setModel(self._cert_model)
+        # Certificate validator
+        self._cert_validator = CertificateValidator(parent=self)
+        # Certificate upload handler
+        self._cert_upload_handler = CertificateUploadHandler(
+            cmis_mngr=self._cmis_mngr,
+            parent=self
+        )
 
-        self._cert_model = CertificateTableModel()
-        self._cert_upload = CertificateUploadHandler()
-        self._cert_validator = CertificateValidator()
+        # Get table horizontal header count
+        tbvw_h_header = self.tbvw_certificate.horizontalHeader()
+        tbvw_h_header_count = tbvw_h_header.count()
 
+        # Resize horizontal headers proportionately
+        for item in range(tbvw_h_header_count):
+            tbvw_h_header.setResizeMode(item, QHeaderView.Stretch)
+
+        # All controls disabled by default
         self._enable_controls(False)
 
+        # Check connection to CMIS repository
         self._check_cmis_connection()
 
         # Connecting signals
@@ -74,27 +107,31 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self.btn_upload_certificate.clicked.connect(
             self._on_upload_certificates
         )
-
-        # self.btn_upload_certificate.clicked.connect()
-        self.btn_close.clicked.connect(self.close)
-
-        self._cert_model.clear()
-
-        # std = QStandardItem('hempire', 'fiona', 'faith', 'george')
-        #TODO Test with a raw model
-
-        self.tbvw_certificate.setModel(std)
+        self._cert_validator.validated.connect(
+            self._on_cert_info_validated
+        )
+        self._cert_validator.validation_completed.connect(
+            self._on_validation_complete
+        )
+        self._cert_upload_handler.uploaded.connect(
+            self._on_cert_info_uploaded
+        )
+        self._cert_upload_handler.upload_completed.connect(
+            self._on_upload_complete
+        )
+        self.btn_close.clicked.connect(
+            self._on_close
+        )
 
     def _enable_controls(self, enable):
         """
-        Enable or disable UI controls.
+        Enable or disable user interface controls.
         :param enable: Status of the controls.
         :type enable: bool
         """
         self.btn_select_folder.setEnabled(enable)
         self.cbo_scheme_number.setEnabled(enable)
         self.btn_upload_certificate.setEnabled(enable)
-        self.tbvw_certificate.setEnabled(enable)
 
     def _check_cmis_connection(self):
         """
@@ -115,15 +152,15 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
 
     def _populate_schemes(self):
         """
-        Populate the combobox with items from the database
+        Populate the schemes combobox with items from the database.
         """
         # Clear combobox
         self.cbo_scheme_number.clear()
         self.cbo_scheme_number.addItem('')
         # Get scheme table data
-        schm_data = export_data('cb_scheme')
+        sch_data = export_data('cb_scheme')
         # Check if no schemes loaded
-        if schm_data is None:
+        if not sch_data:
             msg = self.tr(
                 'Schemes could not be loaded.'
             )
@@ -131,7 +168,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         else:
             # Loop through result proxy to get scheme number and add to
             # combobox
-            for s in schm_data:
+            for s in sch_data:
                 self.cbo_scheme_number.addItem(s.scheme_number, s.id)
             # Sort region combobox items
             self.cbo_scheme_number.model().sort(0)
@@ -142,82 +179,198 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         if not self.cbo_scheme_number.currentText():
             self.btn_select_folder.setEnabled(False)
+            self.lbl_status.setText(self._status_txt)
         else:
             self.btn_select_folder.setEnabled(True)
+            self.tbvw_certificate.setEnabled(True)
+            self.lbl_status.setText(
+                self._status_txt + 'Select certificates folder')
 
     def on_select_folder(self):
         """
-        Slot raised when the select folder button is clicked
+        Slot raised when the select folder button is clicked.
         """
+        scan_cert_path = scanned_certificate_path()
+        if not scan_cert_path:
+            scan_cert_path = '~/'
         # Check if combobox has scheme selected.
         if not self.cbo_scheme_number.currentText():
             self.notif_bar.clear()
             self.notif_bar.insertWarningNotification(
                 self.tr(
-                    "Scheme value must be selected first."
+                    "Scheme name must be selected first."
                 )
             )
         else:
             cert_dir = QFileDialog.getExistingDirectory(
                 self,
-                caption="Browse Certificates Source Folder"
+                "Browse Certificates Source Folder",
+                scan_cert_path,
+                QFileDialog.ShowDirsOnly
             )
-            return cert_dir
+            # Check if directory is selected
+            if cert_dir:
+                # Set path to the scanned certificate directory
+                set_scanned_certificate_path(cert_dir)
+                # Get certificate info items from directory
+                cert_info_items = self._cert_info_from_dir(cert_dir)
+                # Populate cert info items
+                self._populate_cert_info_items(cert_info_items)
 
-    def certificate_name_from_directory(self, cert_name):
+    def _cert_info_from_dir(self, path):
         """
-        Get certificate name from the selected directory.
-        :param cert_name: Name of the certificate in the selected directory.
-        :type cert_name: Str
-        :return: Returns the name of the certificate in the directory.
-        :rtype: Str
+        Create certificate info items from the user selected directory.
+        :return: cert_info_items: List of certificate info items.
+        :rtype cert_info_items: list
         """
-        pdf_filter = '.pdf'
-        # Get a list of files in the directory
-        file_info = QDir(self.on_select_folder()).entryInfoList(
-            QDir.NoDot | QDir.NoDotDot | QDir.Files
+        dir_ = QDir(path)
+        dir_.setNameFilters(['*.pdf'])
+        file_infos = dir_.entryInfoList(
+            QDir.NoDot | QDir.NoDotDot | QDir.Files | QDir.Name
         )
-        # Get list of file names from the selected directory
-        file_name = [cert.fileName() for cert in file_info]
         # Check if list contains file names
-        if len(file_name) == 0:
+        cert_info_items = []
+        if len(file_infos) == 0:
             msg = self.tr(
                 'There are no files in the selected directory.'
             )
             self.show_error_message(msg)
-        elif len(file_name) > 0:
-            # Check if list contains PDF files
-            if not any(pdf_filter in string for string in file_name):
-                msg = self.tr(
-                    'There are no PDF files in the selected directory.'
-                )
-                self.show_error_message(msg)
-            else:
-                for file_ in file_name:
-                    if not cert_name:
-                        # Assign variable to file name without PDF extension
-                        cert_name = file_.split(pdf_filter)[0]
+            self._cert_model.clear()
+        else:
+            # Loop through file info objects
+            for f in file_infos:
+                # Create certificate info object for each file
+                cert_info = CertificateInfo()
+                cert_info.filename = f.absoluteFilePath()
+                cert_info.certificate_number = f.completeBaseName()
+                cert_info_items.append(cert_info)
 
-                return cert_name
+        return cert_info_items
 
-    def _populate_table_view(self, filenames):
+    def _populate_cert_info_items(self, cert_info_items):
         """
-        Populate table view with the list of certificates that have been
-        loaded from the folder.
-        :param filenames: List of certificates in the folder.
-        :type filenames: list
+        Populate the table widget with the file info items from the selected
+        directory.
+        :param cert_info_items: List of file info items fom the selected
+        directory.
+        :type cert_info_items: list
         """
-        # Clear previous items in the model.
-        self._cert_model.clear()
-        if not filenames:
-            filenames = []
+        self._cert_model.cert_info_items = cert_info_items
 
-        for file_ in filenames:
-            filenames.append(
-                self.certificate_name_from_directory(file_)
+        # Check if certificate items is empty
+        if len(cert_info_items) == 0:
+            self.notif_bar.clear()
+            self.notif_bar.insertWarningNotification(
+                self.tr(
+                    "There are no certificates to be uploaded."
                 )
-        model = QStandardItemModel(filenames)
-        self._cert_model.setModel(model)
+            )
+            return
+
+        self._show_record_count()
+
+        # Validation function call
+        self._validate_items(cert_info_items)
+
+    def _show_record_count(self):
+        """
+        Show the number of records loaded in the view.
+        """
+        # Show/update record count
+        record_count = 'Number of files: ' + str(
+            self._cert_model.rowCount()
+        )
+
+        self.lbl_records_count.clear()
+
+        self.lbl_records_count.setText(record_count)
+
+    def _validate_items(self, cert_info_items):
+        """
+        Validate list of certificate items loaded in the table view.
+        :param cert_info_items: List of certificate items in the table view.
+        :type cert_info_items: list
+        """
+        # Set certificate info items
+        self._cert_validator.cert_info_items = cert_info_items
+
+        # Initiate validation process
+        self._cert_validator.start()
+
+        self.lbl_status.setText(self._status_txt + 'Validating...')
+
+    def _on_cert_info_validated(self, cert_info):
+        """
+        Slot raised when the certificate info item has been validated.
+        :param cert_info: Validated certificate info object.
+        """
+        self._cert_model.update_validation_status(
+            cert_info.certificate_number
+        )
+
+        # Upload certificates to the Temp folder in document repository
+        if cert_info.validation_status == CertificateInfo.CAN_UPLOAD:
+            self._cert_upload_handler.upload_certificate(
+                cert_info.certificate_number
+            )
+
+    def _on_validation_complete(self):
+        """
+        Slot raised when the validation is complete.
+        """
+        self.btn_upload_certificate.setEnabled(True)
+        self.lbl_status.setText(self._status_txt + 'Ready to upload')
+
+    def _on_upload_certificates(self):
+        """
+        Slot raised when the upload button is clicked.
+        """
+        # Set status label
+        self.lbl_status.setText(self._status_txt + 'Uploading...')
+        cert_info_items = self._cert_model.cert_info_items
+
+        # Check if certificate items is empty
+        if len(cert_info_items) == 0:
+            self.notif_bar.clear()
+            self.notif_bar.insertWarningNotification(
+                self.tr(
+                    "There are no certificates to be uploaded."
+                )
+            )
+            return
+
+        self._upload_certificates(cert_info_items)
+
+    def _upload_certificates(self, cert_info_items):
+        """
+        Initiates upload session of list of certificate info objects by
+        calling the upload method in certificate upload handler.
+        :param cert_info_items: Certificate info items.
+        :type cert_info_items: list
+        """
+        # Move certificates from the Temp folder to the permanent folder
+        for cert in cert_info_items:
+            self._cert_upload_handler.persist_certificates(
+                cert.certificate_number
+            )
+
+    def _on_cert_info_uploaded(self, cert_info):
+        """
+        Slot raised when the certificate info item has been uploaded.
+        :param cert_info: Certificate info object.
+        :type cert_info: CertificateInfo
+        """
+        self._cert_model.update_upload_status(
+            cert_info.certificate_number
+        )
+
+    def _on_upload_complete(self):
+        """
+        Slot raised when all the certificates have been uploaded.
+        """
+        self.lbl_status.setText(
+            self._status_txt + self.tr('Upload complete')
+        )
 
     def show_error_message(self, message):
         """
@@ -233,60 +386,26 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             message
         )
 
-    def _validate_items(self, cert_info):
+    def _on_close(self):
         """
-        Validate list of certificate items loaded in the  table view.
-        :param cert_info: List of certificate items in the table view.
-        :type cert_info: list
+        Slot raised when the close button is clicked.
         """
-        pass
+        # Reset labels
+        self.lbl_status.setText(
+            self._status_txt + 'Select Folder'
+        )
 
-    def _on_cert_info_uploaded(self, cert_info):
-        """
-        :param cert_info:
-        :return:
-        """
-        pass
+        # Reset combobox index
+        self.cbo_scheme_number.setCurrentIndex(0)
 
-    def _on_upload_certificates(self):
-        """
-        :return:
-        """
-        pass
+        # Clear the model and validation items
+        self._cert_model.clear()
+        self._show_record_count()
+        self._cert_validator.clear()
+        self._cert_upload_handler.reset()
+        # Close the widget
+        self.close()
 
-    def _upload_certificates(self, cert_info):
-        """
-        Initiates upload session of list of certificate info objects by
-        calling the upload method in certificate upload handler.
-        :param cert_info: List of certificate items to be uploaded.
-        :type cert_info: list
-        """
-        pass
+    def closeEvent(self, event):
+        self._on_close()
 
-    def check_validation_status(self):
-        """
-        Checks the validation status of the certificates
-        """
-
-    def validate(self):
-        """
-        Validate certificates
-        """
-
-    def _on_cert_info_validated(self, cert_info):
-        """
-        Slot raised when the certificate info item has been validated.
-        :param cert_info:
-        """
-
-    def _update_status_icons(self):
-        """
-        Update the icons in the table widget based on the status of
-        upload.
-        """
-
-    def _update_status_description(self):
-        """
-        Update the icons in the table widget based on the status of
-        upload.
-        """
