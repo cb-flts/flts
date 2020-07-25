@@ -1100,13 +1100,23 @@ class STDMQGISLoader(object):
             self.iface.mainWindow()
         )
 
+        self.cert_upload_act = QAction(
+            QIcon(":/plugins/stdm/images/icons/flts_certificate_upload.png"),
+            QApplication.translate(
+                "ReportToolbarAction",
+                "Certificate Upload"
+            ),
+            self.iface.mainWindow()
+        )
+
         # Connect the slots for the actions above
         self.contentAuthAct.triggered.connect(self.contentAuthorization)
         self.usersAct.triggered.connect(self.manageAccounts)
         self.options_act.triggered.connect(self.on_sys_options)
         self.docDesignerAct.triggered.connect(self.onDocumentDesigner)
         self.docGeneratorAct.triggered.connect(self.onDocumentGenerator)
-        self.reportGeneratorAct.triggered.connect(self.on_cert_upload)
+        self.reportGeneratorAct.triggered.connect(self.onReportGenerator)
+        self.cert_upload_act.triggered.connect(self.on_cert_upload)
         self.wzdAct.triggered.connect(self.load_config_wizard)
         # self.viewSTRAct.triggered.connect(self.onViewSTR)
 
@@ -1142,6 +1152,9 @@ class STDMQGISLoader(object):
 
         reportGeneratorCnt = ContentGroup.contentItemFromQAction(self.reportGeneratorAct)
         reportGeneratorCnt.code = "8F5DB287-4295-40F7-A826-EA2F5868196B"
+
+        certUploadCnt = ContentGroup.contentItemFromQAction(self.cert_upload_act)
+        certUploadCnt.code = "4JDFB3C3-N4UP-A200-A826-SYGPFV6B2OT4"
 
         wzdConfigCnt = ContentGroup.contentItemFromQAction(self.wzdAct)
         wzdConfigCnt.code = "F16CA4AC-3E8C-49C8-BD3C-96111EA74206"
@@ -1246,6 +1259,10 @@ class STDMQGISLoader(object):
         self.reportGeneratorCntGroup.addContentItem(reportGeneratorCnt)
         self.reportGeneratorCntGroup.register()
 
+        self.certUploadCntGroup = ContentGroup(username, self.cert_upload_act)
+        self.certUploadCntGroup.addContentItem(certUploadCnt)
+        self.certUploadCntGroup.register()
+
         adminSettingsCntGroups = []
         adminSettingsCntGroups.append(self.contentAuthCntGroup)
         adminSettingsCntGroups.append(self.userRoleCntGroup)
@@ -1302,6 +1319,8 @@ class STDMQGISLoader(object):
         certSettingsCntGroups = []
         certSettingsCntGroups.append(self.docGeneratorCntGroup)
         certSettingsCntGroups.append(self.docDesignerCntGroup)
+        certSettingsCntGroups.append(self.certUploadCntGroup)
+
         searchReportCntgroups = []
         # toolbar items
         self.toolbarLoader.addContent(self.wzdConfigCntGroup,
@@ -1343,6 +1362,7 @@ class STDMQGISLoader(object):
         self.toolbarLoader.addContent(self.docDesignerCntGroup)
         self.toolbarLoader.addContent(self.docGeneratorCntGroup)
         self.toolbarLoader.addContent(self.reportGeneratorCntGroup)
+        self.toolbarLoader.addContent(self.certUploadCntGroup)
 
         # menubar items
         self.menubarLoader.addContents(schemeSettingsCntGroups,
@@ -2069,6 +2089,7 @@ class STDMQGISLoader(object):
             self.stdmInitToolbar.removeAction(self.printCertificateAct)
             self.stdmInitToolbar.removeAction(self.scanCertificateAct)
             self.stdmInitToolbar.removeAction(self.searchAct)
+            self.stdmInitToolbar.removeAction(self.cert_upload_act)
             self.stdmInitToolbar.removeAction(self.reportAct)
             # Clear current user name from status bar
             self.flts_status_label.clear()
