@@ -304,15 +304,44 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         Slot raised when the certificate info item has been validated.
         :param cert_info: Validated certificate info object.
         """
+        # Update the validation status icon and tooltip
         self._cert_model.update_validation_status(
             cert_info.certificate_number
         )
+        # Upload certificates
+        self._upload_certificates(
+            cert_info.filename
+        )
 
-        # Upload certificates to the Temp folder in document repository
-        if cert_info.validation_status == CertificateInfo.CAN_UPLOAD:
-            self._cert_upload_handler.upload_certificate(
-                cert_info.certificate_number
-            )
+    def _upload_certificates(self, filepath):
+        """
+        Upload the certificates to the Temp folder in CMIS document repository
+        :param filepath: Location path of the certificate
+        """
+        # Upload the certificates to the Temp folder in
+        # CMIS document repository
+        self._cert_upload_handler.upload_certificate(
+            filepath
+        )
+
+    def _on_cert_info_uploaded(self, cert_info):
+        """
+        Slot raised when the certificate info item has been uploaded.
+        :param cert_info: Certificate info object.
+        :type cert_info: CertificateInfo
+        """
+        # Update upload status text and icon
+        self._cert_model.update_upload_status(
+            cert_info.certificate_number
+        )
+
+    def _on_upload_complete(self):
+        """
+        Slot raised when all the certificates have been uploaded.
+        """
+        self.lbl_status.setText(
+            self._status_txt + 'Certificates ready for upload'
+        )
 
     def _on_validation_complete(self):
         """
@@ -326,7 +355,10 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         Slot raised when the upload button is clicked.
         """
         # Set status label
-        self.lbl_status.setText(self._status_txt + 'Uploading...')
+        self.lbl_status.setText(
+            self._status_txt + 'Uploading certificates...'
+        )
+
         cert_info_items = self._cert_model.cert_info_items
 
         # Check if certificate items is empty
@@ -339,37 +371,16 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             )
             return
 
-        self._upload_certificates(cert_info_items)
-
-    def _upload_certificates(self, cert_info_items):
-        """
-        Initiates upload session of list of certificate info objects by
-        calling the upload method in certificate upload handler.
-        :param cert_info_items: Certificate info items.
-        :type cert_info_items: list
-        """
-        # Move certificates from the Temp folder to the permanent folder
         for cert in cert_info_items:
-            self._cert_upload_handler.persist_certificates(
-                cert.certificate_number
-            )
+            self._persist_certificates(cert.certificate_number)
 
-    def _on_cert_info_uploaded(self, cert_info):
+    def _persist_certificates(self, cert_number):
         """
-        Slot raised when the certificate info item has been uploaded.
-        :param cert_info: Certificate info object.
-        :type cert_info: CertificateInfo
+        Move certificates to the permanent folder in the CMIS repository.
+        :param cert_number: Certificate number identifying the certificate
         """
-        self._cert_model.update_upload_status(
-            cert_info.certificate_number
-        )
-
-    def _on_upload_complete(self):
-        """
-        Slot raised when all the certificates have been uploaded.
-        """
-        self.lbl_status.setText(
-            self._status_txt + self.tr('Upload complete')
+        self._cert_upload_handler.persist_certificates(
+            cert_number
         )
 
     def show_error_message(self, message):

@@ -198,18 +198,18 @@ class CertificateUploadHandler(QObject):
             self.CERT_DOC_TYPE
         )
 
-    def _upload_cert_info(self, cert_number, cert_doc_type):
+    def _upload_cert_info(self, file_path, cert_doc_type):
         """
         Upload the certificate with the matching certificate number to the
         CMIS document repository temp folder.
-        :param cert_number: Certificate number.
-        :type cert_number: str
+        :param file_path: Certificate file path.
+        :type file_path: str
         :param cert_doc_type: Name of the document type to be uploaded.
         The default option is 'Archive'.
         :type cert_doc_type: str
         """
         upload_crt = CmisDocumentUploadThread(
-            cert_number,
+            file_path,
             self._cert_doc_mapper,
             cert_doc_type,
             self
@@ -233,7 +233,9 @@ class CertificateUploadHandler(QObject):
         )
 
         # Set the status of the document
-        self._cert_upload_status[cert_number] = CertificateInfo.NOT_UPLOADED
+        self._cert_upload_status[
+            file_path
+        ] = CertificateInfo.NOT_UPLOADED
 
         upload_crt.start()
 
@@ -248,12 +250,12 @@ class CertificateUploadHandler(QObject):
         sender = self.sender()
         cert_info = CertificateInfo()
         if sender:
-            cert_number = sender.file_path
+            file_path = sender.file_path
             doc_obj = status_info[1]
-            self._cert_upload_status[cert_number] = CertificateInfo.SUCCESS
-            self._uploaded_certs[cert_number] = doc_obj
+            self._cert_upload_status[file_path] = CertificateInfo.SUCCESS
+            self._uploaded_certs[file_path] = doc_obj
             cert_info.upload_status = CertificateInfo.SUCCESS
-            cert_info.certificate_number = cert_number
+            cert_info.filename = file_path
 
             # Emit signal
             self.uploaded.emit(cert_info)
@@ -268,12 +270,13 @@ class CertificateUploadHandler(QObject):
         sender = self.sender()
         cert_info = CertificateInfo()
         if sender:
-            cert_number = sender.file_path
+            file_path = sender.file_path
             err_msg = error_info[1]
-            self._cert_upload_status[cert_number] = CertificateInfo.ERROR
-            self._certificate_upload_error[cert_number] = err_msg
+            self._cert_upload_status[file_path] = CertificateInfo.ERROR
+            self._certificate_upload_error[file_path] = err_msg
             cert_info.upload_status = CertificateInfo.ERROR
-            cert_info.certificate_number = cert_number
+            cert_info.filename = file_path
+            print(error_info[1])
 
             # Emit signal
             self.uploaded.emit(cert_info)
@@ -325,21 +328,22 @@ class CertificateUploadHandler(QObject):
         """
         Moves the certificates from the Temp folder to the permanent
         certificate directory in the CMIS server.
+        :param cert_number: certificate number
         """
         self._cert_doc_mapper.entity_name = self.CERT_ENTITY_NAME
 
         cert_objects = self._cert_doc_mapper.persist_documents(
-            cert_number
+            str(cert_number)
         )
-        cert_obj = self._cert_doc_model()
-        cert_obj.documents = cert_objects
-        cert_obj.save()
+        cert_doc_obj = self._cert_doc_model()
+        cert_doc_obj.documents = cert_objects
+        cert_doc_obj.save()
         self._update_cert_metadata(cert_number)
 
         # # Emit signal
         self.persisted.emit()
 
-        return cert_obj.id
+        return cert_doc_obj.id
 
     def _update_cert_metadata(self, cert_number):
         """
@@ -351,14 +355,15 @@ class CertificateUploadHandler(QObject):
         # Certificate object
         cert_obj = self._cert_model()
         # Query fetching row based on certificate number
-        res = cert_obj.queryObject().filter(
-            cert_obj.certificate_number == cert_number
-        ).all()
+        res = cert_obj.queryObject().filter().all()
         # Updating column values for each fetched certificate.
         for obj in res:
-            obj.archive_date = datetime.now()
-            obj.is_uploaded = 't'
-            obj.update()
+            if obj.certificate_number == str(cert_number):
+                obj.archive_date = datetime.now()
+                obj.is_uploaded = 'true'
+                obj.update()
+
+        self.reset()
 
     def reset(self):
         """
