@@ -379,9 +379,14 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         Move certificates to the permanent folder in the CMIS repository.
         :param cert_number: Certificate number identifying the certificate
         """
-        self._cert_upload_handler.persist_certificates(
-            cert_number
-        )
+        try:
+            self._cert_upload_handler.persist_certificates(
+                cert_number
+            )
+        except (IOError, OSError, Exception) as e:
+            self.show_error_message(
+                "Failed to import: {}".format(e)
+            )
 
     def show_error_message(self, message):
         """
