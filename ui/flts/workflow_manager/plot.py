@@ -30,6 +30,7 @@ from PyQt4.QtCore import (
 from PyQt4.QtGui import QMessageBox
 from qgis.core import (
     QgsCoordinateTransform,
+    QgsCoordinateReferenceSystem,
     QgsFeature,
     QgsField,
     QgsGeometry,
@@ -373,8 +374,28 @@ class PlotLayer:
         :param destination_crs: Target CRS
         :type destination_crs: int
         """
-        tr = QgsCoordinateTransform(source_crs, destination_crs)
+        source_crs_sys = QgsCoordinateReferenceSystem(
+            cls.convert_to_int(source_crs)
+        )
+        destination_crs_sys = QgsCoordinateReferenceSystem(
+            cls.convert_to_int(destination_crs)
+        )
+        tr = QgsCoordinateTransform(source_crs_sys, destination_crs_sys)
         geom.transform(tr)
+
+    @classmethod
+    def convert_to_int(cls, crs):
+        """
+        Convert coordinate reference system (CRS) value to int.
+        :param crs: Source CRS value
+        :type crs: str
+        :return: Returns the CRS  as a integer value.
+        :rtype: int
+        """
+        try:
+            return int(crs)
+        except ValueError:
+            return crs
 
     @classmethod
     def export_to_wkt(cls, geom):

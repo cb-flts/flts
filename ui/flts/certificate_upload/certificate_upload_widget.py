@@ -339,15 +339,29 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         Slot raised when all the certificates have been uploaded.
         """
-        self.lbl_status.setText(
-            self._status_txt + 'Certificates ready for upload'
-        )
+        pass
 
     def _on_validation_complete(self):
         """
         Slot raised when the validation is complete.
         """
-        self.btn_upload_certificate.setEnabled(True)
+        # Get loaded certificates from the model
+        cert_info_items = self._cert_model.cert_info_items
+
+        # Create an empty list to store certificate statuses
+        status_res = []
+        for cert in cert_info_items:
+            status = cert.validation_status
+            status_res.append(status)
+
+        can_upload = CertificateInfo.CAN_UPLOAD
+
+        # Check if any of the loaded certificates can be uploaded
+        if can_upload not in status_res:
+            self.btn_upload_certificate.setEnabled(False)
+        else:
+            self.btn_upload_certificate.setEnabled(True)
+
         self.lbl_status.setText(self._status_txt + 'Ready to upload')
 
     def _on_upload_certificates(self):
