@@ -119,6 +119,9 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self._cert_upload_handler.upload_completed.connect(
             self._on_upload_complete
         )
+        self._cert_upload_handler.persisted.connect(
+            self._on_persist_certificates
+        )
         self.btn_close.clicked.connect(
             self._on_close
         )
@@ -309,17 +312,14 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             cert_info.certificate_number
         )
         # Upload certificates
-        self._upload_certificates(
-            cert_info.filename
-        )
+        if cert_info.validation_status == CertificateInfo.CAN_UPLOAD:
+            self._upload_certificates(cert_info.filename)
 
     def _upload_certificates(self, filepath):
         """
         Upload the certificates to the Temp folder in CMIS document repository
         :param filepath: Location path of the certificate
         """
-        # Upload the certificates to the Temp folder in
-        # CMIS document repository
         self._cert_upload_handler.upload_certificate(
             filepath
         )
@@ -385,22 +385,31 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             )
             return
 
-        for cert in cert_info_items:
-            self._persist_certificates(cert.certificate_number)
-
-    def _persist_certificates(self, cert_number):
-        """
-        Move certificates to the permanent folder in the CMIS repository.
-        :param cert_number: Certificate number identifying the certificate
-        """
         try:
-            self._cert_upload_handler.persist_certificates(
-                cert_number
+            cert_numbers = iter(
+                [str(cert.certificate_number) for cert in cert_info_items]
             )
+
+            # Loop though the iterator
+            self._cert_upload_handler.persist_certificates(
+                    next(cert_numbers)
+            )
+
         except (IOError, OSError, Exception) as e:
             self.show_error_message(
-                "Failed to import: {}".format(e)
+                "Failed to upload: {}".format(e)
             )
+
+    def _on_persist_certificates(self):
+        """
+        Slot raised when certificates have been moved from the temp folder to
+        the permanent folder in the document repository.
+        """
+        self.notif_bar.clear()
+        msg = self.tr(
+            "Certificates have been uploaded."
+        )
+        self.notif_bar.insertSuccessNotification(msg)
 
     def show_error_message(self, message):
         """
