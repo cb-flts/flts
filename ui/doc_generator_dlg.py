@@ -599,18 +599,32 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         # If using template data source
         template_doc, err_msg = self._doc_generator.template_document(self._docTemplatePath)
         if template_doc is None:
-            QMessageBox.critical(self, "Error Generating documents", QApplication.translate("DocumentGeneratorDialog",
-                                                                                            "Error Generating documents - %s" % (
-                                                                                                err_msg)))
+            QMessageBox.critical(
+                self,
+                "Error Generating documents",
+                QApplication.translate(
+                    "DocumentGeneratorDialog",
+                    "Error Generating documents - %s" % (
+                        err_msg
+                    )
+                )
+            )
 
             return
 
         composer_ds, err_msg = self._doc_generator.composer_data_source(template_doc)
 
         if composer_ds is None:
-            QMessageBox.critical(self, "Error Generating documents", QApplication.translate("DocumentGeneratorDialog",
-                                                                                            "Error Generating documents - %s" % (
-                                                                                                err_msg)))
+            QMessageBox.critical(
+                self,
+                "Error Generating documents",
+                QApplication.translate(
+                    "DocumentGeneratorDialog",
+                    "Error Generating documents - %s" % (
+                        err_msg
+                    )
+                )
+            )
 
             return
 
@@ -678,8 +692,12 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
         config = self.current_config()
         self.last_data_source = config.data_source()
         if config is None:
-            self._notif_bar.insertErrorNotification(QApplication.translate("DocumentGeneratorDialog", \
-                                                                           "The entity configuration could not be extracted."))
+            self._notif_bar.insertErrorNotification(
+                QApplication.translate(
+                    "DocumentGeneratorDialog",
+                    "The entity configuration could not be extracted."
+                )
+            )
             return
 
         # Get selected records and validate
@@ -689,20 +707,31 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
             records = self._dummy_template_records()
 
         if len(records) == 0:
-            self._notif_bar.insertErrorNotification(QApplication.translate("DocumentGeneratorDialog", \
-                                                                           "Please load at least one entity record"))
+            self._notif_bar.insertErrorNotification(QApplication.translate(
+                "DocumentGeneratorDialog",
+                "Please load at least one entity record"
+            )
+            )
             return
 
         if not self._docTemplatePath:
-            self._notif_bar.insertErrorNotification(QApplication.translate("DocumentGeneratorDialog", \
-                                                                           "Please select a document template to use"))
+            self._notif_bar.insertErrorNotification(
+                QApplication.translate(
+                    "DocumentGeneratorDialog",
+                    "Please select a document template to use"
+                    )
+                )
             return
 
         documentNamingAttrs = self.lstDocNaming.selectedMappings()
 
         if self.chkUseOutputFolder.checkState() == Qt.Checked and len(documentNamingAttrs) == 0:
-            self._notif_bar.insertErrorNotification(QApplication.translate("DocumentGeneratorDialog", \
-                                                                           "Please select at least one field for naming the output document"))
+            self._notif_bar.insertErrorNotification(
+                QApplication.translate(
+                    "DocumentGeneratorDialog",
+                    "Please select at least one field for naming the output document"
+                )
+            )
 
             return
 
@@ -725,19 +754,27 @@ class DocumentGeneratorDialog(QDialog, Ui_DocumentGeneratorDialog):
                 fileInfo = QFileInfo(self._outputFilePath)
                 docDir = fileInfo.dir().path()
 
-            self._outputFilePath = QFileDialog.getSaveFileName(self,
-                                                               QApplication.translate("DocumentGeneratorDialog",
-                                                                                      "Save Document"),
-                                                               docDir,
-                                                               "{0} (*.{1})".format(
-                                                                   QApplication.translate("DocumentGeneratorDialog",
-                                                                                          saveAsText),
-                                                                   fileExtension))
+            self._outputFilePath = QFileDialog.getSaveFileName(
+                self,
+                QApplication.translate(
+                    "DocumentGeneratorDialog",
+                    "Save Document"
+                ),
+                docDir, "{0} (*.{1})".format(
+                    QApplication.translate(
+                        "DocumentGeneratorDialog",
+                        saveAsText
+                    ), fileExtension
+                )
+            )
 
             if not self._outputFilePath:
                 self._notif_bar.insertErrorNotification(
-                    QApplication.translate("DocumentGeneratorDialog",
-                                           "Process aborted. No output file was specified."))
+                    QApplication.translate(
+                        "DocumentGeneratorDialog",
+                        "Process aborted. No output file was specified."
+                    )
+                )
 
                 return
 
