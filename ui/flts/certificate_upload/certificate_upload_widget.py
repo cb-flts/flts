@@ -29,7 +29,7 @@ from PyQt4.QtGui import (
     QIcon,
     QProgressDialog,
     QProgressBar,
-    QHeaderView
+    QHeaderView,
 )
 
 from stdm.network.cmis_manager import (
@@ -49,6 +49,7 @@ from stdm.ui.flts.certificate_upload.certificate_validator import CertificateVal
 from stdm.ui.flts.certificate_upload.ui_flts_certificate_upload import Ui_FltsCertUploadWidget
 from stdm.ui.flts.certificate_upload.certificate_info import CertificateInfo
 from stdm.ui.flts.workflow_manager.pdf_viewer_widget import PDFViewerWidget
+from stdm.ui.flts.certificate_upload.delegate import IconDelegate
 
 
 class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
@@ -91,6 +92,12 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         for item in range(tbvw_h_header_count):
             tbvw_h_header.setResizeMode(item, QHeaderView.Stretch)
 
+        icon_delegate = IconDelegate(self.tbvw_certificate)
+
+        self.tbvw_certificate.setItemDelegate(
+            icon_delegate
+        )
+
         # All controls disabled by default
         self._enable_controls(False)
 
@@ -121,6 +128,9 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         )
         self._cert_upload_handler.persisted.connect(
             self._on_persist_certificates
+        )
+        self.tbvw_certificate.clicked.connect(
+            self._on_preview_certificate
         )
         self.btn_close.clicked.connect(
             self._on_close
@@ -409,6 +419,14 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         msg = self.tr(
             "Certificates have been uploaded."
         )
+
+        cert_info_items = self._cert_model.cert_info_items
+
+        for cert in cert_info_items:
+            self._cert_model.update_upload_status(
+                cert.certificate_number
+            )
+
         self.notif_bar.insertSuccessNotification(msg)
 
     def show_error_message(self, message):
@@ -424,6 +442,37 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             ),
             message
         )
+
+    def _on_preview_certificate(self, index):
+        # Loads a window for previewing the field book.
+        cert_items = self._cert_model.cert_info_items
+        if index.isValid():
+            if index.column() == 2:
+                cert_info = cert_items[index.row()]
+                path = cert_info.filename
+                status = self._cert_upload_handler.upload_status(path)
+                self.notif_bar.clear()
+
+                if status == -1:
+                    msg = '{0} could not be found in the list of uploaded ' \
+                        'documents'.format(cert_info.certificate_number)
+                    self.notif_bar.insertWarningNotification(msg)
+                elif status == CertificateInfo.SUCCESS:
+                    doc_uuid = self._cert_upload_handler.certificate_uuid(path)
+                    doc_name = self._cert_upload_handler.certificate_name(path)
+                    if not doc_uuid or not doc_name:
+                        msg = 'An error occurred, the field book cannot be previewed.'
+                        self.notif_bar.insertWarningNotification(msg)
+                        return
+
+                    pdf_viewer = PDFViewerWidget(
+                            doc_uuid,
+                            doc_name
+                        )
+                    pdf_viewer.view_document()
+
+                    # Flag the field book as viewed
+                    self._previewed[path] = path
 
     def _on_close(self):
         """

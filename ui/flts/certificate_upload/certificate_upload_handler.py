@@ -449,7 +449,7 @@ class CertificateUploadHandler(QObject):
 
     def document_type_count(self, document_type):
         """
-        Gets the number of documents already uploaded for thr given document
+        Gets the number of documents already uploaded for the given document
         type.
         :param document_type: Document type
         :type document_type: str
@@ -558,14 +558,14 @@ class CertificateUploadHandler(QObject):
                 # Emit signal with status info
                 self.removed.emit((path, False, err_msg))
 
-    def upload_status(self, cert_number):
+    def upload_status(self, file_path):
         """
         Gets the upload status of the document with the given path.
-        :param cert_number: Certificate number.
-        :type cert_number: str
+        :param file_path: Certificate file path.
+        :type file_path: str
         :return: Returns the status indicating whether the document is
         NOT_UPLOADED, SUCCESSFUL or ERROR occurred, else returns -1 if
         the given file path is not found.
         ":rtype: int
         """
-        return self._cert_upload_status.get(cert_number, -1)
+        return self._cert_upload_status.get(file_path, -1)
