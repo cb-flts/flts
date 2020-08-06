@@ -434,8 +434,8 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             last_value = 0
         last_value += 1
         self._abs_last_scheme_value = last_value
-        scheme_code = u'{0}.{1}.{2}'.format(code, str(last_value).zfill(4),
-                                            self._current_year)
+        scheme_code = u'{0}. {1} / {2}'.format(code, str(last_value).zfill(4),
+                                               self._current_year)
 
         return scheme_code
 
