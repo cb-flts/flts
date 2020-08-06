@@ -404,6 +404,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         """
         # Clear scheme number
         self.lnedit_schm_num.clear()
+        self.lnedit_landhold_num.clear()
         self.cbx_reg_div.clear()
 
         if not self.cbx_relv_auth_name.currentText():
@@ -418,7 +419,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
         for regdiv in reg_divs:
             self.cbx_reg_div.addItem(regdiv[1], regdiv[0])
-            print(regdiv[1], regdiv[0])
 
         # Select the first item automatically if there is only one division
         if self.cbx_reg_div.count() == 2:
@@ -427,6 +427,23 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         scheme_code = self._gen_scheme_number(code, last_value)
 
         self.lnedit_schm_num.setText(scheme_code)
+
+        self._update_land_hold_plan_number()
+
+    def _update_land_hold_plan_number(self):
+        """
+        Updates the Land Hold Number prefix.
+        """
+        # Registration division letter
+        reg_div = self.cbx_reg_div.currentText()
+        # Land hold plan number existing text
+        flts_txt = 'FLTS '
+
+        # Append the LHP text
+        lhp_text = u'{0}-{1}'.format(reg_div, flts_txt)
+
+        # Clear and update the LHP text
+        self.lnedit_landhold_num.setText(lhp_text)
 
     def _gen_scheme_number(self, code, last_value):
         # Generates a new scheme number
