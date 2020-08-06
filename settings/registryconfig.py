@@ -228,6 +228,15 @@ def set_scanned_certificate_path(path):
     set_registry_value(SCANNED_CERTIFICATE_PATH, path)
 
 
+def set_entity_browser_record_limit(limit):
+    """
+    Sets the entity browser record limit.
+    :param limit: Record browser limit
+    :type limit: int
+    """
+    set_registry_value(ENTITY_BROWSER_RECORD_LIMIT, limit)
+
+
 def enable_stdm():
     """
     Enables the STDM plugin if it is disabled.

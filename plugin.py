@@ -98,7 +98,9 @@ from stdm.settings.registryconfig import (
     STDM_VERSION,
     CONFIG_UPDATED,
     HOST,
-    composer_template_path
+    composer_template_path,
+    set_entity_browser_record_limit
+
 )
 from stdm.ui.license_agreement import LicenseAgreement
 
@@ -185,6 +187,7 @@ class STDMQGISLoader(object):
         self.dock_widget = None
         self.search_dock_widget = None
         self.cert_upload_widget = None
+        set_entity_browser_record_limit(1000)
 
     def initGui(self):
         # Initial actions on starting up the application
