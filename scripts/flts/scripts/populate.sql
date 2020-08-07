@@ -965,7 +965,8 @@ CREATE TABLE cb_holder_log (
   "spouse_date_of_birth" date,
   "other_dependants" int4,
   "juristic_person_name" varchar(50),
-  "juristic_person_number" varchar(50)
+  "juristic_person_number" varchar(50),
+  "transfer_contract_number" varchar(30)
 )
 ;
 

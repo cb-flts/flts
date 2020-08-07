@@ -428,23 +428,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
         self.lnedit_schm_num.setText(scheme_code)
 
-        self._update_land_hold_plan_number()
-
-    def _update_land_hold_plan_number(self):
-        """
-        Updates the Land Hold Number prefix.
-        """
-        # Registration division letter
-        reg_div = self.cbx_reg_div.currentText()
-        # Land hold plan number existing text
-        flts_txt = 'FLTS '
-
-        # Append the LHP text
-        lhp_text = u'{0}-{1}'.format(reg_div, flts_txt)
-
-        # Clear and update the LHP text
-        self.lnedit_landhold_num.setText(lhp_text)
-
     def _gen_scheme_number(self, code, last_value):
         # Generates a new scheme number
         if not last_value:
@@ -1261,6 +1244,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         Save scheme information, move supporting documents, save holders
         table and create appropriate notifications.
         """
+        sch_number = None
         pg_dlg = QProgressDialog(
             parent=self
         )
@@ -1286,9 +1270,14 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             'Saving supporting documents, please wait...'
         ))
         pg_dlg.setValue(2)
+
+        # Format scheme number for saving in document repository
+        if not sch_number:
+            sch_number = scheme_obj.scheme_number.replace(" / ", "_")
+
         # Attach documents
         doc_objs = self._cmis_doc_mapper.persist_documents(
-            scheme_obj.scheme_number
+            sch_number
         )
         scheme_obj.documents = doc_objs
         QgsApplication.processEvents()

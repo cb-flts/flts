@@ -161,7 +161,7 @@
        <string/>
       </property>
       <property name="text">
-       <string>SG </string>
+       <string>S. G. No.</string>
       </property>
       <property name="readOnly">
        <bool>false</bool>
@@ -287,7 +287,7 @@
     <item row="14" column="1">
      <widget class="QLineEdit" name="lnedit_constitution_ref_num">
       <property name="text">
-       <string/>
+       <string>FC</string>
       </property>
       <property name="placeholderText">
        <string>Enter Consitution Reference Number</string>

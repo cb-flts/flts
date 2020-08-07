@@ -584,8 +584,9 @@ class PlotImportWidget(QWidget):
 
         try:
             # Move field book to permanent plot directory in CMIS server
+            sch_number = self._scheme_number.replace(" / ", "_")
             sch_fld_bk_id = self._field_bk_mgr.persist_documents(
-                self._scheme_number,
+                sch_number,
                 self._scheme_id
             )
             import_plot = ImportPlot(

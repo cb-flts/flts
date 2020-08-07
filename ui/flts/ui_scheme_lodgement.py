@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_scheme_lodgement.ui'
 #
-# Created: Tue Apr 28 15:18:43 2020
+# Created: Thu Aug  6 20:53:31 2020
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -145,7 +145,6 @@ class Ui_ldg_wzd(object):
         self.label_constitution_ref_num.setObjectName(_fromUtf8("label_constitution_ref_num"))
         self.gridLayout_4.addWidget(self.label_constitution_ref_num, 14, 0, 1, 1)
         self.lnedit_constitution_ref_num = QtGui.QLineEdit(self.wizardPage1)
-        self.lnedit_constitution_ref_num.setText(_fromUtf8(""))
         self.lnedit_constitution_ref_num.setObjectName(_fromUtf8("lnedit_constitution_ref_num"))
         self.gridLayout_4.addWidget(self.lnedit_constitution_ref_num, 14, 1, 1, 1)
         self.label_scheme_description = QtGui.QLabel(self.wizardPage1)
@@ -219,6 +218,8 @@ class Ui_ldg_wzd(object):
         self.tbw_documents.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
         self.tbw_documents.setSelectionMode(QtGui.QAbstractItemView.NoSelection)
         self.tbw_documents.setObjectName(_fromUtf8("tbw_documents"))
+        # self.tbw_documents.setColumnCount(0)
+        # self.tbw_documents.setRowCount(0)
         self.gridLayout.addWidget(self.tbw_documents, 2, 0, 1, 2)
         self.vlNotification_docs = QtGui.QVBoxLayout()
         self.vlNotification_docs.setContentsMargins(-1, -1, -1, 10)
@@ -245,6 +246,8 @@ class Ui_ldg_wzd(object):
         self.gridLayout_3.setObjectName(_fromUtf8("gridLayout_3"))
         self.tw_hld_prv = HoldersTableView(self.wizardPage2)
         self.tw_hld_prv.setObjectName(_fromUtf8("tw_hld_prv"))
+        # self.tw_hld_prv.setColumnCount(0)
+        # self.tw_hld_prv.setRowCount(0)
         self.gridLayout_3.addWidget(self.tw_hld_prv, 4, 0, 1, 3)
         self.lnEdit_hld_path = QtGui.QLineEdit(self.wizardPage2)
         self.lnEdit_hld_path.setEnabled(True)
@@ -322,7 +325,7 @@ class Ui_ldg_wzd(object):
         self.label_landhold_num.setText(_translate("ldg_wzd", "<html><head/><body><p>Land Hold Plan Number <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
         self.lnedit_landhold_num.setPlaceholderText(_translate("ldg_wzd", "Enter the Land Hold Plan number", None))
         self.label_sg_num.setText(_translate("ldg_wzd", "<html><head/><body><p>Surveyor General Number <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
-        self.lnedit_sg_num.setText(_translate("ldg_wzd", "SG ", None))
+        self.lnedit_sg_num.setText(_translate("ldg_wzd", "S. G. No.", None))
         self.lnedit_sg_num.setPlaceholderText(_translate("ldg_wzd", "Enter Surveyor General Number", None))
         self.label_schm_name.setText(_translate("ldg_wzd", "<html><head/><body><p>Scheme Name <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
         self.lnedit_schm_nam.setPlaceholderText(_translate("ldg_wzd", "Enter name of the Scheme", None))
@@ -333,6 +336,7 @@ class Ui_ldg_wzd(object):
         self.lnedit_title_deed_num.setText(_translate("ldg_wzd", "T", None))
         self.lnedit_title_deed_num.setPlaceholderText(_translate("ldg_wzd", "Enter Title Deed Number", None))
         self.label_constitution_ref_num.setText(_translate("ldg_wzd", "<html><head/><body><p>Constitution Ref. Number</p></body></html>", None))
+        self.lnedit_constitution_ref_num.setText(_translate("ldg_wzd", "FC", None))
         self.lnedit_constitution_ref_num.setPlaceholderText(_translate("ldg_wzd", "Enter Consitution Reference Number", None))
         self.label_scheme_description.setText(_translate("ldg_wzd", "<html><head/><body><p>Scheme Description <span style=\" color:#ff0000;\">*</span></p></body></html>", None))
         self.lnedit_scheme_description.setPlaceholderText(_translate("ldg_wzd", "Erf Number, Township Name", None))
