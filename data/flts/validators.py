@@ -43,7 +43,7 @@ from stdm.utils.reverse_dict import ReverseDict
 from stdm.data.configuration import entity_model
 
 CONFIG_COL_MAPPING_SECTION = 'ColumnMapping'
-DATE_FORMAT = '%d/%m/%Y'
+DATE_FORMAT = '%Y/%m/%d'
 
 # Validation result
 SUCCESS, WARNING, ERROR, UNDEFINED = range(4)
@@ -512,12 +512,12 @@ class DateValidator(AbstractColumnValidator):
             if isinstance(value, (datetime, date)):
                 value = value.strftime(DATE_FORMAT)
 
-            # Check if date is in dd-mm-yyyy
+            # Check if date is in yyyy-mm-dd
             try:
                 value = datetime.strptime(value, DATE_FORMAT)
                 is_date_valid = True
             except ValueError:
-                msg = 'Incorrect date format.\nExpected format dd-mm-yyyy.'
+                msg = 'Incorrect date format.\nExpected format yyyy-mm-dd.'
                 v_msg = self._create_validation_message(ERROR, msg)
                 self.add_validation_message(v_msg)
 
