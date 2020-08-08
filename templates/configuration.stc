@@ -127,9 +127,9 @@
     <CodeValue value="Not Uploaded" code="NP"/>
    </ValueList>
    <ValueList name="check_lht_nature_of_marriage">
-    <CodeValue value="Customary" code=""/>
     <CodeValue value="In Community of Property" code=""/>
     <CodeValue value="Out of Community of Property" code=""/>
+    <CodeValue value="Married" code=""/>
    </ValueList>
    <ValueList name="check_holder_document_type">
     <CodeValue value="Transfer Contract" code=""/>

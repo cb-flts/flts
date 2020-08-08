@@ -135,6 +135,33 @@ class DocumentGenerator(QObject):
         # Value formatter for output files
         self._file_name_value_formatter = None
 
+    def set_composition_vars_from_record(self, composition, record):
+        """
+        Sets the values of composition variables based on the value of similar
+        column names in the record.
+        :param composition: The object containing the template.
+        :type composition: QgsComposition
+        :param record: The row containing the data.
+        :type record: object
+        """
+        custom_props = composition.customProperty('variableNames', '')
+        custom_vals = composition.customProperty('variableValues', '')
+        if not custom_props:
+            return
+
+        needs_refresh = False
+        new_prop_values = []
+        for p_name, p_val in zip(custom_props, custom_vals):
+            if hasattr(record, p_name):
+                if not needs_refresh:
+                    needs_refresh = True
+                p_val = getattr(record, p_name)
+            new_prop_values.append(p_val)
+
+        if needs_refresh:
+            composition.setCustomProperty('variableValues', new_prop_values)
+            composition.refreshItems()
+
     def link_field(self):
         """
         :return: The field name in the data source that should also exist
@@ -332,6 +359,7 @@ class DocumentGenerator(QObject):
             for rec in records:
                 composition = QgsComposition(self._map_settings)
                 composition.loadFromTemplate(templateDoc)
+                self.set_composition_vars_from_record(composition, rec)
                 ref_layer = None
                 # Set value of composer items based on the corresponding db values
                 for composerId in composerDS.dataFieldMappings().reverse:
