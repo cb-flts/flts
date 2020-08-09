@@ -43,7 +43,7 @@ from stdm.utils.reverse_dict import ReverseDict
 from stdm.data.configuration import entity_model
 
 CONFIG_COL_MAPPING_SECTION = 'ColumnMapping'
-DATE_FORMAT = '%Y/%m/%d'
+DATE_FORMAT = "%Y-%m-%d"
 
 # Validation result
 SUCCESS, WARNING, ERROR, UNDEFINED = range(4)
