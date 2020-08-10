@@ -1246,40 +1246,41 @@ CREATE OR REPLACE FUNCTION "public"."flts_integer_to_text"(int4)
               WHEN $1=8 THEN 'Eight'
               WHEN $1=9 THEN 'Nine'
               WHEN $1=10 THEN 'Ten'
-              WHEN $1=11 THEN 'Eleven'
-              WHEN $1=12 THEN 'Twelve'
-              WHEN $1=13 THEN 'Thirteen'
-              WHEN $1=14 THEN 'Fourteen'
-              WHEN $1=15 THEN 'Fifteen'
-              WHEN $1=16 THEN 'Sixteen'
-              WHEN $1=17 THEN 'Seventeen'
-              WHEN $1=18 THEN 'Eighteen'
-              WHEN $1=19 THEN 'Nineteen'
+              WHEN $1=10 THEN ' One Zero'
+              WHEN $1=11 THEN ' One One'
+              WHEN $1=12 THEN ' One Two'
+              WHEN $1=13 THEN ' One Three'
+              WHEN $1=14 THEN ' One Four'
+              WHEN $1=15 THEN ' One Five'
+              WHEN $1=16 THEN ' One Six'
+              WHEN $1=17 THEN ' One Seven'
+              WHEN $1=18 THEN ' One Eight'
+              WHEN $1=19 THEN ' One Nine'
               WHEN $1<100 THEN CASE
-                 WHEN $1/10=2 THEN 'Twenty' || COALESCE(' ' || flts_integer_to_text($1%10), '')
-                 WHEN $1/10=3 THEN 'Thirty' || COALESCE(' ' || flts_integer_to_text($1%10), '')
-                 WHEN $1/10=4 THEN 'Fourty' || COALESCE(' ' || flts_integer_to_text($1%10), '')
-                 WHEN $1/10=5 THEN 'Fifty' || COALESCE(' ' || flts_integer_to_text($1%10), '')
-                 WHEN $1/10=6 THEN 'Sixty' || COALESCE(' ' || flts_integer_to_text($1%10), '')
-                 WHEN $1/10=7 THEN 'Seventy' || COALESCE(' ' || flts_integer_to_text($1%10), '')
-                 WHEN $1/10=8 THEN 'Eighty' || COALESCE(' ' || flts_integer_to_text($1%10), '')
-                 WHEN $1/10=9 THEN 'Ninety' || COALESCE(' ' || flts_integer_to_text($1%10), '')
+                 WHEN $1/10=2 THEN ' Two' || COALESCE(' ' || flts_integer_to_text($1%10), '')
+                 WHEN $1/10=3 THEN ' Three' || COALESCE(' ' || flts_integer_to_text($1%10), '')
+                 WHEN $1/10=4 THEN ' Four' || COALESCE(' ' || flts_integer_to_text($1%10), '')
+                 WHEN $1/10=5 THEN ' Five' || COALESCE(' ' || flts_integer_to_text($1%10), '')
+                 WHEN $1/10=6 THEN ' Six' || COALESCE(' ' || flts_integer_to_text($1%10), '')
+                 WHEN $1/10=7 THEN ' Seven' || COALESCE(' ' || flts_integer_to_text($1%10), '')
+                 WHEN $1/10=8 THEN ' Eight' || COALESCE(' ' || flts_integer_to_text($1%10), '')
+                 WHEN $1/10=9 THEN ' Nine' || COALESCE(' ' || flts_integer_to_text($1%10), '')
               END
               WHEN $1<1000
-                 THEN flts_integer_to_text($1/100) || ' Hundred' ||
-                      COALESCE(' and ' || flts_integer_to_text($1%100), '')
-              WHEN $1<1000000
-                 THEN flts_integer_to_text($1/1000) || ' Thousand' ||
-                      CASE WHEN $1%1000 < 100
-                         THEN COALESCE(' and ' || flts_integer_to_text($1%1000), '')
-                         ELSE COALESCE(' ' || flts_integer_to_text($1%1000), '')
-                      END
-              WHEN $1<1000000000
-                 THEN flts_integer_to_text($1/1000000) || ' Million' ||
-                      CASE WHEN $1%1000000 < 100
-                         THEN COALESCE(' and ' || flts_integer_to_text($1%1000000), '')
-                         ELSE COALESCE(' ' || flts_integer_to_text($1%1000000), '')
-                      END
+                 THEN flts_integer_to_text($1/100) || '' ||
+                      COALESCE('' || flts_integer_to_text($1%100), '')
+--               WHEN $1<1000000
+--                  THEN flts_integer_to_text($1/1000) || ' Thousand' ||
+--                       CASE WHEN $1%1000 < 100
+--                          THEN COALESCE(' and ' || flts_integer_to_text($1%1000), '')
+--                          ELSE COALESCE(' ' || flts_integer_to_text($1%1000), '')
+--                       END
+--               WHEN $1<1000000000
+--                  THEN flts_integer_to_text($1/1000000) || ' Million' ||
+--                       CASE WHEN $1%1000000 < 100
+--                          THEN COALESCE(' and ' || flts_integer_to_text($1%1000000), '')
+--                          ELSE COALESCE(' ' || flts_integer_to_text($1%1000000), '')
+--                       END
               ELSE NULL
          END$BODY$
   LANGUAGE sql IMMUTABLE STRICT
@@ -1301,7 +1302,7 @@ BEGIN
 		units := 'Hectares';
 	END IF;
 
-	RETURN rounded_area::TEXT || 'm² (' || flts_integer_to_text(rounded_area) || ') ' || units || measurement_txt;
+	RETURN rounded_area::TEXT || ' (' || flts_integer_to_text(rounded_area) || ') ' || units || measurement_txt;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
@@ -1319,6 +1320,17 @@ BEGIN
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
+CREATE OR REPLACE FUNCTION "public"."flts_ownership_text"("holder_row" "public"."cb_holder")
+  RETURNS "pg_catalog"."text" AS $BODY$BEGIN
+	IF holder_row.marital_status = 1 THEN
+		RETURN 'their heirs, executors, administrators, or assigned, are the registered the holder(s) of';
+	ELSE
+		RETURN 'his/her heirs, executors, administrators, or assigned, is the registered the holder of';
+	END IF;
+END$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
   
 ----------------Custom FLTS Views------------------------
 
@@ -1390,6 +1402,7 @@ CREATE OR REPLACE VIEW cb_plot_vw_lht_certificate_template AS
     SELECT cb_plot.id,
         cb_scheme.scheme_number,
         flts_gen_cert_number() AS certificate_number,
+        flts_ownership_text(cb_holder.*) AS ownership_text,
         concat('I, the Land Rights Registrar at ', cb_check_lht_land_rights_office.value, ', hereby certify that') AS land_rights_office_text,
         concat(upper((cb_holder.holder_first_name)::text), ' ', upper((cb_holder.holder_surname)::text)) AS full_name,
         concat('Identity Number ', cb_holder.holder_identifier) AS holder_id,
