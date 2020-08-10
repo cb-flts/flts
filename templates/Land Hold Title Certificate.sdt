@@ -1,5 +1,5 @@
 <Composer title="Land Hold Title Certificate" visible="1">
- <Composition resizeToContentsMarginLeft="0.3" snapping="0" showPages="1" guidesVisible="1" resizeToContentsMarginTop="0" worldFileMap="{611597f7-cdc5-4818-b263-ab6cf21d009b}" alignmentSnap="1" printResolution="300" paperWidth="210" gridVisible="0" snapGridOffsetX="0" smartGuides="1" snapGridOffsetY="0" resizeToContentsMarginRight="0" snapTolerancePixels="5" printAsRaster="0" generateWorldFile="0" paperHeight="297" numPages="2" snapGridResolution="10" resizeToContentsMarginBottom="0">
+ <Composition resizeToContentsMarginLeft="0.3" snapping="0" showPages="1" guidesVisible="1" resizeToContentsMarginTop="0" worldFileMap="{6d7eaeb1-1aba-4a08-a4bb-82d18a0170e5}" alignmentSnap="1" printResolution="300" paperWidth="210" gridVisible="0" snapGridOffsetX="0" smartGuides="1" snapGridOffsetY="0" resizeToContentsMarginRight="0" snapTolerancePixels="5" printAsRaster="0" generateWorldFile="0" paperHeight="297" numPages="2" snapGridResolution="10" resizeToContentsMarginBottom="0">
   <symbol alpha="1" clip_to_extent="1" type="fill" name="">
    <layer pass="0" class="SimpleFill" locked="0">
     <prop k="border_width_map_unit_scale" v="0,0,0,0,0,0"/>
@@ -18,28 +18,32 @@
   <SnapLine y1="0" x1="0" y2="604" x2="0"/>
   <SnapLine y1="432.91" x1="0" y2="432.91" x2="210"/>
   <SnapLine y1="175.519" x1="0" y2="175.519" x2="210"/>
-  <SnapLine y1="35.8704" x1="0" y2="35.8704" x2="210"/>
-  <SnapLine y1="45.4542" x1="0" y2="45.4542" x2="210"/>
+  <SnapLine y1="66.284" x1="0" y2="66.284" x2="210"/>
+  <SnapLine y1="74.5695" x1="0" y2="74.5695" x2="210"/>
   <SnapLine y1="0" x1="105.968" y2="604" x2="105.968"/>
   <SnapLine y1="0" x1="39.8854" y2="604" x2="39.8854"/>
   <SnapLine y1="279.844" x1="0" y2="279.844" x2="210"/>
-  <SnapLine y1="586.797" x1="0" y2="586.797" x2="210"/>
-  <SnapLine y1="0" x1="203.996" y2="604" x2="203.996"/>
+  <SnapLine y1="587.649" x1="0" y2="587.649" x2="210"/>
+  <SnapLine y1="0" x1="200.371" y2="604" x2="200.371"/>
   <SnapLine y1="346.656" x1="0" y2="346.656" x2="210"/>
   <SnapLine y1="0" x1="47.9185" y2="604" x2="47.9185"/>
+  <SnapLine y1="0" x1="115.79" y2="604" x2="115.79"/>
+  <SnapLine y1="0" x1="6.35222" y2="604" x2="6.35222"/>
+  <SnapLine y1="57.9295" x1="0" y2="57.9295" x2="210"/>
+  <SnapLine y1="49.4368" x1="0" y2="49.4368" x2="210"/>
   <ComposerLabel valign="128" marginX="1" marginY="1" labelText="_________________________________________________________________________________________________" htmlState="0" halign="4">
    <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="40.4378" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="true" x="40.15" y="40.4378" visibility="1" zValue="72" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="166.564" outlineWidth="0.3" excludeFromExports="0" uuid="{8959741d-9d54-4bf9-9872-f7b17eca8524}" height="6.2" itemRotation="0" frame="false" pagex="40.15">
+   <ComposerItem pagey="41.4378" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.15" y="41.4378" visibility="1" zValue="72" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="166.564" outlineWidth="0.3" excludeFromExports="0" uuid="{02d6e85e-b040-40da-befc-46fd9ae7cd25}" height="6.2" itemRotation="0" frame="false" pagex="40.15">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
    </ComposerItem>
   </ComposerLabel>
-  <ComposerLabel valign="32" marginX="0" marginY="1" labelText="and" htmlState="0" halign="1">
+  <ComposerLabel valign="32" marginX="0" marginY="0" labelText="and" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="141" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="47.9185" y="141" visibility="1" zValue="72" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="19.1848" outlineWidth="0.3" excludeFromExports="0" uuid="{49364270-1a9f-4c2d-a2db-f4ccccd83887}" height="8.22495" itemRotation="0" frame="false" pagex="47.9185">
+   <ComposerItem pagey="141" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="47.9185" y="141" visibility="1" zValue="72" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="18.6374" outlineWidth="0.3" excludeFromExports="0" uuid="{7934c75a-8f18-4ecd-886a-c28f57fb1f3e}" height="8.22495" itemRotation="0" frame="false" pagex="47.9185">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="141 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
@@ -49,16 +53,26 @@
   <ComposerLabel valign="32" marginX="1" marginY="1" labelText="PAGE 2 OF 2" htmlState="0" halign="2">
    <LabelFont description="Arial,8,-1,5,75,0,0,0,0,0" style=""/>
    <FontColor red="130" blue="130" green="130"/>
-   <ComposerItem pagey="279.797" page="2" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="177.692" y="586.797" visibility="1" zValue="42" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="26.3046" outlineWidth="0.3" excludeFromExports="0" uuid="{2a65a86b-43a3-4d7e-87db-6ff132926c2f}" height="6.29787" itemRotation="0" frame="false" pagex="177.692">
+   <ComposerItem pagey="282.647" page="2" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="177.692" y="589.647" visibility="1" zValue="42" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="22.691" outlineWidth="0.3" excludeFromExports="0" uuid="{2bd1577c-35f4-413d-837d-946b197470db}" height="6.44787" itemRotation="0" frame="false" pagex="177.692">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="0" marginY="0" labelText="[cb_plot_vw_lht_certificate_template.ownership_text]" htmlState="0" halign="1">
+   <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="85" page="1" id="{dd92e163-7dae-40c6-9d87-49d6660dbe60}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.15" y="85" visibility="1" zValue="42" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="163.847" outlineWidth="0.3" excludeFromExports="0" uuid="{dd92e163-7dae-40c6-9d87-49d6660dbe60}" height="7.96908" itemRotation="0" frame="false" pagex="40.15">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <dataDefinedPositionY expr="85 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
     <customproperties/>
    </ComposerItem>
   </ComposerLabel>
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.footer_text]" htmlState="0" halign="1">
    <LabelFont description="Arial,8,-1,5,75,0,0,0,0,0" style=""/>
    <FontColor red="130" blue="130" green="130"/>
-   <ComposerItem pagey="280.071" page="2" id="{e57af3af-d6df-4695-aff7-484159276312}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.85" y="587.071" visibility="1" zValue="41" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="128.258" outlineWidth="0.3" excludeFromExports="0" uuid="{e57af3af-d6df-4695-aff7-484159276312}" height="6.2" itemRotation="0" frame="false" pagex="39.85">
+   <ComposerItem pagey="282.649" page="2" id="{26405afc-83ae-4665-8e8d-e01ecd29c8ae}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.85" y="589.649" visibility="1" zValue="41" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="128.258" outlineWidth="0.3" excludeFromExports="0" uuid="{26405afc-83ae-4665-8e8d-e01ecd29c8ae}" height="6.44555" itemRotation="0" frame="false" pagex="39.85">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -67,7 +81,16 @@
   <ComposerLabel valign="128" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.land_hold_plan_no_text]" htmlState="0" halign="4">
    <LabelFont description="Arial,10,-1,5,75,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="18.3937" page="2" id="{f7c1e0f5-1507-4667-904a-a463fc96690f}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.85" y="325.394" visibility="1" zValue="41" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="159.383" outlineWidth="0.3" excludeFromExports="0" uuid="{f7c1e0f5-1507-4667-904a-a463fc96690f}" height="6.2" itemRotation="0" frame="false" pagex="40.85">
+   <ComposerItem pagey="18.3937" page="2" id="{ea58707d-c1a8-4d2a-94e0-c3829bea0443}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.85" y="325.394" visibility="1" zValue="41" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="159.383" outlineWidth="0.3" excludeFromExports="0" uuid="{ea58707d-c1a8-4d2a-94e0-c3829bea0443}" height="6.2" itemRotation="0" frame="false" pagex="40.85">
+    <FrameColor alpha="255" red="0" blue="0" green="0"/>
+    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
+    <customproperties/>
+   </ComposerItem>
+  </ComposerLabel>
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="the Flexible Land Tenure Act, 2012 (Act No. 4 of 2012)" htmlState="0" halign="4">
+   <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
+   <FontColor red="0" blue="0" green="0"/>
+   <ComposerItem pagey="32.6257" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="true" x="39.85" y="32.6257" visibility="1" zValue="41" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="166.864" outlineWidth="0.3" excludeFromExports="0" uuid="{319902bd-163c-4e9f-9314-43cebd4442d9}" height="6.82442" itemRotation="0" frame="false" pagex="39.85">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -76,7 +99,7 @@
   <ComposerLabel valign="32" marginX="1" marginY="1" labelText="PAGE 1 OF 2" htmlState="0" halign="2">
    <LabelFont description="MS Shell Dlg 2,8,-1,5,75,0,0,0,0,0" style=""/>
    <FontColor red="130" blue="130" green="130"/>
-   <ComposerItem pagey="279.844" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="177.692" y="279.844" visibility="1" zValue="40" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="26.1935" outlineWidth="0.3" excludeFromExports="0" uuid="{bfc41b2c-6a79-4681-945b-e367c4e31971}" height="6.2" itemRotation="0" frame="false" pagex="177.692">
+   <ComposerItem pagey="280.844" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="177.692" y="280.844" visibility="1" zValue="40" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="22.691" outlineWidth="0.3" excludeFromExports="0" uuid="{f4db64f2-1c0d-45c0-9973-0dfac14deacd}" height="6.2" itemRotation="0" frame="false" pagex="177.692">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -85,7 +108,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.plot_number_description]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="95" page="1" id="{44d21be1-2522-46a8-ba15-181f06efa614}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="69.4439" y="95" visibility="1" zValue="40" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="135.192" outlineWidth="0.3" excludeFromExports="0" uuid="{44d21be1-2522-46a8-ba15-181f06efa614}" height="8.064" itemRotation="0" frame="false" pagex="69.4439">
+   <ComposerItem pagey="95" page="1" id="{4f188423-2ad9-4f98-851b-6d7eea654db8}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="69.4439" y="95" visibility="1" zValue="40" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="135.192" outlineWidth="0.3" excludeFromExports="0" uuid="{4f188423-2ad9-4f98-851b-6d7eea654db8}" height="8.064" itemRotation="0" frame="false" pagex="69.4439">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="95 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
@@ -95,7 +118,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.reg_division]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="116" page="1" id="{271aa67a-b467-49f4-9036-e2c129f6dc0a}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="69.4439" y="116" visibility="1" zValue="40" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="134.891" outlineWidth="0.3" excludeFromExports="0" uuid="{271aa67a-b467-49f4-9036-e2c129f6dc0a}" height="7.579" itemRotation="0" frame="false" pagex="69.4439">
+   <ComposerItem pagey="116" page="1" id="{6eeec798-ac8e-4676-8d8b-3154fe4e0514}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="69.4439" y="116" visibility="1" zValue="40" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="134.891" outlineWidth="0.3" excludeFromExports="0" uuid="{6eeec798-ac8e-4676-8d8b-3154fe4e0514}" height="7.579" itemRotation="0" frame="false" pagex="69.4439">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="116 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
@@ -105,7 +128,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.plot_scheme_text]" htmlState="0" halign="4">
    <LabelFont description="Arial,10,-1,5,75,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="24.6483" page="2" id="{d24c931f-fc99-4059-8ad6-4fada5657f07}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.85" y="331.648" visibility="1" zValue="40" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="159.383" outlineWidth="0.3" excludeFromExports="0" uuid="{d24c931f-fc99-4059-8ad6-4fada5657f07}" height="6.2" itemRotation="0" frame="false" pagex="40.85">
+   <ComposerItem pagey="24.6483" page="2" id="{e927e2d4-7c99-47fa-895d-e56f1ef1d8c0}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.85" y="331.648" visibility="1" zValue="40" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="159.383" outlineWidth="0.3" excludeFromExports="0" uuid="{e927e2d4-7c99-47fa-895d-e56f1ef1d8c0}" height="6.2" itemRotation="0" frame="false" pagex="40.85">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -114,14 +137,14 @@
   <ComposerLabel valign="128" marginX="1" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.certificate_number]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="35.7878" page="1" id="{b13706e8-4e82-4425-9cb0-9aca8df3b8d6}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="124.418" y="35.7878" visibility="1" zValue="39" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="43.6898" outlineWidth="0.3" excludeFromExports="0" uuid="{b13706e8-4e82-4425-9cb0-9aca8df3b8d6}" height="9.7" itemRotation="0" frame="false" pagex="124.418">
+   <ComposerItem pagey="36.7878" page="1" id="{eb1ee0b2-6727-4b7e-a85c-ab685b04262f}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="124.418" y="36.7878" visibility="1" zValue="39" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="43.6898" outlineWidth="0.3" excludeFromExports="0" uuid="{eb1ee0b2-6727-4b7e-a85c-ab685b04262f}" height="9.7" itemRotation="0" frame="false" pagex="124.418">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
    </ComposerItem>
   </ComposerLabel>
   <ComposerMap followPreset="false" mapRotation="0" keepLayerSet="true" followPresetName="" id="1" previewMode="Rectangle" drawCanvasItems="true">
-   <Extent ymin="-17.76950781299608195" xmin="15.72417192043061895" ymax="-17.76713016014407742" xmax="15.72728306447607061"/>
+   <Extent ymin="-17.76950781299608195" xmin="15.72417192043061895" ymax="-17.76712088127248634" xmax="15.72728306447607061"/>
    <LayerSet/>
    <Grid/>
    <ComposerMapGrid rightAnnotationDirection="0" gridFramePenColor="0,0,0,255" show="0" bottomAnnotationPosition="1" annotationPrecision="3" showAnnotation="0" topFrameDivisions="0" uuid="{c29d6cb1-428f-4501-a4f9-c13f19ca8c00}" leftAnnotationDirection="0" topAnnotationPosition="1" rightAnnotationDisplay="0" offsetX="0" offsetY="0" rightFrameDivisions="0" gridStyle="0" annotationFontColor="0,0,0,255" intervalX="0" gridFrameSideFlags="15" intervalY="0" bottomAnnotationDirection="0" leftAnnotationDisplay="0" leftFrameDivisions="0" frameFillColor1="255,255,255,255" annotationExpression="" frameFillColor2="0,0,0,255" crossLength="3" gridFramePenThickness="0.5" bottomAnnotationDisplay="0" unit="0" topAnnotationDisplay="0" leftAnnotationPosition="1" blendMode="0" gridFrameStyle="0" rightAnnotationPosition="1" gridFrameWidth="2" name="Grid 1" annotationFormat="0" bottomFrameDivisions="0" topAnnotationDirection="0" frameAnnotationDistance="1">
@@ -173,7 +196,7 @@
     <annotationFontProperties description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
    </ComposerMapGrid>
    <AtlasMap scalingMode="2" atlasDriven="0" margin="0.10000000000000001"/>
-   <ComposerItem pagey="151.743" page="2" id="{611597f7-cdc5-4818-b263-ab6cf21d009b}" lastValidViewScaleFactor="3.65203" positionMode="0" positionLock="false" x="39.85" y="458.743" visibility="1" zValue="38" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="164.636" outlineWidth="0.3" excludeFromExports="0" uuid="{611597f7-cdc5-4818-b263-ab6cf21d009b}" height="125.821" itemRotation="0" frame="true" pagex="39.85">
+   <ComposerItem pagey="151.743" page="2" id="{6d7eaeb1-1aba-4a08-a4bb-82d18a0170e5}" lastValidViewScaleFactor="3.65203" positionMode="0" positionLock="false" x="39.85" y="458.743" visibility="1" zValue="38" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="163.996" outlineWidth="0.3" excludeFromExports="0" uuid="{6d7eaeb1-1aba-4a08-a4bb-82d18a0170e5}" height="125.821" itemRotation="0" frame="true" pagex="39.85">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -182,7 +205,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.footer_text]" htmlState="0" halign="1">
    <LabelFont description="Arial,8,-1,5,75,0,0,0,0,0" style=""/>
    <FontColor red="130" blue="130" green="130"/>
-   <ComposerItem pagey="279.844" page="1" id="{e4781012-a781-45d5-8a85-f2f6d40b3c81}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.85" y="279.844" visibility="1" zValue="38" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="125.628" outlineWidth="0.3" excludeFromExports="0" uuid="{e4781012-a781-45d5-8a85-f2f6d40b3c81}" height="6.2" itemRotation="0" frame="false" pagex="39.85">
+   <ComposerItem pagey="280.844" page="1" id="{a45ee924-6709-43db-8fdd-8cce364caa76}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.8854" y="280.844" visibility="1" zValue="38" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="125.593" outlineWidth="0.3" excludeFromExports="0" uuid="{a45ee924-6709-43db-8fdd-8cce364caa76}" height="6.2" itemRotation="0" frame="false" pagex="39.8854">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -191,7 +214,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="(a)" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="95" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.7" y="95" visibility="1" zValue="38" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="8.63022" outlineWidth="0.3" excludeFromExports="0" uuid="{59331c6c-2b50-4745-a9f9-12626c233f02}" height="6.2" itemRotation="0" frame="false" pagex="39.7">
+   <ComposerItem pagey="95" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.7" y="95" visibility="1" zValue="38" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="8.63022" outlineWidth="0.3" excludeFromExports="0" uuid="{3bec60f8-f5ee-454c-a6b9-6de796278bd6}" height="6.2" itemRotation="0" frame="false" pagex="39.7">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="95 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
@@ -199,7 +222,7 @@
    </ComposerItem>
   </ComposerLabel>
   <ComposerMap followPreset="false" mapRotation="0" keepLayerSet="false" followPresetName="" id="0" previewMode="Render" drawCanvasItems="true">
-   <Extent ymin="-17.76950694564709465" xmin="15.7238284347065278" ymax="-17.7669211427960505" xmax="15.72763147593525268"/>
+   <Extent ymin="-17.76950694564709465" xmin="15.7238284347065278" ymax="-17.76691106744087989" xmax="15.72763147593525268"/>
    <LayerSet/>
    <Grid/>
    <ComposerMapGrid rightAnnotationDirection="0" gridFramePenColor="0,0,0,255" show="0" bottomAnnotationPosition="1" annotationPrecision="3" showAnnotation="0" topFrameDivisions="0" uuid="{d0f40319-25c3-4128-bd34-449635922024}" leftAnnotationDirection="0" topAnnotationPosition="1" rightAnnotationDisplay="0" offsetX="0" offsetY="0" rightFrameDivisions="0" gridStyle="0" annotationFontColor="0,0,0,255" intervalX="0" gridFrameSideFlags="15" intervalY="0" bottomAnnotationDirection="0" leftAnnotationDisplay="0" leftFrameDivisions="0" frameFillColor1="255,255,255,255" annotationExpression="" frameFillColor2="0,0,0,255" crossLength="3" gridFramePenThickness="0.5" bottomAnnotationDisplay="0" unit="0" topAnnotationDisplay="0" leftAnnotationPosition="1" blendMode="0" gridFrameStyle="0" rightAnnotationPosition="1" gridFrameWidth="2" name="Grid 1" annotationFormat="0" bottomFrameDivisions="0" topAnnotationDirection="0" frameAnnotationDistance="1">
@@ -251,7 +274,7 @@
     <annotationFontProperties description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
    </ComposerMapGrid>
    <AtlasMap scalingMode="2" atlasDriven="0" margin="0.10000000000000001"/>
-   <ComposerItem pagey="35" page="2" id="" lastValidViewScaleFactor="3.65203" positionMode="0" positionLock="false" x="39.85" y="342" visibility="1" zValue="37" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="164.636" outlineWidth="0.3" excludeFromExports="0" uuid="{8a8246e9-20e7-4256-a61b-0276ceed988b}" height="111.941" itemRotation="0" frame="true" pagex="39.85">
+   <ComposerItem pagey="35" page="2" id="" lastValidViewScaleFactor="6.58324" positionMode="0" positionLock="false" x="39.85" y="342" visibility="1" zValue="37" background="true" transparency="0" frameJoinStyle="miter" blendMode="0" width="163.997" outlineWidth="0.3" excludeFromExports="0" uuid="{10bffa7c-ba08-4edf-8853-c1dc4702677c}" height="111.941" itemRotation="0" frame="true" pagex="39.85">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -260,7 +283,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.imposing_condition_text2]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="188" page="1" id="{d21d00f6-89de-45d8-9a7b-f23f1a3da31a}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40" y="188" visibility="1" zValue="37" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="154.174" outlineWidth="0.3" excludeFromExports="0" uuid="{d21d00f6-89de-45d8-9a7b-f23f1a3da31a}" height="6.2" itemRotation="0" frame="false" pagex="40">
+   <ComposerItem pagey="188" page="1" id="{74ced3a1-b187-4aa9-971b-b5ee271c197f}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.8854" y="188" visibility="1" zValue="37" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="154.289" outlineWidth="0.3" excludeFromExports="0" uuid="{74ced3a1-b187-4aa9-971b-b5ee271c197f}" height="6.2" itemRotation="0" frame="false" pagex="39.8854">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="188 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
@@ -270,17 +293,17 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.region]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="123" page="1" id="{95b38b84-4e27-44ec-bbb4-415f6412199d}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="69.4439" y="123" visibility="1" zValue="37" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="134.891" outlineWidth="0.3" excludeFromExports="0" uuid="{95b38b84-4e27-44ec-bbb4-415f6412199d}" height="6.24658" itemRotation="0" frame="false" pagex="69.4439">
+   <ComposerItem pagey="123" page="1" id="{699a8849-86a2-47ca-b953-f583e35b1067}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="69.4439" y="123" visibility="1" zValue="37" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="134.891" outlineWidth="0.3" excludeFromExports="0" uuid="{699a8849-86a2-47ca-b953-f583e35b1067}" height="6.24658" itemRotation="0" frame="false" pagex="69.4439">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="123 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
     <customproperties/>
    </ComposerItem>
   </ComposerLabel>
-  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="(b)" htmlState="0" halign="1">
+  <ComposerLabel valign="32" marginX="0" marginY="1" labelText="(b)" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="148" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.85" y="148" visibility="1" zValue="37" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="8.02304" outlineWidth="0.3" excludeFromExports="0" uuid="{29e04cf4-f3f7-4026-aefc-6f3d267bfb83}" height="6.2" itemRotation="0" frame="false" pagex="39.85">
+   <ComposerItem pagey="148" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.85" y="148" visibility="1" zValue="37" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="8.02304" outlineWidth="0.3" excludeFromExports="0" uuid="{3df3250c-6c36-49ff-967a-b6abfaa6920e}" height="6.2" itemRotation="0" frame="false" pagex="39.85">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="148 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
@@ -290,7 +313,7 @@
   <ComposerLabel valign="128" marginX="1" marginY="1" labelText="________________________________________________________________________________________________" htmlState="0" halign="4">
    <LabelFont description="MS Shell Dlg 2,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="11.7502" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.15" y="11.7502" visibility="1" zValue="36" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="166.564" outlineWidth="0.3" excludeFromExports="0" uuid="{fca3e522-ab17-4de4-a0a2-b8bdd3ceae02}" height="6.2" itemRotation="0" frame="false" pagex="40.15">
+   <ComposerItem pagey="11.7502" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.85" y="11.7502" visibility="1" zValue="36" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="166.864" outlineWidth="0.3" excludeFromExports="0" uuid="{fbd3b835-1f99-4447-94bb-78920262125b}" height="6.2" itemRotation="0" frame="false" pagex="39.85">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -299,7 +322,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="…………………………………… &#xa;Land Rights Registrar&#xa;" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="255.375" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.85" y="255.375" visibility="1" zValue="36" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="164.485" outlineWidth="0.3" excludeFromExports="0" uuid="{f2cc8631-72d3-4609-be1f-b023f9ce6848}" height="14.4813" itemRotation="0" frame="false" pagex="39.85">
+   <ComposerItem pagey="255.375" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.8854" y="255.375" visibility="1" zValue="36" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="164.45" outlineWidth="0.3" excludeFromExports="0" uuid="{3a08e01f-1db4-49a8-be10-6225ec17cd49}" height="14.4813" itemRotation="0" frame="false" pagex="39.8854">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -308,7 +331,7 @@
   <ComposerLabel valign="128" marginX="0" marginY="1" labelText="LAND HOLD PLAN" htmlState="0" halign="4">
    <LabelFont description="Arial,10,-1,5,75,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="11.7529" page="2" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.85" y="318.753" visibility="1" zValue="36" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="159.383" outlineWidth="0.3" excludeFromExports="0" uuid="{684f99a3-16a0-44f5-959e-2f880badb9e3}" height="6.2" itemRotation="0" frame="false" pagex="40.85">
+   <ComposerItem pagey="11.7529" page="2" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.85" y="318.753" visibility="1" zValue="36" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="159.383" outlineWidth="0.3" excludeFromExports="0" uuid="{dadcb507-67e3-497b-a9d5-96082e262d54}" height="6.2" itemRotation="0" frame="false" pagex="40.85">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -317,7 +340,7 @@
   <ComposerLabel valign="128" marginX="1" marginY="1" labelText="Certificate No. " htmlState="0" halign="4">
    <LabelFont description="Arial,10,-1,5,75,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="35.8704" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="true" x="98.9036" y="35.8704" visibility="1" zValue="36" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="28.5058" outlineWidth="0.3" excludeFromExports="0" uuid="{ff710c02-a2f8-4ce8-a22a-cd39d1437463}" height="9.4338" itemRotation="0" frame="false" pagex="98.9036">
+   <ComposerItem pagey="36.8704" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="98.9036" y="36.8704" visibility="1" zValue="36" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="28.5058" outlineWidth="0.3" excludeFromExports="0" uuid="{6c58d25b-108b-48f6-8d74-da5bc7cb967c}" height="9.4338" itemRotation="0" frame="false" pagex="98.9036">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -326,7 +349,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.area_in_words]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="130" page="1" id="{62c54e03-e788-4c6f-8669-343a7b91e570}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="69.5949" y="130" visibility="1" zValue="35" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="134.891" outlineWidth="0.3" excludeFromExports="0" uuid="{62c54e03-e788-4c6f-8669-343a7b91e570}" height="9.61128" itemRotation="0" frame="false" pagex="69.5949">
+   <ComposerItem pagey="130" page="1" id="{4efccdcb-7a4d-4e30-bb02-18a02fba5cf1}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="69.5949" y="130" visibility="1" zValue="35" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="134.891" outlineWidth="0.3" excludeFromExports="0" uuid="{4efccdcb-7a4d-4e30-bb02-18a02fba5cf1}" height="9.61128" itemRotation="0" frame="false" pagex="69.5949">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="130 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
@@ -336,7 +359,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.imposing_condition_text]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="174" page="1" id="{2d19dbb7-fe20-48c2-854c-1349c2715449}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.15" y="174" visibility="1" zValue="34" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="164.185" outlineWidth="0.3" excludeFromExports="0" uuid="{2d19dbb7-fe20-48c2-854c-1349c2715449}" height="13.4066" itemRotation="0" frame="false" pagex="40.15">
+   <ComposerItem pagey="174" page="1" id="{3776d460-abc3-4328-9fea-d236f1a18476}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.8854" y="174" visibility="1" zValue="34" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="164.45" outlineWidth="0.3" excludeFromExports="0" uuid="{3776d460-abc3-4328-9fea-d236f1a18476}" height="13.4066" itemRotation="0" frame="false" pagex="39.8854">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="174 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
@@ -346,7 +369,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.authority]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="109" page="1" id="{8165db3e-b901-423f-842e-1b25548e404a}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="69.4439" y="109" visibility="1" zValue="32" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="135.192" outlineWidth="0.3" excludeFromExports="0" uuid="{8165db3e-b901-423f-842e-1b25548e404a}" height="7.6139" itemRotation="0" frame="false" pagex="69.4439">
+   <ComposerItem pagey="109" page="1" id="{19c9e0e8-bddc-457c-b963-71422ef23e9e}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="69.4439" y="109" visibility="1" zValue="32" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="135.192" outlineWidth="0.3" excludeFromExports="0" uuid="{19c9e0e8-bddc-457c-b963-71422ef23e9e}" height="7.6139" itemRotation="0" frame="false" pagex="69.4439">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="109 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
@@ -356,7 +379,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.nature_of_marriage]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="74" page="1" id="{aa13cbb5-6695-41ad-a52a-6780e4527ae2}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="true" x="40.15" y="74" visibility="1" zValue="31" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="154.024" outlineWidth="0.3" excludeFromExports="0" uuid="{aa13cbb5-6695-41ad-a52a-6780e4527ae2}" height="12.8545" itemRotation="0" frame="false" pagex="40.15">
+   <ComposerItem pagey="74" page="1" id="{6a0ce8b4-be0f-42e5-acd4-6edd6212347c}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="true" x="40.15" y="74" visibility="1" zValue="31" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="154.024" outlineWidth="0.3" excludeFromExports="0" uuid="{6a0ce8b4-be0f-42e5-acd4-6edd6212347c}" height="12.8545" itemRotation="0" frame="false" pagex="40.15">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="74 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
@@ -366,7 +389,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.spouse_name]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="81.0841" page="1" id="{42bdb1cd-ae41-4e3a-8e68-8764df5ebfaa}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="true" x="40.15" y="81.0841" visibility="1" zValue="30" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="160.083" outlineWidth="0.3" excludeFromExports="0" uuid="{42bdb1cd-ae41-4e3a-8e68-8764df5ebfaa}" height="8.0639" itemRotation="0" frame="false" pagex="40.15">
+   <ComposerItem pagey="81.0841" page="1" id="{cf4aca36-ac60-4927-a8e0-ca35ad9ab00a}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="true" x="40.15" y="81.0841" visibility="1" zValue="30" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="160.083" outlineWidth="0.3" excludeFromExports="0" uuid="{cf4aca36-ac60-4927-a8e0-ca35ad9ab00a}" height="8.0639" itemRotation="0" frame="false" pagex="40.15">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -375,25 +398,25 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.spouse_document_identifier]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="89.448" page="1" id="{772164b7-0066-4001-8afd-2d74d20ad905}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.3" y="89.448" visibility="1" zValue="30" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="159.933" outlineWidth="0.3" excludeFromExports="0" uuid="{772164b7-0066-4001-8afd-2d74d20ad905}" height="8.2139" itemRotation="0" frame="false" pagex="40.3">
+   <ComposerItem pagey="89.448" page="1" id="{169202b1-aecf-4a25-b0d7-4dca22ef274d}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.8854" y="89.448" visibility="1" zValue="30" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="160.348" outlineWidth="0.3" excludeFromExports="0" uuid="{169202b1-aecf-4a25-b0d7-4dca22ef274d}" height="8.2139" itemRotation="0" frame="false" pagex="39.8854">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
    </ComposerItem>
   </ComposerLabel>
-  <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.append_and]" htmlState="0" halign="1">
+  <ComposerLabel valign="32" marginX="0" marginY="-1" labelText="[cb_plot_vw_lht_certificate_template.append_and]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="74.7871" page="1" id="{0f1d1a79-4b49-443b-9150-20e2ea17ba10}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40" y="74.7871" visibility="1" zValue="29" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="70.5201" outlineWidth="0.3" excludeFromExports="0" uuid="{0f1d1a79-4b49-443b-9150-20e2ea17ba10}" height="5.99703" itemRotation="0" frame="false" pagex="40">
+   <ComposerItem pagey="74.7871" page="1" id="{cef9496e-4e05-4417-98a6-4f2a62d78b1b}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.15" y="74.7871" visibility="1" zValue="29" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="70.3701" outlineWidth="0.3" excludeFromExports="0" uuid="{cef9496e-4e05-4417-98a6-4f2a62d78b1b}" height="5.99703" itemRotation="0" frame="false" pagex="40.15">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
    </ComposerItem>
   </ComposerLabel>
-  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="Issued in terms of section 13(12) and regulation 22(1)(b) of &#xa;the Flexible Land Tenure Act, 2012 (Act No. 4 of 2012)&#xa;" htmlState="0" halign="4">
+  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="Issued in terms of section 13(12) and regulation 22(1)(b) of &#xa;&#xa;" htmlState="0" halign="4">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="27.7379" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.15" y="27.7379" visibility="1" zValue="28" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="166.564" outlineWidth="0.3" excludeFromExports="0" uuid="{3e1dccb4-1091-4c96-a7e1-1d75cc73b84d}" height="10.7894" itemRotation="0" frame="false" pagex="40.15">
+   <ComposerItem pagey="27.7379" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="true" x="40.15" y="27.7379" visibility="1" zValue="28" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="166.564" outlineWidth="0.3" excludeFromExports="0" uuid="{fb0e8d8f-dca2-4da6-9340-ca3ff628e55c}" height="6.4616" itemRotation="0" frame="false" pagex="40.15">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -402,7 +425,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="Signed on this …………….. day of ………………… 20…… and confirmed with my seal of office." htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="234" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.85" y="234" visibility="1" zValue="23" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="164.485" outlineWidth="0.3" excludeFromExports="0" uuid="{58c01bb4-daf8-4d2b-8053-64868a41811b}" height="9.47166" itemRotation="0" frame="false" pagex="39.85">
+   <ComposerItem pagey="234" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.85" y="234" visibility="1" zValue="23" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="164.485" outlineWidth="0.3" excludeFromExports="0" uuid="{cbaafa4f-54ad-428a-809a-f2a10f4b0722}" height="9.47166" itemRotation="0" frame="false" pagex="39.85">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -411,7 +434,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="an undivided share in the common property on the said land in the said scheme, as shown and more fully described in the said Land Hold Plan, and that the said holder’s title to the said plot and undivided share in the said common property are subject to, or shall benefit by: the servitudes, other real rights and conditions if any, endorsed in the said Land Hold Plan; and the servitudes referred to in section 10(5) of the Flexible Land Tenure Act, 2012. &#xa;" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="148" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="47.9185" y="148" visibility="1" zValue="19" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="156.317" outlineWidth="0.2" excludeFromExports="0" uuid="{68a3db96-4b47-46c9-a788-4c1a36a2070e}" height="23.2984" itemRotation="0" frame="false" pagex="47.9185">
+   <ComposerItem pagey="148" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="47.9185" y="148" visibility="1" zValue="19" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="155.77" outlineWidth="0.2" excludeFromExports="0" uuid="{d6c90794-98cd-40bd-ac94-9dec9cb4f58f}" height="23.2984" itemRotation="0" frame="false" pagex="47.9185">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="148 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
@@ -421,7 +444,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.scheme_name]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="102" page="1" id="{0eb7698d-1563-42c9-a2cd-d99d409a33a2}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="69.4439" y="102" visibility="1" zValue="17" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="135.192" outlineWidth="0.3" excludeFromExports="0" uuid="{0eb7698d-1563-42c9-a2cd-d99d409a33a2}" height="8.064" itemRotation="0" frame="false" pagex="69.4439">
+   <ComposerItem pagey="102" page="1" id="{53df1b35-d891-4dd3-9f01-aaa1d386c25c}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="69.4439" y="102" visibility="1" zValue="17" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="135.192" outlineWidth="0.3" excludeFromExports="0" uuid="{53df1b35-d891-4dd3-9f01-aaa1d386c25c}" height="8.064" itemRotation="0" frame="false" pagex="69.4439">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="102 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
@@ -431,7 +454,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="Measuring:" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,75,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="130" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="47.873" y="130" visibility="1" zValue="15" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="24.1652" outlineWidth="0.3" excludeFromExports="0" uuid="{04b90ae7-27d3-479e-99a7-7bfda346a6ec}" height="7.6139" itemRotation="0" frame="false" pagex="47.873">
+   <ComposerItem pagey="130" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="47.873" y="130" visibility="1" zValue="15" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="24.1652" outlineWidth="0.3" excludeFromExports="0" uuid="{affe47dd-9954-4ced-a747-bde8235ed391}" height="7.6139" itemRotation="0" frame="false" pagex="47.873">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="130 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
@@ -441,7 +464,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="SITUATED:" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,75,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="102" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="47.873" y="102" visibility="1" zValue="14" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="24.3224" outlineWidth="0.3" excludeFromExports="0" uuid="{ffc5a11c-44e8-44c1-8977-3a13a411b642}" height="7.7639" itemRotation="0" frame="false" pagex="47.873">
+   <ComposerItem pagey="102" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="47.873" y="102" visibility="1" zValue="14" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="24.3224" outlineWidth="0.3" excludeFromExports="0" uuid="{3b7f1831-6c56-40c8-af84-e0865553d694}" height="7.7639" itemRotation="0" frame="false" pagex="47.873">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="102 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
@@ -451,27 +474,17 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="CERTAIN:" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,75,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="95" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="47.873" y="95" visibility="1" zValue="13" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="24.1723" outlineWidth="0.3" excludeFromExports="0" uuid="{c97ff8b2-2c21-4fb5-a897-5245888ff6d8}" height="7.9139" itemRotation="0" frame="false" pagex="47.873">
+   <ComposerItem pagey="95" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="47.873" y="95" visibility="1" zValue="13" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="24.1723" outlineWidth="0.3" excludeFromExports="0" uuid="{136b674f-23b6-484c-9a41-126ed8ecaddc}" height="7.9139" itemRotation="0" frame="false" pagex="47.873">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <dataDefinedPositionY expr="95 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
     <customproperties/>
    </ComposerItem>
   </ComposerLabel>
-  <ComposerLabel valign="32" marginX="1" marginY="1" labelText="his/her/their heirs, executors, administrators, or assigned, is the registered the holder(s) of" htmlState="0" halign="1">
-   <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
-   <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="85" page="1" id="" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.7" y="85" visibility="1" zValue="12" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="164.185" outlineWidth="0.3" excludeFromExports="0" uuid="{fb92af6a-73c6-4ebc-ab30-efd0835a9c21}" height="8.064" itemRotation="0" frame="false" pagex="39.7">
-    <FrameColor alpha="255" red="0" blue="0" green="0"/>
-    <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
-    <dataDefinedPositionY expr="85 +  @marital_status_offset_value" field="" active="true" useExpr="true"/>
-    <customproperties/>
-   </ComposerItem>
-  </ComposerLabel>
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.full_name]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="58.0593" page="1" id="{7cd646ff-e438-4f0b-ab22-9d864039a5d0}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40" y="58.0593" visibility="1" zValue="10" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="160.233" outlineWidth="0.3" excludeFromExports="0" uuid="{7cd646ff-e438-4f0b-ab22-9d864039a5d0}" height="8.0639" itemRotation="0" frame="false" pagex="40">
+   <ComposerItem pagey="58.0593" page="1" id="{c5bfde38-c197-4031-aa51-4c65e14361e5}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.0354" y="58.0593" visibility="1" zValue="10" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="163.811" outlineWidth="0.3" excludeFromExports="0" uuid="{c5bfde38-c197-4031-aa51-4c65e14361e5}" height="8.0639" itemRotation="0" frame="false" pagex="40.0354">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -480,7 +493,7 @@
   <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.land_rights_office_text]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="49.5454" page="1" id="{744e88b5-1a91-416a-9a09-7f794aa14eab}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="39.85" y="49.5454" visibility="1" zValue="8" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="154.324" outlineWidth="0.3" excludeFromExports="0" uuid="{744e88b5-1a91-416a-9a09-7f794aa14eab}" height="8.2139" itemRotation="0" frame="false" pagex="39.85">
+   <ComposerItem pagey="49.5454" page="1" id="{f6c1d8e3-0218-4491-a040-1041817c8459}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.0354" y="49.5454" visibility="1" zValue="8" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="163.811" outlineWidth="0.3" excludeFromExports="0" uuid="{f6c1d8e3-0218-4491-a040-1041817c8459}" height="8.2139" itemRotation="0" frame="false" pagex="40.0354">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -489,16 +502,16 @@
   <ComposerLabel valign="32" marginX="1" marginY="1" labelText="CERTIFICATE OF LAND HOLD TITLE RIGHT&#xa;&#xa;" htmlState="0" halign="4">
    <LabelFont description="Arial,14,-1,5,75,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="19.0494" page="1" id="Header" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.15" y="19.0494" visibility="1" zValue="4" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="166.564" outlineWidth="0.3" excludeFromExports="0" uuid="{1ec1887e-10f4-406b-b7e5-33b7c63038ff}" height="8.68846" itemRotation="0" frame="false" pagex="40.15">
+   <ComposerItem pagey="19.0494" page="1" id="Header" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.15" y="19.0494" visibility="1" zValue="4" background="false" transparency="0" frameJoinStyle="miter" blendMode="0" width="166.564" outlineWidth="0.3" excludeFromExports="0" uuid="{8a9fde05-ce9f-439b-8aaa-3f4d7701cfd0}" height="8.68846" itemRotation="0" frame="false" pagex="40.15">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
    </ComposerItem>
   </ComposerLabel>
-  <ComposerLabel valign="32" marginX="0" marginY="1" labelText="[cb_plot_vw_lht_certificate_template.holder_id]" htmlState="0" halign="1">
+  <ComposerLabel valign="32" marginX="0" marginY="0" labelText="[cb_plot_vw_lht_certificate_template.holder_id]" htmlState="0" halign="1">
    <LabelFont description="Arial,10,-1,5,50,0,0,0,0,0" style=""/>
    <FontColor red="0" blue="0" green="0"/>
-   <ComposerItem pagey="66.4232" page="1" id="{a3182238-c89d-4d33-8fad-60568306773f}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40" y="66.4232" visibility="1" zValue="2" background="false" transparency="0" frameJoinStyle="round" blendMode="0" width="160.233" outlineWidth="0.3" excludeFromExports="0" uuid="{a3182238-c89d-4d33-8fad-60568306773f}" height="8.0639" itemRotation="0" frame="false" pagex="40">
+   <ComposerItem pagey="66.4232" page="1" id="{4708ec82-caeb-469e-8339-e88029b8e142}" lastValidViewScaleFactor="-1" positionMode="0" positionLock="false" x="40.0354" y="66.4232" visibility="1" zValue="2" background="false" transparency="0" frameJoinStyle="round" blendMode="0" width="163.811" outlineWidth="0.3" excludeFromExports="0" uuid="{4708ec82-caeb-469e-8339-e88029b8e142}" height="8.0639" itemRotation="0" frame="false" pagex="40.0354">
     <FrameColor alpha="255" red="0" blue="0" green="0"/>
     <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
     <customproperties/>
@@ -516,28 +529,29 @@
   </customproperties>
  </Composition>
  <DataSource category="View" name="cb_plot_vw_lht_certificate_template" referencedTable="cb_plot">
-  <DataField name="footer_text" itemid="{e57af3af-d6df-4695-aff7-484159276312}"/>
-  <DataField name="append_and" itemid="{0f1d1a79-4b49-443b-9150-20e2ea17ba10}"/>
-  <DataField name="imposing_condition_text" itemid="{2d19dbb7-fe20-48c2-854c-1349c2715449}"/>
-  <DataField name="scheme_name" itemid="{0eb7698d-1563-42c9-a2cd-d99d409a33a2}"/>
-  <DataField name="plot_scheme_text" itemid="{d24c931f-fc99-4059-8ad6-4fada5657f07}"/>
-  <DataField name="spouse_name" itemid="{42bdb1cd-ae41-4e3a-8e68-8764df5ebfaa}"/>
-  <DataField name="certificate_number" itemid="{b13706e8-4e82-4425-9cb0-9aca8df3b8d6}"/>
-  <DataField name="holder_id" itemid="{a3182238-c89d-4d33-8fad-60568306773f}"/>
-  <DataField name="authority" itemid="{8165db3e-b901-423f-842e-1b25548e404a}"/>
-  <DataField name="spouse_document_identifier" itemid="{772164b7-0066-4001-8afd-2d74d20ad905}"/>
-  <DataField name="land_rights_office_text" itemid="{744e88b5-1a91-416a-9a09-7f794aa14eab}"/>
-  <DataField name="reg_division" itemid="{271aa67a-b467-49f4-9036-e2c129f6dc0a}"/>
-  <DataField name="region" itemid="{95b38b84-4e27-44ec-bbb4-415f6412199d}"/>
-  <DataField name="footer_text" itemid="{e4781012-a781-45d5-8a85-f2f6d40b3c81}"/>
-  <DataField name="imposing_condition_text2" itemid="{d21d00f6-89de-45d8-9a7b-f23f1a3da31a}"/>
-  <DataField name="full_name" itemid="{7cd646ff-e438-4f0b-ab22-9d864039a5d0}"/>
-  <DataField name="nature_of_marriage" itemid="{aa13cbb5-6695-41ad-a52a-6780e4527ae2}"/>
-  <DataField name="area_in_words" itemid="{62c54e03-e788-4c6f-8669-343a7b91e570}"/>
-  <DataField name="land_hold_plan_no_text" itemid="{f7c1e0f5-1507-4667-904a-a463fc96690f}"/>
-  <DataField name="plot_number_description" itemid="{44d21be1-2522-46a8-ba15-181f06efa614}"/>
+  <DataField name="imposing_condition_text" itemid="{3776d460-abc3-4328-9fea-d236f1a18476}"/>
+  <DataField name="area_in_words" itemid="{4efccdcb-7a4d-4e30-bb02-18a02fba5cf1}"/>
+  <DataField name="footer_text" itemid="{a45ee924-6709-43db-8fdd-8cce364caa76}"/>
+  <DataField name="reg_division" itemid="{6eeec798-ac8e-4676-8d8b-3154fe4e0514}"/>
+  <DataField name="spouse_document_identifier" itemid="{169202b1-aecf-4a25-b0d7-4dca22ef274d}"/>
+  <DataField name="spouse_name" itemid="{cf4aca36-ac60-4927-a8e0-ca35ad9ab00a}"/>
+  <DataField name="scheme_name" itemid="{53df1b35-d891-4dd3-9f01-aaa1d386c25c}"/>
+  <DataField name="holder_id" itemid="{4708ec82-caeb-469e-8339-e88029b8e142}"/>
+  <DataField name="ownership_text" itemid="{dd92e163-7dae-40c6-9d87-49d6660dbe60}"/>
+  <DataField name="imposing_condition_text2" itemid="{74ced3a1-b187-4aa9-971b-b5ee271c197f}"/>
+  <DataField name="region" itemid="{699a8849-86a2-47ca-b953-f583e35b1067}"/>
+  <DataField name="land_hold_plan_no_text" itemid="{ea58707d-c1a8-4d2a-94e0-c3829bea0443}"/>
+  <DataField name="authority" itemid="{19c9e0e8-bddc-457c-b963-71422ef23e9e}"/>
+  <DataField name="plot_scheme_text" itemid="{e927e2d4-7c99-47fa-895d-e56f1ef1d8c0}"/>
+  <DataField name="nature_of_marriage" itemid="{6a0ce8b4-be0f-42e5-acd4-6edd6212347c}"/>
+  <DataField name="certificate_number" itemid="{eb1ee0b2-6727-4b7e-a85c-ab685b04262f}"/>
+  <DataField name="full_name" itemid="{c5bfde38-c197-4031-aa51-4c65e14361e5}"/>
+  <DataField name="footer_text" itemid="{26405afc-83ae-4665-8e8d-e01ecd29c8ae}"/>
+  <DataField name="plot_number_description" itemid="{4f188423-2ad9-4f98-851b-6d7eea654db8}"/>
+  <DataField name="land_rights_office_text" itemid="{f6c1d8e3-0218-4491-a040-1041817c8459}"/>
+  <DataField name="append_and" itemid="{cef9496e-4e05-4417-98a6-4f2a62d78b1b}"/>
   <SpatialFields>
-   <SpatialField geomType="POLYGON" zoom="2.0" srid="4326" labelField="" name="plot_geom" itemid="{611597f7-cdc5-4818-b263-ab6cf21d009b}">
+   <SpatialField geomType="POLYGON" zoom="2.0" srid="4326" labelField="" name="plot_geom" itemid="{6d7eaeb1-1aba-4a08-a4bb-82d18a0170e5}">
     <Symbol layerType="SimpleFill">
      <prop k="border_width_map_unit_scale" v="0,0,0,0,0,0"/>
      <prop k="color" v="255,255,0,255"/>
