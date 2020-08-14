@@ -1274,6 +1274,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         # Format scheme number for saving in document repository
         if not sch_number:
             sch_number = scheme_obj.scheme_number.replace(" / ", "_")
+            sch_number = sch_number.replace(" ", "_")
 
         # Attach documents
         doc_objs = self._cmis_doc_mapper.persist_documents(
