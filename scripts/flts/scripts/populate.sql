@@ -1127,6 +1127,29 @@ END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
+CREATE OR REPLACE FUNCTION "public"."flts_gen_holder_full_name"("holder_row" "public"."cb_holder")
+  RETURNS "pg_catalog"."text" AS $BODY$DECLARE
+BEGIN
+	IF (holder_row.holder_first_name is null or holder_row.holder_first_name = '') THEN
+		RETURN upper(holder_row.juristic_person_name);
+	ELSE
+		RETURN  upper(holder_row.holder_first_name) || ' ' || upper(holder_row.holder_surname);
+	END IF;
+END;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+CREATE OR REPLACE FUNCTION "public"."flts_gen_holder_identity_number"("holder_row" "public"."cb_holder")
+  RETURNS "pg_catalog"."text" AS $BODY$BEGIN
+	IF (holder_row.holder_first_name is null or holder_row.holder_first_name = '') THEN
+		RETURN 'Registration Number ' || holder_row.juristic_person_number;
+	ELSE
+		RETURN 'Identity Number ' || holder_row.holder_identifier;
+	END IF;
+END;$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
 ---Creates or populates certificate number when a certificate is generated
 CREATE OR REPLACE FUNCTION "public"."flts_gen_cert_number"()
   RETURNS "pg_catalog"."text" AS $BODY$DECLARE
@@ -1150,16 +1173,20 @@ CREATE OR REPLACE FUNCTION "public"."flts_get_holder_nature_of_marriage"("holder
   RETURNS "pg_catalog"."text" AS $BODY$DECLARE
 	nature_of_marriage text;
 BEGIN
-	IF holder_row.marital_status = 1 THEN
-		IF holder_row.nature_of_marriage = 1 THEN
-			RETURN 'Married, which marriage does not have the legal consequences of a marriage in community of property, by virtue of the provisions of Proclamation 15 of 1928.';
-		ELSIF holder_row.nature_of_marriage = 2 THEN
-			RETURN 'Married in community of property to each other.';
-		ELSE
-			RETURN 'Married out of  community of property.';
-		END IF;
+	IF (holder_row.holder_first_name is null or holder_row.holder_first_name = '') THEN
+		RETURN '';
 	ELSE
+		IF holder_row.marital_status = 1 THEN
+			IF holder_row.nature_of_marriage = 1 THEN
+				RETURN 'Married, which marriage does not have the legal consequences of a marriage in community of property, by virtue of the provisions of Proclamation 15 of 1928.';
+			ELSIF holder_row.nature_of_marriage = 2 THEN
+				RETURN 'Married in community of property to each other.';
+			ELSE
+				RETURN 'Married out of  community of property.';
+			END IF;
+		ELSE
 		RETURN 'Unmarried';
+		END IF;
 	END IF;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
@@ -1212,7 +1239,7 @@ END;$BODY$
 CREATE OR REPLACE FUNCTION "public"."flts_get_spouse_name"("holder_row" "public"."cb_holder")
   RETURNS "pg_catalog"."text" AS $BODY$BEGIN
 	IF holder_row.marital_status = 1 THEN
-		RETURN holder_row.spouse_first_name || ' ' || holder_row.spouse_surname;
+		RETURN upper(holder_row.spouse_first_name) || ' ' || upper(holder_row.spouse_surname);
 	ELSE
 		RETURN '';
 	END IF;
@@ -1330,7 +1357,7 @@ CREATE OR REPLACE FUNCTION "public"."flts_ownership_text"("holder_row" "public".
 	END IF;
 END$BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100
+  COST 100;
   
 ----------------Custom FLTS Views------------------------
 
@@ -1399,44 +1426,42 @@ CREATE OR REPLACE VIEW cb_holder_vw_lht_report_disability_template AS
 
 -- This creates the view for the certificate of Land Hold Title(LHT)
 CREATE OR REPLACE VIEW cb_plot_vw_lht_certificate_template AS
-    SELECT cb_plot.id,
-        cb_scheme.scheme_number,
-        flts_gen_cert_number() AS certificate_number,
-        flts_ownership_text(cb_holder.*) AS ownership_text,
-        concat('I, the Land Rights Registrar at ', cb_check_lht_land_rights_office.value, ', hereby certify that') AS land_rights_office_text,
-        concat(upper((cb_holder.holder_first_name)::text), ' ', upper((cb_holder.holder_surname)::text)) AS full_name,
-        concat('Identity Number ', cb_holder.holder_identifier) AS holder_id,
-        flts_append_and_to_spouse_name(cb_holder.*) AS append_and,
-        upper(flts_get_spouse_name(cb_holder.*)) AS spouse_name,
-        flts_get_spouse_document_identifier(cb_holder.*) AS spouse_document_identifier,
-        flts_get_holder_nature_of_marriage(cb_holder.*) AS nature_of_marriage,
-        concat('Plot No: ', (cb_plot.plot_number)::integer, ', ', cb_scheme.scheme_description) AS plot_number_description,
-        concat(cb_scheme.scheme_name, ' Scheme') AS scheme_name,
-        concat(cb_relevant_authority.name_of_relevant_authority, ' ', cb_check_lht_relevant_authority.value) AS authority,
-        concat('Registration Division ', cb_check_lht_reg_division.value) AS reg_division,
-        concat(cb_check_lht_region.value, ' Region') AS region,
-        concat(flts_plot_area_to_text(cb_plot.area), cb_scheme.land_hold_plan_number, ';') AS area_in_words,
-        concat(flts_get_scheme_imposing_condition(cb_scheme.*), cb_relevant_authority.name_of_relevant_authority, ' ', cb_check_lht_relevant_authority.value, ' in terms of section 13(6) of the Flexible Land Tenure Act, 2012.') AS imposing_condition_text,
-        flts_get_scheme_imposing_condition2(cb_scheme.*) AS imposing_condition_text2,
-        flts_gen_footer_text(cb_scheme.*) AS footer_text,
-        cb_scheme.land_hold_plan_number,
-        concat('No. ', cb_scheme.land_hold_plan_number) AS land_hold_plan_no_text,
-        concat('Plot No: ', (cb_plot.plot_number)::integer, ', ', cb_scheme.scheme_name, ' Scheme') AS plot_scheme_text,
-        concat(rtrim((cb_check_lht_relevant_authority.value)::text, 'Council'::text), 'of ', cb_relevant_authority.name_of_relevant_authority, ', ', cb_check_lht_region.value, ' Region') AS ra_region,
-        cb_check_lht_marital_status.value AS marital_status,
-        concat('Plot No: ', (cb_plot.plot_number)::integer) AS plot_number,
-        cb_plot.upi AS plot_upi,
-        cb_plot.geom AS plot_geom,
-        flts_marital_status_offset_value(cb_holder.*) AS marital_status_offset_value
-    FROM cb_social_tenure_relationship
-        JOIN cb_plot ON cb_social_tenure_relationship.plot_id = cb_plot.id
-        JOIN cb_scheme ON cb_plot.scheme_id = cb_scheme.id
-        JOIN cb_check_lht_land_rights_office ON cb_scheme.land_rights_office = cb_check_lht_land_rights_office.id
-        JOIN cb_holder ON cb_social_tenure_relationship.holder_id = cb_holder.id
-        JOIN cb_check_lht_marital_status ON cb_check_lht_marital_status.id = cb_holder.marital_status
-        JOIN cb_relevant_authority ON cb_relevant_authority.au_code::text = 'OSHKTI'::text
-        JOIN cb_check_lht_relevant_authority ON cb_check_lht_relevant_authority.id = cb_scheme.relevant_authority
-        JOIN cb_check_lht_reg_division ON cb_check_lht_reg_division.id = cb_scheme.registration_division
-        JOIN cb_check_lht_region ON cb_check_lht_region.id = cb_scheme.region;
+ SELECT cb_plot.id,
+    cb_scheme.scheme_number,
+    flts_gen_cert_number() AS certificate_number,
+    flts_ownership_text(cb_holder.*) AS ownership_text,
+    concat('I, the Land Rights Registrar at ', cb_check_lht_land_rights_office.value, ', hereby certify that') AS land_rights_office_text,
+    flts_gen_holder_full_name(cb_holder.*) AS full_name,
+    flts_gen_holder_identity_number(cb_holder.*) AS holder_id,
+    flts_append_and_to_spouse_name(cb_holder.*) AS append_and,
+    flts_get_spouse_name(cb_holder.*) AS spouse_name,
+    flts_get_spouse_document_identifier(cb_holder.*) AS spouse_document_identifier,
+    flts_get_holder_nature_of_marriage(cb_holder.*) AS nature_of_marriage,
+    concat('Plot No: ', (cb_plot.plot_number)::integer, ', ', cb_scheme.scheme_description) AS plot_number_description,
+    concat(cb_scheme.scheme_name, ' Scheme') AS scheme_name,
+    concat(cb_relevant_authority.name_of_relevant_authority, ' ', cb_check_lht_relevant_authority.value) AS authority,
+    concat('Registration Division ', cb_check_lht_reg_division.value) AS reg_division,
+    concat(cb_check_lht_region.value, ' Region') AS region,
+    concat(flts_plot_area_to_text(cb_plot.area), cb_scheme.land_hold_plan_number, ';') AS area_in_words,
+    concat(flts_get_scheme_imposing_condition(cb_scheme.*), cb_relevant_authority.name_of_relevant_authority, ' ', cb_check_lht_relevant_authority.value, ' in terms of section 13(6) of the Flexible Land Tenure Act, 2012.') AS imposing_condition_text,
+    flts_get_scheme_imposing_condition2(cb_scheme.*) AS imposing_condition_text2,
+    flts_gen_footer_text(cb_scheme.*) AS footer_text,
+    cb_scheme.land_hold_plan_number,
+    concat('No. ', cb_scheme.land_hold_plan_number) AS land_hold_plan_no_text,
+    concat('Plot No: ', (cb_plot.plot_number)::integer, ', ', cb_scheme.scheme_name, ' Scheme') AS plot_scheme_text,
+    concat(rtrim((cb_check_lht_relevant_authority.value)::text, 'Council'::text), 'of ', cb_relevant_authority.name_of_relevant_authority, ', ', cb_check_lht_region.value, ' Region') AS ra_region,
+    concat('Plot No: ', (cb_plot.plot_number)::integer) AS plot_number,
+    cb_plot.upi AS plot_upi,
+    cb_plot.geom AS plot_geom,
+    flts_marital_status_offset_value(cb_holder.*) AS marital_status_offset_value
+   FROM ((((((((cb_social_tenure_relationship
+     JOIN cb_plot ON ((cb_social_tenure_relationship.plot_id = cb_plot.id)))
+     JOIN cb_scheme ON ((cb_plot.scheme_id = cb_scheme.id)))
+     JOIN cb_check_lht_land_rights_office ON ((cb_scheme.land_rights_office = cb_check_lht_land_rights_office.id)))
+     JOIN cb_holder ON ((cb_social_tenure_relationship.holder_id = cb_holder.id)))
+     JOIN cb_relevant_authority ON (((cb_relevant_authority.au_code)::text = 'OSHKTI'::text)))
+     JOIN cb_check_lht_relevant_authority ON ((cb_check_lht_relevant_authority.id = cb_scheme.relevant_authority)))
+     JOIN cb_check_lht_reg_division ON ((cb_check_lht_reg_division.id = cb_scheme.registration_division)))
+     JOIN cb_check_lht_region ON ((cb_check_lht_region.id = cb_scheme.region)))
 		
 ----------------------END-------------------------------------
