@@ -11,7 +11,7 @@ class IconDelegate(QStyledItemDelegate):
     """
     def initStyleOption(self, option, index):
         super(IconDelegate, self).initStyleOption(option, index)
-        option.decorationSize = QSize(24, 24)
+        option.decorationSize = QSize(16, 16)
         # Position decoration to top
         option.decorationPosition = 2
         # Align decoration to center
