@@ -1334,20 +1334,6 @@ END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
-CREATE OR REPLACE FUNCTION "public"."flts_gen_footer_text"("scheme_row" "public"."cb_scheme")
-  RETURNS "pg_catalog"."text" AS $BODY$DECLARE
-	doc_row cb_scheme_supporting_document%ROWTYPE;
-BEGIN
-	SELECT * INTO doc_row FROM cb_scheme_supporting_document WHERE (cb_scheme_supporting_document.scheme_id = scheme_row.id AND cb_scheme_supporting_document.document_type = 7);
-	IF doc_row IS NULL THEN
-		RETURN 'CERTIFICATE OF LAND HOLD TITLE';
-	ELSE
-		RETURN 'CERTIFICATE OF LAND HOLD TITLE WITH CONDITIONS';
-	END IF;
-END;$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-
 CREATE OR REPLACE FUNCTION "public"."flts_ownership_text"("holder_row" "public"."cb_holder")
   RETURNS "pg_catalog"."text" AS $BODY$BEGIN
 	IF holder_row.marital_status = 1 THEN
@@ -1356,6 +1342,28 @@ CREATE OR REPLACE FUNCTION "public"."flts_ownership_text"("holder_row" "public".
 		RETURN 'his/her heirs, executors, administrators, or assigned, is the registered the holder of';
 	END IF;
 END$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+CREATE OR REPLACE FUNCTION "public"."flts_gen_crs_text"("plot_row" "public"."cb_plot")
+  RETURNS "pg_catalog"."text" AS $BODY$DECLARE
+		BEGIN
+			IF plot_row.crs_id = 1 THEN
+				RETURN 'Lo22/13°';
+			ELSIF plot_row.crs_id = 2 THEN
+				RETURN 'Lo22/15°';
+			ELSIF plot_row.crs_id = 3 THEN
+				RETURN 'Lo22/17°';
+			ELSIF plot_row.crs_id = 4 THEN
+				RETURN 'Lo22/19°';
+			ELSIF plot_row.crs_id = 5 THEN
+				RETURN 'Lo22/21°';
+			ELSIF plot_row.crs_id = 6 THEN
+				RETURN 'Lo22/23°';
+			ELSE
+			RETURN 'Lo22/25°';
+	END IF;
+END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
   
@@ -1426,7 +1434,7 @@ CREATE OR REPLACE VIEW cb_holder_vw_lht_report_disability_template AS
 
 -- This creates the view for the certificate of Land Hold Title(LHT)
 CREATE OR REPLACE VIEW cb_plot_vw_lht_certificate_template AS
- SELECT cb_plot.id,
+  SELECT cb_plot.id,
     cb_scheme.scheme_number,
     flts_gen_cert_number() AS certificate_number,
     flts_ownership_text(cb_holder.*) AS ownership_text,
@@ -1445,10 +1453,9 @@ CREATE OR REPLACE VIEW cb_plot_vw_lht_certificate_template AS
     concat(flts_plot_area_to_text(cb_plot.area), cb_scheme.land_hold_plan_number, ';') AS area_in_words,
     concat(flts_get_scheme_imposing_condition(cb_scheme.*), cb_relevant_authority.name_of_relevant_authority, ' ', cb_check_lht_relevant_authority.value, ' in terms of section 13(6) of the Flexible Land Tenure Act, 2012.') AS imposing_condition_text,
     flts_get_scheme_imposing_condition2(cb_scheme.*) AS imposing_condition_text2,
-    flts_gen_footer_text(cb_scheme.*) AS footer_text,
     cb_scheme.land_hold_plan_number,
     concat('No. ', cb_scheme.land_hold_plan_number) AS land_hold_plan_no_text,
-    concat('Plot No: ', (cb_plot.plot_number)::integer, ', ', cb_scheme.scheme_name, ' Scheme') AS plot_scheme_text,
+    concat('Plot No: ', (cb_plot.plot_number)::integer, ', ', cb_scheme.scheme_name, ' Scheme, ', flts_gen_crs_text(cb_plot.*)) AS plot_scheme_text,
     concat(rtrim((cb_check_lht_relevant_authority.value)::text, 'Council'::text), 'of ', cb_relevant_authority.name_of_relevant_authority, ', ', cb_check_lht_region.value, ' Region') AS ra_region,
     concat('Plot No: ', (cb_plot.plot_number)::integer) AS plot_number,
     cb_plot.upi AS plot_upi,

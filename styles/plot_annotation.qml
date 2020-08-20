@@ -93,7 +93,7 @@
             <layer pass="0" class="FontMarker" locked="0">
               <prop k="angle" v="0"/>
               <prop k="char_dd_active" v="1"/>
-              <prop k="char_dd_expression" v="'X = ' || round(x(&#xd;&#xa;&#x9;transform(point_n($geometry, @geometry_part_num), 'EPSG:4326', 'EPSG:29375')&#xd;&#xa;&#x9;), &#xd;&#xa;&#x9;3&#xd;&#xa;)"/>
+              <prop k="char_dd_expression" v="'Y = ' || round(x(&#xd;&#xa;&#x9;transform(point_n($geometry, @geometry_part_num), 'EPSG:4326', 'EPSG:29375')&#xd;&#xa;&#x9;), &#xd;&#xa;&#x9;3&#xd;&#xa;)"/>
               <prop k="char_dd_field" v=""/>
               <prop k="char_dd_useexpr" v="1"/>
               <prop k="chr" v="A"/>
@@ -101,9 +101,9 @@
               <prop k="font" v="Arial"/>
               <prop k="horizontal_anchor_point" v="1"/>
               <prop k="joinstyle" v="miter"/>
-              <prop k="offset" v="-2,-1.99999999999999756"/>
+              <prop k="offset" v="-2,-1"/>
               <prop k="offset_dd_active" v="1"/>
-              <prop k="offset_dd_expression" v="CASE WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 90 THEN '5.0000, -4.3000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 180 THEN '5.0000, 7.5000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 270 THEN '-5.0000, 7.5000'&#xd;&#xa;ELSE&#xd;&#xa;&#x9;'-5.0000, -4.3000'&#xd;&#xa;END"/>
+              <prop k="offset_dd_expression" v="CASE WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 90 THEN '6.0000, -7.5000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 180 THEN '6.0000, 4.3000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 270 THEN '-6.0000, 4.3000'&#xd;&#xa;ELSE&#xd;&#xa;&#x9;'-6.0000, -7.5000'&#xd;&#xa;END"/>
               <prop k="offset_dd_field" v=""/>
               <prop k="offset_dd_useexpr" v="1"/>
               <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
@@ -182,7 +182,7 @@
             <layer pass="0" class="FontMarker" locked="0">
               <prop k="angle" v="0"/>
               <prop k="char_dd_active" v="1"/>
-              <prop k="char_dd_expression" v="'Y = ' || round(y(&#xd;&#xa;&#x9;transform(point_n($geometry, @geometry_part_num), 'EPSG:4326', 'EPSG:29375')&#xd;&#xa;&#x9;), &#xd;&#xa;&#x9;3&#xd;&#xa;)"/>
+              <prop k="char_dd_expression" v="'X = ' || round(y(&#xd;&#xa;&#x9;transform(point_n($geometry, @geometry_part_num), 'EPSG:4326', 'EPSG:29375')&#xd;&#xa;&#x9;), &#xd;&#xa;&#x9;3&#xd;&#xa;)"/>
               <prop k="char_dd_field" v=""/>
               <prop k="char_dd_useexpr" v="1"/>
               <prop k="chr" v="A"/>
@@ -190,9 +190,9 @@
               <prop k="font" v="Arial"/>
               <prop k="horizontal_anchor_point" v="1"/>
               <prop k="joinstyle" v="bevel"/>
-              <prop k="offset" v="-2,0"/>
+              <prop k="offset" v="-2,-1"/>
               <prop k="offset_dd_active" v="1"/>
-              <prop k="offset_dd_expression" v="CASE WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 90 THEN '6.0000, -7.5000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 180 THEN '6.0000, 4.3000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 270 THEN '-6.0000, 4.3000'&#xd;&#xa;ELSE&#xd;&#xa;&#x9;'-6.0000, -7.5000'&#xd;&#xa;END"/>
+              <prop k="offset_dd_expression" v="CASE WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 90 THEN '5.0000, -4.3000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 180 THEN '5.0000, 7.5000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 270 THEN '-5.0000, 7.5000'&#xd;&#xa;ELSE&#xd;&#xa;&#x9;'-5.0000, -4.3000'&#xd;&#xa;END"/>
               <prop k="offset_dd_field" v=""/>
               <prop k="offset_dd_useexpr" v="1"/>
               <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
