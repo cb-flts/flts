@@ -25,11 +25,7 @@ from PyQt4.QtGui import (
     QWidget,
     QMessageBox,
     QFileDialog,
-    QStandardItem,
-    QIcon,
-    QProgressDialog,
-    QProgressBar,
-    QHeaderView,
+    QHeaderView
 )
 
 from stdm.network.cmis_manager import (
@@ -67,8 +63,9 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         # Disables the maximize button
         self.setWindowFlags(Qt.WindowMinimizeButtonHint)
 
-        # Set the certificate status text label
+        # Set the labels text
         self._status_txt = self.lbl_status.text()
+        self.lbl_status.setText(self._status_txt + 'Select scheme')
 
         # CMIS Manager
         self._cmis_mngr = CmisManager()
@@ -82,6 +79,11 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self._cert_upload_handler = CertificateUploadHandler(
             cmis_mngr=self._cmis_mngr,
             parent=self
+        )
+
+        self._lbl_records_txt = self.lbl_records_count.text()
+        self.lbl_records_count.setText(
+            str(self._cert_model.rowCount()) + self._lbl_records_txt
         )
 
         # Get table horizontal header count
@@ -192,7 +194,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         if not self.cbo_scheme_number.currentText():
             self.btn_select_folder.setEnabled(False)
-            self.lbl_status.setText(self._status_txt)
+            self.lbl_status.setText(self._status_txt + 'Select scheme')
         else:
             self.btn_select_folder.setEnabled(True)
             self.tbvw_certificate.setEnabled(True)
@@ -289,14 +291,9 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         Show the number of records loaded in the view.
         """
-        # Show/update record count
-        record_count = 'Number of files: ' + str(
-            self._cert_model.rowCount()
+        self.lbl_records_count.setText(
+            str(self._cert_model.rowCount()) + self._lbl_records_txt
         )
-
-        self.lbl_records_count.clear()
-
-        self.lbl_records_count.setText(record_count)
 
     def _validate_items(self, cert_info_items):
         """
@@ -321,18 +318,22 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self._cert_model.update_validation_status(
             cert_info.certificate_number
         )
+
         # Upload certificates
-        if cert_info.validation_status == CertificateInfo.CAN_UPLOAD:
-            self._upload_certificates(cert_info.filename)
+        self._upload_certificates(cert_info.filename)
 
     def _upload_certificates(self, filepath):
         """
         Upload the certificates to the Temp folder in CMIS document repository
         :param filepath: Location path of the certificate
         """
-        self._cert_upload_handler.upload_certificate(
-            filepath
+        cert_model_items = self._cert_model.cert_info_items
+        upload_handler = CertificateUploadHandler(
+            cmis_mngr=self._cmis_mngr,
+            parent=self
         )
+        upload_handler.cert_info_items = cert_model_items
+        upload_handler.upload_certificate(filepath)
 
     def _on_cert_info_uploaded(self, cert_info):
         """
@@ -342,7 +343,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         # Update upload status text and icon
         self._cert_model.update_upload_status(
-            cert_info.certificate_number
+            cert_info.filename
         )
 
     def _on_upload_complete(self):
@@ -369,10 +370,10 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         # Check if any of the loaded certificates can be uploaded
         if can_upload not in status_res:
             self.btn_upload_certificate.setEnabled(False)
+            self.lbl_status.setText(self._status_txt + 'Cannot upload')
         else:
             self.btn_upload_certificate.setEnabled(True)
-
-        self.lbl_status.setText(self._status_txt + 'Ready to upload')
+            self.lbl_status.setText(self._status_txt + 'Ready to upload')
 
     def _on_upload_certificates(self):
         """
@@ -400,8 +401,13 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
                 [str(cert.certificate_number) for cert in cert_info_items]
             )
 
+            upload_handler = CertificateUploadHandler(
+                cmis_mngr=self._cmis_mngr,
+                parent=self
+            )
+
             # Loop though the iterator
-            self._cert_upload_handler.persist_certificates(
+            upload_handler.persist_certificates(
                     next(cert_numbers)
             )
 
@@ -437,42 +443,37 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         QMessageBox.critical(
             self,
-            self.tr(
-                'Certificate Upload Error'
-            ),
+            self.tr('Certificate Upload Error'),
             message
         )
 
     def _on_preview_certificate(self, index):
-        # Loads a window for previewing the field book.
         cert_items = self._cert_model.cert_info_items
         if index.isValid():
             if index.column() == 2:
+                self.notif_bar.clear()
                 cert_info = cert_items[index.row()]
                 path = cert_info.filename
-                status = self._cert_upload_handler.upload_status(path)
-                self.notif_bar.clear()
-
-                if status == -1:
-                    msg = '{0} could not be found in the list of uploaded ' \
-                        'documents'.format(cert_info.certificate_number)
+                upload_status = self._cert_upload_handler.upload_status(path)
+                validation_status = cert_info.validation_status
+                if upload_status == -1:
+                    msg = '{0} could not be found in the list of validated ' \
+                          '/ uploaded documents'.format(cert_info.certificate_number)
                     self.notif_bar.insertWarningNotification(msg)
-                elif status == CertificateInfo.SUCCESS:
-                    doc_uuid = self._cert_upload_handler.certificate_uuid(path)
-                    doc_name = self._cert_upload_handler.certificate_name(path)
-                    if not doc_uuid or not doc_name:
-                        msg = 'An error occurred, the field book cannot be previewed.'
-                        self.notif_bar.insertWarningNotification(msg)
-                        return
+                else:
+                    if not validation_status == CertificateInfo.UNDEFINED:
+                        doc_uuid = self._cert_upload_handler.certificate_uuid(path)
+                        doc_name = self._cert_upload_handler.certificate_name(path)
+                        if not doc_uuid or not doc_name:
+                            msg = 'An error occurred, the certificate cannot be previewed.'
+                            self.notif_bar.insertWarningNotification(msg)
+                            return
 
-                    pdf_viewer = PDFViewerWidget(
+                        pdf_viewer = PDFViewerWidget(
                             doc_uuid,
                             doc_name
                         )
-                    pdf_viewer.view_document()
-
-                    # Flag the field book as viewed
-                    self._previewed[path] = path
+                        pdf_viewer.view_document()
 
     def _on_close(self):
         """

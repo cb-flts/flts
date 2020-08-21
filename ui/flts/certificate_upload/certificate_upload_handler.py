@@ -185,16 +185,16 @@ class CertificateUploadHandler(QObject):
         """
         self._cert_info_items = cert_info
 
-    def upload_certificate(self, cert_number):
+    def upload_certificate(self, cert_path):
         """
         Upload the certificate to the temporary directory based on the
         information on the certificate info object.
-        :param cert_number: Certificate information objects.
-        :type cert_number: str
+        :param cert_path: Certificate path.
+        :type cert_path: str
         """
         # Upload certificates and supporting docs
         self._upload_cert_info(
-            cert_number,
+            cert_path,
             self.CERT_DOC_TYPE
         )
 
@@ -248,17 +248,18 @@ class CertificateUploadHandler(QObject):
         :type status_info: tuple(doc_type, document object)
         """
         sender = self.sender()
-        cert_info = CertificateInfo()
         if sender:
             file_path = sender.file_path
             doc_obj = status_info[1]
             self._cert_upload_status[file_path] = CertificateInfo.SUCCESS
             self._uploaded_certs[file_path] = doc_obj
-            cert_info.upload_status = CertificateInfo.SUCCESS
-            cert_info.filename = file_path
 
-            # Emit signal
-            self.uploaded.emit(cert_info)
+            cert_info = iter(self._cert_info_items)
+            try:
+                # Emit signal
+                self.uploaded.emit(next(cert_info))
+            except StopIteration:
+                print('stopped')
 
     def _on_upload_error(self, error_info):
         """
@@ -268,18 +269,19 @@ class CertificateUploadHandler(QObject):
         :type error_info: tuple(cert_doc_type, error_msg)
         """
         sender = self.sender()
-        cert_info = CertificateInfo()
         if sender:
             file_path = sender.file_path
             err_msg = error_info[1]
             self._cert_upload_status[file_path] = CertificateInfo.ERROR
             self._certificate_upload_error[file_path] = err_msg
-            cert_info.upload_status = CertificateInfo.ERROR
-            cert_info.filename = file_path
-            print(error_info[1])
 
             # Emit signal
-            self.uploaded.emit(cert_info)
+            cert_info = iter(self._cert_info_items)
+            try:
+                # Emit signal
+                self.uploaded.emit(next(cert_info))
+            except StopIteration:
+                print('error')
 
     def _on_upload_finished(self):
         """
