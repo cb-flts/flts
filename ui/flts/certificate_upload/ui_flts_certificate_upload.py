@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_flts_certificate_upload.ui'
 #
-# Created: Wed Aug  5 17:02:23 2020
+# Created: Sun Aug 30 18:05:11 2020
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -84,8 +84,9 @@ class Ui_FltsCertUploadWidget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.cbo_scheme_number.sizePolicy().hasHeightForWidth())
         self.cbo_scheme_number.setSizePolicy(sizePolicy)
-        self.cbo_scheme_number.setMinimumSize(QtCore.QSize(110, 0))
+        self.cbo_scheme_number.setMinimumSize(QtCore.QSize(127, 0))
         self.cbo_scheme_number.setObjectName(_fromUtf8("cbo_scheme_number"))
+        self.cbo_scheme_number.addItem(_fromUtf8(""))
         self.gridLayout.addWidget(self.cbo_scheme_number, 0, 1, 1, 1)
         self.gridLayout_2.addWidget(self.frame_2, 1, 0, 1, 3)
         self.tbvw_certificate = QtGui.QTableView(FltsCertUploadWidget)
@@ -99,6 +100,12 @@ class Ui_FltsCertUploadWidget(object):
         self.tbvw_certificate.setObjectName(_fromUtf8("tbvw_certificate"))
         self.gridLayout_2.addWidget(self.tbvw_certificate, 2, 0, 1, 3)
         self.lbl_status = QtGui.QLabel(FltsCertUploadWidget)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.lbl_status.sizePolicy().hasHeightForWidth())
+        self.lbl_status.setSizePolicy(sizePolicy)
+        self.lbl_status.setMaximumSize(QtCore.QSize(160, 16777215))
         self.lbl_status.setObjectName(_fromUtf8("lbl_status"))
         self.gridLayout_2.addWidget(self.lbl_status, 3, 0, 1, 1)
         self.line = QtGui.QFrame(FltsCertUploadWidget)
@@ -134,10 +141,11 @@ class Ui_FltsCertUploadWidget(object):
     def retranslateUi(self, FltsCertUploadWidget):
         FltsCertUploadWidget.setWindowTitle(_translate("FltsCertUploadWidget", "Upload Scanned Certificate", None))
         self.btn_select_folder.setText(_translate("FltsCertUploadWidget", "Select Folder...", None))
-        self.label.setText(_translate("FltsCertUploadWidget", "Select scheme:", None))
+        self.label.setText(_translate("FltsCertUploadWidget", "Select scheme", None))
         self.btn_upload_certificate.setText(_translate("FltsCertUploadWidget", "Upload", None))
         self.cbo_scheme_number.setToolTip(_translate("FltsCertUploadWidget", "<html><head/><body><p>Select Scheme</p></body></html>", None))
-        self.lbl_status.setText(_translate("FltsCertUploadWidget", "Status: ", None))
+        self.cbo_scheme_number.setItemText(0, _translate("FltsCertUploadWidget", "OSHKTI. 0001 / 2020", None))
+        self.lbl_status.setText(_translate("FltsCertUploadWidget", "Status:  ", None))
         self.lbl_records_count.setText(_translate("FltsCertUploadWidget", "  files", None))
         self.btn_close.setText(_translate("FltsCertUploadWidget", "Close", None))
 
