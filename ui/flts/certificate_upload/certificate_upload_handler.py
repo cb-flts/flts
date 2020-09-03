@@ -51,7 +51,7 @@ class CertificateUploadHandler(QObject):
     CERT_DOC_TYPE = 'Archive'
 
     # Signals
-    uploaded = pyqtSignal(CertificateInfo)
+    uploaded = pyqtSignal(unicode)
     upload_completed = pyqtSignal()
     removed = pyqtSignal()
     persisted = pyqtSignal()
@@ -253,13 +253,8 @@ class CertificateUploadHandler(QObject):
             doc_obj = status_info[1]
             self._cert_upload_status[file_path] = CertificateInfo.SUCCESS
             self._uploaded_certs[file_path] = doc_obj
-
-            cert_info = iter(self._cert_info_items)
-            try:
-                # Emit signal
-                self.uploaded.emit(next(cert_info))
-            except StopIteration:
-                print('stopped')
+            # Emit signal
+            self.uploaded.emit(file_path)
 
     def _on_upload_error(self, error_info):
         """
@@ -271,17 +266,11 @@ class CertificateUploadHandler(QObject):
         sender = self.sender()
         if sender:
             file_path = sender.file_path
-            err_msg = error_info[1]
+            doc_obj = error_info[1]
             self._cert_upload_status[file_path] = CertificateInfo.ERROR
-            self._certificate_upload_error[file_path] = err_msg
-
+            self._uploaded_certs[file_path] = doc_obj
             # Emit signal
-            cert_info = iter(self._cert_info_items)
-            try:
-                # Emit signal
-                self.uploaded.emit(next(cert_info))
-            except StopIteration:
-                print('error')
+            self.uploaded.emit(file_path)
 
     def _on_upload_finished(self):
         """
@@ -329,20 +318,23 @@ class CertificateUploadHandler(QObject):
     def persist_certificates(self, cert_number):
         """
         Moves the certificates from the Temp folder to the permanent
-        certificate directory in the CMIS server.
+        certificate directory in the CMIS server. The document object
+        models will also be created and returned as a list.
         :param cert_number: certificate number
+        :type cert_number: str
         """
         self._cert_doc_mapper.entity_name = self.CERT_ENTITY_NAME
 
         cert_objects = self._cert_doc_mapper.persist_documents(
-            str(cert_number)
+            cert_number
         )
         cert_doc_obj = self._cert_doc_model()
         cert_doc_obj.documents = cert_objects
         cert_doc_obj.save()
+        cert_number = cert_number.replace('.', '/')
         self._update_cert_metadata(cert_number)
 
-        # # Emit signal
+        # Emit signal
         self.persisted.emit()
 
         return cert_doc_obj.id
