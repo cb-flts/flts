@@ -60,14 +60,11 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self.notif_bar = NotificationBar(
             self.vlNotification
         )
-
         # Disables the maximize button
         self.setWindowFlags(Qt.WindowMinimizeButtonHint)
-
         # Set the labels text
         self._status_txt = self.lbl_status.text()
         self.lbl_status.setText(self._status_txt + 'Select scheme')
-
         # CMIS Manager
         self._cmis_mngr = CmisManager()
         # Certificate table model
@@ -76,60 +73,41 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self.tbvw_certificate.setModel(self._cert_model)
         # Certificate validator
         self._cert_validator = CertificateValidator(parent=self)
-
+        # Uploaded items
+        self._upload_items = OrderedDict()
         self._lbl_records_txt = self.lbl_records_count.text()
         self.lbl_records_count.setText(
             str(self._cert_model.rowCount()) + self._lbl_records_txt
         )
-
         # Get table horizontal header count
         tbvw_h_header = self.tbvw_certificate.horizontalHeader()
         tbvw_h_header_count = tbvw_h_header.count()
-
         # Resize horizontal headers proportionately
         for item in range(tbvw_h_header_count):
             tbvw_h_header.setResizeMode(item, QHeaderView.Stretch)
-
+        # Create an icon delegate for the table view
         icon_delegate = IconDelegate(self.tbvw_certificate)
-
+        # Set icon delagate
         self.tbvw_certificate.setItemDelegate(
             icon_delegate
         )
-
         # All controls disabled by default
         self._enable_controls(False)
-
         # Check connection to CMIS repository
         self._check_cmis_connection()
-
         # Connecting signals
         self.cbo_scheme_number.currentIndexChanged.connect(
-            self.on_cbo_scheme_changed
+            self._on_cbo_scheme_changed
         )
         self.btn_select_folder.clicked.connect(
-            self.on_select_folder
+            self._on_select_folder
         )
-        # self.btn_upload_certificate.clicked.connect(
-        #     self._on_upload_certificates
-        # )
         self._cert_validator.validated.connect(
             self._on_cert_info_validated
         )
         self._cert_validator.validation_completed.connect(
             self._on_validation_complete
         )
-        # self._cert_upload_handler.uploaded.connect(
-        #     self._on_cert_info_uploaded
-        # )
-        # self._cert_upload_handler.upload_completed.connect(
-        #     self._on_upload_complete
-        # )
-        # self._cert_upload_handler.persisted.connect(
-        #     self._on_persist_certificates
-        # )
-        # self.tbvw_certificate.clicked.connect(
-        #     self._on_preview_certificate
-        # )
         self.btn_close.clicked.connect(
             self._on_close
         )
@@ -184,7 +162,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             # Sort region combobox items
             self.cbo_scheme_number.model().sort(0)
 
-    def on_cbo_scheme_changed(self):
+    def _on_cbo_scheme_changed(self):
         """
         Slot raised when the scheme selection combobox is changed.
         """
@@ -197,7 +175,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             self.lbl_status.setText(
                 self._status_txt + 'Select certificates folder')
 
-    def on_select_folder(self):
+    def _on_select_folder(self):
         """
         Slot raised when the select folder button is clicked.
         """
@@ -320,13 +298,14 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             parent=self
         )
 
-        # Upload certificates
-        self._upload_certificates(
-            cert_info.filename,
-            upload_handler
-        )
+        # Upload only if status is can upload
+        if cert_info.validation_status == CertificateInfo.CAN_UPLOAD:
+            self._upload_certificates(
+                cert_info.filename,
+                upload_handler
+            )
 
-        # Populate upload items for saving in the CMIS permanent folder
+        # Populate upload items
         self._populate_uploaded_items(
             cert_info, upload_handler
         )
@@ -356,7 +335,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
 
     def _upload_certificates(self, filepath, uploader):
         """
-        Upload the certificates to the Temp folder in CMIS document repository.
+        Upload the certificates to the Temp folder in CMIS document
+        repository.
         :param filepath: The path to the certificate document.
         :type filepath: str
         :param uploader: Certificate upload handler.
@@ -372,13 +352,19 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         :param uploader: Certificate upload handler.
         :type uploader: CertificateUploadHandler
         """
-        upload_items = OrderedDict()
-        upload_items.update({cert_info: uploader})
+        self._upload_items.update({cert_info: uploader})
 
         self.btn_upload_certificate.clicked.connect(
             lambda: self._on_upload_button_clicked(
-                upload_items
+                self._upload_items
             )
+        )
+
+        self.btn_close.clicked.connect(
+            self._on_close
+        )
+        self.tbvw_certificate.clicked.connect(
+            self._on_preview_certificate
         )
 
     def _on_upload_button_clicked(self, upload_items):
@@ -398,6 +384,31 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         :param index: Model index of the table view model.
         :type index: QModelIndex
         """
+        cert_items = self._cert_model.cert_info_items
+        cert_info = cert_items[index.row()]
+        path = cert_info.filename
+
+        items_list = []
+        for handler in self._upload_items.iteritems():
+            doc_uuid = handler[1].certificate_uuid(path)
+            doc_name = handler[1].certificate_name(path)
+            items_list.append(doc_uuid)
+            items_list.append(doc_name)
+
+        if index.isValid():
+            if index.column() == 2:
+                self.notif_bar.clear()
+                path = cert_info.filename
+                validation_status = cert_info.validation_status
+                if validation_status != CertificateInfo.CAN_UPLOAD:
+                    msg = '{0} could not be found in the list of validated ' \
+                                  '/ uploaded documents'.format(cert_info.certificate_number)
+                    self.notif_bar.insertWarningNotification(msg)
+
+                pdf_viewer = PDFViewerWidget(
+                    items_list[0], items_list[1]
+                )
+                pdf_viewer.view_document()
 
     def _on_cert_info_uploaded(self, cert_path):
         """
@@ -441,7 +452,13 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self._cert_model.clear()
         self._show_record_count()
         self._cert_validator.clear()
-        self._upload_handler.reset()
+
+        if len(self._upload_items) > 0:
+            for k, v in self._upload_items.iteritems():
+                v.remove_certificate(
+                    k.filename
+                )
+
         # Close the widget
         self.close()
 

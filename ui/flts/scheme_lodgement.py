@@ -18,7 +18,6 @@ email                : stdm@unhabitat.org
  *                                                                         *
  ***************************************************************************/
 """
-from time import strftime
 from cmislib.exceptions import (
     CmisException
 )
@@ -39,9 +38,6 @@ from qgis.core import QgsApplication
 
 from stdm.ui.customcontrols.documents_table_widget import (
     DirDocumentTypeSelector
-)
-from stdm.ui.customcontrols.scheme_summary_widget import (
-    SchemeSummaryWidget
 )
 from stdm.data.pg_utils import (
     export_data,

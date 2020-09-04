@@ -25,7 +25,6 @@ from PyQt4.QtCore import (
 )
 
 from stdm.settings import current_profile
-from stdm.data.configuration import entity_model
 from stdm.data.pg_utils import export_data
 from stdm.network.cmis_manager import (
     CmisDocumentMapperException,
@@ -53,7 +52,7 @@ class CertificateUploadHandler(QObject):
     # Signals
     uploaded = pyqtSignal(unicode)
     upload_completed = pyqtSignal()
-    removed = pyqtSignal()
+    removed = pyqtSignal(tuple)
     persisted = pyqtSignal()
 
     def __init__(self, cert_info=None, cmis_mngr=None, parent=None):
@@ -82,8 +81,7 @@ class CertificateUploadHandler(QObject):
 
         self._cert_doc_mapper = CmisEntityDocumentMapper(
             cmis_manager=self._cmis_mngr,
-            doc_model_cls=self._cert_doc_model,
-            # entity_name=self.CERT_ENTITY_NAME
+            doc_model_cls=self._cert_doc_model
         )
 
         # Error messages as to why the upload handler is not responsive
@@ -459,40 +457,41 @@ class CertificateUploadHandler(QObject):
         else:
             return len(docs)
 
-    def remove_certificate(self, cert_number):
+    def remove_certificate(self, cert_path):
         """
         Remove the certificate with the given path from the document
         repository.
-        :param cert_number: Certificate number that uniquely identifies the
+        :param cert_path: Certificate path that uniquely identifies the
         certificate to be removed.
-        :type cert_number: str
+        :type cert_path: str
         """
-        self._remove_certificate_supporting_document(cert_number)
+        self._remove_certificate_supporting_document(cert_path, self.CERT_DOC_TYPE)
 
-    def _remove_certificate_supporting_document(self, cert_number, cert_doc_type):
+    def _remove_certificate_supporting_document(self, cert_path, cert_doc_type):
         """
         Removes the certificate indexed by the given certificate number and of
         the given type. Certificate must have been uploaded successfully
         before initiating the command to remove it else the operation will not
         be executed.
-        :param cert_number: Certificate number that uniquely identifies the
+        :param cert_path: Certificate path that uniquely identifies the
         certificate to be removed.
-        :type cert_number: str
+        :type cert_path: str
         :param cert_doc_type: Name of the certificate document type to be
         deleted.
         :type cert_doc_type: str
         """
         # Check if the certificate was previously uploaded.
-        crt = self.doc_from_cert_number(cert_number)
+        crt = self.doc_from_cert_number(cert_path)
         if not crt:
             # Remove reference if there was an error while attempting to
             # upload.
-            if cert_number in self._certificate_upload_error:
-                del self._certificate_upload_error[cert_number]
+            if cert_path in self._certificate_upload_error:
+                del self._certificate_upload_error[cert_path]
 
             return
 
-        uuid = self._uuid_from_cert(crt)
+        uuid = self._uuid_from_doc(crt)
+
         delete_crt = CmisDocumentDeleteThread(
             self._cert_doc_mapper,
             cert_doc_type,
@@ -527,7 +526,7 @@ class CertificateUploadHandler(QObject):
             path = self.cert_path_from_uuid(uuid)
             if path in self._uploaded_certs:
                 # Remove all references
-                del self._uploaded_docs[path]
+                del self._uploaded_certs[path]
                 del self._cert_upload_status[path]
 
                 # Emit signal with status info
