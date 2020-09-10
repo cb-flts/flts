@@ -1217,7 +1217,7 @@ BEGIN
 	IF doc_row IS NULL THEN
 		RETURN '';
 	ELSE
-		RETURN condition_txt || scheme_row.scheme_number;
+		RETURN condition_txt || substr(scheme_row.scheme_number, 9) || ' S';
 	END IF;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
