@@ -56,6 +56,9 @@ LOG_FILE_PATH = LOG_DIR + '/stdm_log'
 # Search
 SEARCH_DIR = u'{0}/search'.format(USER_PLUGIN_DIR)
 
+# Templates directory
+TEMPLATES_DIR = u'{0}/reports/templates'.format(USER_PLUGIN_DIR)
+
 
 def setup_logger():
     from stdm.settings.registryconfig import debug_logging
@@ -141,6 +144,18 @@ def copy_holders_configuration():
     copy_status = holders_conf_file.copy(holders_conf_dest)
 
 
+def setup_templates_folder():
+    # Create reports directory and templates sub-directory if it does not
+    # exist
+    reports_folder = QDir()
+    if not reports_folder.exists(TEMPLATES_DIR):
+        status = reports_folder.mkpath(TEMPLATES_DIR)
+
+        # Log directory could not be created
+        if not status:
+            raise IOError('Reports directory for FLTS could not be created.')
+
+
 def setup_search():
     # Create search directory if it does not exist
     search_folder = QDir()
@@ -183,6 +198,9 @@ def classFactory(iface):
 
     # Copy the holders mapping config file
     copy_holders_configuration()
+
+    # Create Search folder
+    setup_templates_folder()
 
     # Create Search folder
     setup_search()
