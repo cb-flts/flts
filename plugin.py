@@ -1841,58 +1841,70 @@ class STDMQGISLoader(object):
         composer with additional tools for designing
         map-based documents.
         """
-        if self.current_profile is None:
-            self.default_profile()
-            return
-        if len(db_user_tables(self.current_profile)) < 1:
-            self.minimum_table_checker()
-            return
-        title = QApplication.translate(
-            "STDMPlugin",
-            "FLTS Document Designer"
+        status, tables = self.check_module_tables(
+            ['scheme', 'holder']
         )
-        documentComposer = self.iface.createNewComposer(
-            title
-        )
-        # Embed STDM customizations
-        composerWrapper = ComposerWrapper(
-            documentComposer, self.iface
-        )
-        composerWrapper.configure()
+        if status:
+            if self.current_profile is None:
+                self.default_profile()
+                return
+            if len(db_user_tables(self.current_profile)) < 1:
+                self.minimum_table_checker()
+                return
+            title = QApplication.translate(
+                "STDMPlugin",
+                "FLTS Document Designer"
+            )
+            documentComposer = self.iface.createNewComposer(
+                title
+            )
+            # Embed STDM customizations
+            composerWrapper = ComposerWrapper(
+                documentComposer, self.iface
+            )
+            composerWrapper.configure()
 
     def onDocumentGenerator(self):
         """
         Document generator by person dialog.
         """
-        if self.current_profile is None:
-            self.default_profile()
-            return
-        if len(db_user_tables(self.current_profile)) < 1:
-            self.minimum_table_checker()
-            return
-        doc_gen_wrapper = CertificateGeneratorDialogWrapper(
-            self.iface,
-            self.iface.mainWindow(),
-            plugin=self
+        status, tables = self.check_module_tables(
+            ['scheme', 'holder', 'certificate', 'plot']
         )
-        doc_gen_wrapper.exec_()
+        if status:
+            if self.current_profile is None:
+                self.default_profile()
+                return
+            if len(db_user_tables(self.current_profile)) < 1:
+                self.minimum_table_checker()
+                return
+            doc_gen_wrapper = CertificateGeneratorDialogWrapper(
+                self.iface,
+                self.iface.mainWindow(),
+                plugin=self
+            )
+            doc_gen_wrapper.exec_()
 
     def onReportGenerator(self):
         """
         Report generator for CB-FLTS
         """
-        if self.current_profile is None:
-            self.default_profile()
-            return
-        if len(db_user_tables(self.current_profile)) < 1:
-            self.minimum_table_checker()
-            return
-        report_gen_wrapper = ReportGeneratorDialogWrapper(
-            self.iface,
-            self.iface.mainWindow(),
-            plugin=self
+        status, tables = self.check_module_tables(
+            ['scheme', 'holder']
         )
-        report_gen_wrapper.exec_()
+        if status:
+            if self.current_profile is None:
+                self.default_profile()
+                return
+            if len(db_user_tables(self.current_profile)) < 1:
+                self.minimum_table_checker()
+                return
+            report_gen_wrapper = ReportGeneratorDialogWrapper(
+                self.iface,
+                self.iface.mainWindow(),
+                plugin=self
+            )
+            report_gen_wrapper.exec_()
 
     def onImportData(self):
         """
@@ -2340,8 +2352,12 @@ class STDMQGISLoader(object):
         """
         Load the wizard for lodgement of scheme.
         """
-        lodge_wizard = LodgementWizard(self.iface.mainWindow())
-        lodge_wizard.exec_()
+        status, tables = self.check_module_tables(
+            ['scheme', 'holder', 'relevant_authority']
+        )
+        if status:
+            lodge_wizard = LodgementWizard(self.iface.mainWindow())
+            lodge_wizard.exec_()
 
     def establish_scheme(self):
         """
@@ -2352,8 +2368,12 @@ class STDMQGISLoader(object):
             "schemeEstablishment",
             Qt.BottomDockWidgetArea
         )
-        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        self.dock_widget.show_dock_widget()
+        status, tables = self.check_module_tables(
+            ['scheme', 'holder', 'scheme_workflow']
+        )
+        if status:
+            self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+            self.dock_widget.show_dock_widget()
 
     def first_examination(self):
         """
@@ -2364,8 +2384,12 @@ class STDMQGISLoader(object):
             "firstExamination",
             Qt.BottomDockWidgetArea
         )
-        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        self.dock_widget.show_dock_widget()
+        status, tables = self.check_module_tables(
+            ['scheme', 'holder', 'scheme_workflow']
+        )
+        if status:
+            self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+            self.dock_widget.show_dock_widget()
 
     def second_examination(self):
         """
@@ -2376,8 +2400,12 @@ class STDMQGISLoader(object):
             "secondExamination",
             Qt.BottomDockWidgetArea
         )
-        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        self.dock_widget.show_dock_widget()
+        status, tables = self.check_module_tables(
+            ['scheme', 'holder', 'scheme_workflow']
+        )
+        if status:
+            self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+            self.dock_widget.show_dock_widget()
 
     def third_examination(self):
         """
@@ -2388,8 +2416,12 @@ class STDMQGISLoader(object):
             "thirdExamination",
             Qt.LeftDockWidgetArea
         )
-        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        self.dock_widget.show_dock_widget()
+        status, tables = self.check_module_tables(
+            ['scheme', 'holder', 'scheme_workflow', 'plot']
+        )
+        if status:
+            self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+            self.dock_widget.show_dock_widget()
 
     def revise_scheme(self):
         """
@@ -2400,8 +2432,12 @@ class STDMQGISLoader(object):
             "schemeLodgement",
             Qt.BottomDockWidgetArea
         )
-        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        self.dock_widget.show_dock_widget()
+        status, tables = self.check_module_tables(
+            ['scheme', 'holder']
+        )
+        if status:
+            self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+            self.dock_widget.show_dock_widget()
 
     def import_plots(self):
         """
@@ -2412,8 +2448,12 @@ class STDMQGISLoader(object):
             "importPlot",
             Qt.LeftDockWidgetArea
         )
-        self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
-        self.dock_widget.show_dock_widget()
+        status, tables = self.check_module_tables(
+            ['scheme', 'holder', 'scheme_workflow', 'plot']
+        )
+        if status:
+            self.dock_widget = DockWidgetFactory(workflow_manager, self.iface)
+            self.dock_widget.show_dock_widget()
 
     def on_cert_upload(self):
         """
@@ -2422,5 +2462,42 @@ class STDMQGISLoader(object):
         if not self.cert_upload_widget:
             self.cert_upload_widget = CertificateUploadWidget()
 
-        self.cert_upload_widget.show()
-        self.cert_upload_widget.raise_()
+        status, tables = self.check_module_tables(
+            ['scheme', 'holder', 'scheme_workflow', 'plot', 'certificate']
+        )
+        if status:
+            self.cert_upload_widget.show()
+            self.cert_upload_widget.raise_()
+
+    def check_module_tables(self, entities, show_err=True):
+        """
+        Check entities
+        """
+        tables_not_exist = []
+        # get the current profile
+        cp = self.current_profile
+        if not cp:
+            return False, tables_not_exist
+
+        # get profile prefix
+        prefix = cp.prefix
+        for ent in entities:
+            ent_name = '{0}_{1}'.format(prefix, ent)
+            # check which tables exist
+            if not pg_table_exists(ent_name):
+                tables_not_exist.append(ent_name)
+
+        if len(tables_not_exist) > 0:
+            if show_err:
+                tables_msg = '\n- '.join(tables_not_exist)
+                QMessageBox.critical(
+                    self.iface.mainWindow(),
+                    'Invalid Tables',
+                    'The following tables do not exist:\n- {0}\n{1}'.format(
+                        tables_msg,
+                        'Please re-run the configuration wizard to create the tables.'
+                    )
+                )
+            return False, tables_not_exist
+        else:
+            return True, tables_not_exist

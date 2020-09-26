@@ -1092,7 +1092,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             if not ret_status:
                 self.docs_notif_bar.clear()
                 msg = self.tr(
-                    '(FOR NOW) Please upload at least one supporting '
+                    'Please upload all the supporting documents. '
                     'document.'
                 )
                 self.docs_notif_bar.insertWarningNotification(msg)
@@ -1125,16 +1125,9 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
     def _is_documents_page_valid(self):
         # Checks if the documents have been uploaded
-        # TODO: Update to incorporate a check for all documents
-        is_valid = False
         uploaded_docs = self.tbw_documents.uploaded_documents.values()
-        for d in uploaded_docs:
-            # Check if not None. To be refactored.
-            if d:
-                is_valid = True
-                break
 
-        return is_valid
+        return len(uploaded_docs) == self.tbw_documents.rowCount()
 
     def populate_summary(self):
         """
