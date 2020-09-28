@@ -1093,7 +1093,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
                 self.docs_notif_bar.clear()
                 msg = self.tr(
                     'Please upload all the supporting documents. '
-                    'document.'
                 )
                 self.docs_notif_bar.insertWarningNotification(msg)
 
