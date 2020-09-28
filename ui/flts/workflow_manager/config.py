@@ -679,11 +679,11 @@ class EntityRecordId(Config):
                     'Workflow Manager',
                     "Failed to get record id: {}".format(e)
                 )
-                QMessageBox.critical(
-                    self._parent,
-                    'Workflow Manager',
-                    msg
-                )
+                # QMessageBox.critical(
+                #     self._parent,
+                #     'Workflow Manager',
+                #     msg
+                # )
         return self._results
 
 

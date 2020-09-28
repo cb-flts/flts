@@ -171,7 +171,7 @@ class WorkflowManagerWidget(QWidget, Ui_WorkflowManagerWidget):
                 else self._disable_search()
         except (AttributeError, exc.SQLAlchemyError, Exception) as e:
             msg = "Failed to load: {}".format(e)
-            self._show_critical_message(msg)
+            # self._show_critical_message(msg)
         else:
             self.table_view.horizontalHeader().setStretchLastSection(True)
             self.table_view.horizontalHeader().\

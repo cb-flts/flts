@@ -2459,13 +2459,13 @@ class STDMQGISLoader(object):
         """
         Certificate upload
         """
-        if not self.cert_upload_widget:
-            self.cert_upload_widget = CertificateUploadWidget()
-
         status, tables = self.check_module_tables(
             ['scheme', 'holder', 'scheme_workflow', 'plot', 'certificate']
         )
         if status:
+            if not self.cert_upload_widget:
+                self.cert_upload_widget = CertificateUploadWidget()
+
             self.cert_upload_widget.show()
             self.cert_upload_widget.raise_()
 
