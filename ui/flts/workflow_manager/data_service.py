@@ -1099,9 +1099,11 @@ class PlotPreviewDataService(DataService):
         :return relevant_authority: Scheme Relevant Authority record/row
         :rtype relevant_authority: Entity
         """
+        schm_number = self._scheme.scheme_number
         filters = {
             "type_of_relevant_authority": self._scheme.relevant_authority,
-            "region": self._scheme.region
+            "region": self._scheme.region,
+            "au_code": schm_number.split('.')[0]
         }
         model = self.entity_model_("Relevant_authority")
         relevant_authority = self.filter_query_by(
