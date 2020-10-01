@@ -108,6 +108,9 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self._cert_validator.validation_completed.connect(
             self._on_validation_complete
         )
+        self.tbvw_certificate.clicked.connect(
+            self._on_preview_certificate
+        )
         self.btn_close.clicked.connect(
             self._on_close
         )
@@ -363,9 +366,6 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self.btn_close.clicked.connect(
             self._on_close
         )
-        self.tbvw_certificate.clicked.connect(
-            self._on_preview_certificate
-        )
 
     def _on_upload_button_clicked(self, upload_items):
         """
@@ -388,25 +388,26 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         cert_info = cert_items[index.row()]
         path = cert_info.filename
 
-        items_list = []
+        items_ = {}
         for handler in self._upload_items.iteritems():
+            cert_info = handler[0]
             doc_uuid = handler[1].certificate_uuid(path)
             doc_name = handler[1].certificate_name(path)
-            items_list.append(doc_uuid)
-            items_list.append(doc_name)
+            items_[cert_info] = doc_uuid, doc_name
 
         if index.isValid():
             if index.column() == 2:
                 self.notif_bar.clear()
-                path = cert_info.filename
                 validation_status = cert_info.validation_status
                 if validation_status != CertificateInfo.CAN_UPLOAD:
                     msg = '{0} could not be found in the list of validated ' \
                                   '/ uploaded documents'.format(cert_info.certificate_number)
                     self.notif_bar.insertWarningNotification(msg)
 
+                uuid, name = items_.values()[index.row()]
                 pdf_viewer = PDFViewerWidget(
-                    items_list[0], items_list[1]
+                    uuid,
+                    name
                 )
                 pdf_viewer.view_document()
 
