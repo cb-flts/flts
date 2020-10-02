@@ -400,8 +400,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
                 self.notif_bar.clear()
                 validation_status = cert_info.validation_status
                 if validation_status != CertificateInfo.CAN_UPLOAD:
-                    msg = '{0} could not be found in the list of validated ' \
-                                  '/ uploaded documents'.format(cert_info.certificate_number)
+                    msg = '{0} could not be found in the list of validated' \
+                          ' uploaded documents'.format(cert_info.certificate_number)
                     self.notif_bar.insertWarningNotification(msg)
 
                 uuid, name = items_.values()[index.row()]
