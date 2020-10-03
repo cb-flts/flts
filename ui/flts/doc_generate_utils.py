@@ -92,7 +92,9 @@ def certificate_preprocess(plot, plots):
     scheme_plot_layer.setCustomProperty("labeling/fontFamily", "Arial")
     scheme_plot_layer.setCustomProperty("labeling/fontSize", "8")
     scheme_plot_layer.setCustomProperty("labeling/fieldName", "plot_number")
-    scheme_plot_layer.setCustomProperty("labeling/placement", "0")
+    scheme_plot_layer.setCustomProperty("labeling/placement", "1")
+    scheme_plot_layer.setCustomProperty("labeling/centroidInside", "true")
+    scheme_plot_layer.setCustomProperty("labeling/centroidWhole", "true")
 
     scheme_plot_layer.triggerRepaint()
 
