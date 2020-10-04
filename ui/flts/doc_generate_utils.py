@@ -90,6 +90,7 @@ def certificate_preprocess(plot, plots):
     scheme_plot_layer.setCustomProperty("labeling", "pal")
     scheme_plot_layer.setCustomProperty("labeling/enabled", "true")
     scheme_plot_layer.setCustomProperty("labeling/fontFamily", "Arial")
+    # scheme_plot_layer.setCustomProperty("labeling/namedStyle", "Bold")
     scheme_plot_layer.setCustomProperty("labeling/fontSize", "8")
     scheme_plot_layer.setCustomProperty("labeling/fieldName", "plot_number")
     scheme_plot_layer.setCustomProperty("labeling/placement", "1")

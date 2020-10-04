@@ -1254,7 +1254,7 @@ CREATE OR REPLACE FUNCTION "public"."flts_marital_status_offset_value"("holder_r
 	IF holder_row.marital_status = 2 THEN
 		RETURN 0;
 	ELSEIF holder_row.marital_status IS NULL THEN
-		RETURN 0;
+		RETURN -11;
 	ELSE
 		RETURN 25;
 	END IF;
