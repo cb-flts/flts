@@ -170,6 +170,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         Slot raised when the scheme selection combobox is changed.
         """
         if not self.cbo_scheme_number.currentText():
+            self._cert_model.clear()
             self.btn_select_folder.setEnabled(False)
             self.lbl_status.setText(self._status_txt + 'Select scheme')
         else:
@@ -388,7 +389,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         cert_info = cert_items[index.row()]
         path = cert_info.filename
 
-        items_ = {}
+        items_ = OrderedDict()
         for handler in self._upload_items.iteritems():
             cert_info = handler[0]
             doc_uuid = handler[1].certificate_uuid(path)
