@@ -170,7 +170,14 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         Slot raised when the scheme selection combobox is changed.
         """
         if not self.cbo_scheme_number.currentText():
+            # Clear model
             self._cert_model.clear()
+            # Clear the Temp CMIS folder
+            if len(self._upload_items) > 0:
+                for k, v in self._upload_items.iteritems():
+                    v.remove_certificate(
+                        k.filename
+                    )
             self.btn_select_folder.setEnabled(False)
             self.lbl_status.setText(self._status_txt + 'Select scheme')
         else:
@@ -186,29 +193,33 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         scan_cert_path = scanned_certificate_path()
         if not scan_cert_path:
             scan_cert_path = '~/'
-        # Check if combobox has scheme selected.
-        if not self.cbo_scheme_number.currentText():
-            self.notif_bar.clear()
-            self.notif_bar.insertWarningNotification(
-                self.tr(
-                    "Scheme name must be selected first."
-                )
-            )
-        else:
-            cert_dir = QFileDialog.getExistingDirectory(
-                self,
-                "Browse Certificates Source Folder",
-                scan_cert_path,
-                QFileDialog.ShowDirsOnly
-            )
-            # Check if directory is selected
-            if cert_dir:
+        cert_dir = QFileDialog.getExistingDirectory(
+            self,
+            "Browse Certificates Source Folder",
+            scan_cert_path,
+            QFileDialog.ShowDirsOnly
+        )
+        # Check if selected directory is mapped
+        if cert_dir:
+            if cert_dir != scan_cert_path:
+                # Clear model and Temp CMIS folder
+                self._cert_model.clear()
+                if len(self._upload_items) > 0:
+                    for k, v in self._upload_items.iteritems():
+                        v.remove_certificate(
+                            k.filename
+                        )
                 # Set path to the scanned certificate directory
                 set_scanned_certificate_path(cert_dir)
                 # Get certificate info items from directory
                 cert_info_items = self._cert_info_from_dir(cert_dir)
                 # Populate cert info items
                 self._populate_cert_info_items(cert_info_items)
+            else:
+                if self._cert_model.rowCount() == 0:
+                    cert_info_items = self._cert_info_from_dir(cert_dir)
+                    # Populate cert info items
+                    self._populate_cert_info_items(cert_info_items)
 
     def _cert_info_from_dir(self, path):
         """
@@ -322,10 +333,12 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         cert_info_items = self._cert_model.cert_info_items
 
         # Create an empty list to store certificate statuses
-        status_res = []
-        for cert in cert_info_items:
-            status = cert.validation_status
-            status_res.append(status)
+        # status_res = []
+        # for cert in cert_info_items:
+        #     status = cert.validation_status
+        #     status_res.append(status)
+
+        status_res = [cert.validation_status for cert in cert_info_items]
 
         can_upload = CertificateInfo.CAN_UPLOAD
 

@@ -1178,11 +1178,11 @@ BEGIN
 	ELSE
 		IF holder_row.marital_status = 1 THEN
 			IF holder_row.nature_of_marriage = 1 THEN
-				RETURN 'Married, which marriage does not have the legal consequences of a marriage in community of property, by virtue of the provisions of Proclamation 15 of 1928.';
-			ELSIF holder_row.nature_of_marriage = 2 THEN
 				RETURN 'Married in community of property to each other.';
+			ELSIF holder_row.nature_of_marriage = 2 THEN
+				RETURN 'Married out of community of property.';
 			ELSE
-				RETURN 'Married out of  community of property.';
+				RETURN 'Married, which marriage does not have the legal consequences of a marriage in community of property, by virtue of the provisions of Proclamation 15 of 1928.';
 			END IF;
 		ELSE
 		RETURN 'Unmarried';
