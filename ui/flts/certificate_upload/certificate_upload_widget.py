@@ -75,10 +75,6 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self._cert_validator = CertificateValidator(parent=self)
         # Uploaded items
         self._upload_items = OrderedDict()
-        self._lbl_records_txt = self.lbl_records_count.text()
-        self.lbl_records_count.setText(
-            str(self._cert_model.rowCount()) + self._lbl_records_txt
-        )
         # Get table horizontal header count
         tbvw_h_header = self.tbvw_certificate.horizontalHeader()
         tbvw_h_header_count = tbvw_h_header.count()
@@ -87,12 +83,14 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             tbvw_h_header.setResizeMode(item, QHeaderView.Stretch)
         # Create an icon delegate for the table view
         icon_delegate = IconDelegate(self.tbvw_certificate)
-        # Set icon delagate
+        # Set icon delegate
         self.tbvw_certificate.setItemDelegate(
             icon_delegate
         )
         # All controls disabled by default
         self._enable_controls(False)
+        # Records count
+        self._update_record_count()
         # Check connection to CMIS repository
         self._check_cmis_connection()
         # Connecting signals
@@ -115,16 +113,6 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             self._on_close
         )
 
-    def _enable_controls(self, enable):
-        """
-        Enable or disable user interface controls.
-        :param enable: Status of the controls.
-        :type enable: bool
-        """
-        self.btn_select_folder.setEnabled(enable)
-        self.cbo_scheme_number.setEnabled(enable)
-        self.btn_upload_certificate.setEnabled(enable)
-
     def _check_cmis_connection(self):
         """
         Checks whether there is connection to the cmis repository.
@@ -141,6 +129,16 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         else:
             self.cbo_scheme_number.setEnabled(True)
             self._populate_schemes()
+
+    def _enable_controls(self, enable):
+        """
+        Enable or disable user interface controls.
+        :param enable: Status of the controls.
+        :type enable: bool
+        """
+        self.btn_select_folder.setEnabled(enable)
+        self.cbo_scheme_number.setEnabled(enable)
+        self.btn_upload_certificate.setEnabled(enable)
 
     def _populate_schemes(self):
         """
@@ -169,22 +167,17 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         Slot raised when the scheme selection combobox is changed.
         """
-        if not self.cbo_scheme_number.currentText():
-            # Clear model
-            self._cert_model.clear()
-            # Clear the Temp CMIS folder
-            if len(self._upload_items) > 0:
-                for k, v in self._upload_items.iteritems():
-                    v.remove_certificate(
-                        k.filename
-                    )
-            self.btn_select_folder.setEnabled(False)
-            self.lbl_status.setText(self._status_txt + 'Select scheme')
-        else:
+        self._cert_model.clear()
+        self._update_record_count()
+        if self.cbo_scheme_number.currentText():
             self.btn_select_folder.setEnabled(True)
             self.tbvw_certificate.setEnabled(True)
             self.lbl_status.setText(
                 self._status_txt + 'Select certificates folder')
+            self._update_record_count()
+        else:
+            self.btn_select_folder.setEnabled(False)
+            self.lbl_status.setText(self._status_txt + 'Select scheme')
 
     def _on_select_folder(self):
         """
@@ -272,17 +265,18 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             )
             return
 
-        self._show_record_count()
+        self._update_record_count()
 
         # Validation function call
         self._validate_items(cert_info_items)
 
-    def _show_record_count(self):
+    def _update_record_count(self):
         """
         Show the number of records loaded in the view.
         """
+        rec_count = self._cert_model.rowCount()
         self.lbl_records_count.setText(
-            str(self._cert_model.rowCount()) + self._lbl_records_txt
+            '{0} files'.format(rec_count)
         )
 
     def _validate_items(self, cert_info_items):
@@ -465,7 +459,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
 
         # Clear the model and validation items
         self._cert_model.clear()
-        self._show_record_count()
+        self._update_record_count()
         self._cert_validator.clear()
 
         if len(self._upload_items) > 0:
