@@ -87,8 +87,6 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self.tbvw_certificate.setItemDelegate(
             icon_delegate
         )
-        # All controls disabled by default
-        self._enable_controls(False)
         # Records count
         self._update_record_count()
         # Check connection to CMIS repository
@@ -120,12 +118,12 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         no connection.
         :rtype: bool
         """
+        self._enable_controls(False)
         if not self._cmis_mngr.connect():
             msg = self.tr(
                 'Failed to connect to the CMIS Service.'
             )
             self.show_error_message(msg)
-            self._enable_controls(False)
         else:
             self.cbo_scheme_number.setEnabled(True)
             self._populate_schemes()
