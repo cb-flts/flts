@@ -2492,10 +2492,10 @@ class STDMQGISLoader(object):
                 tables_msg = '\n- '.join(tables_not_exist)
                 QMessageBox.critical(
                     self.iface.mainWindow(),
-                    'Invalid Tables',
+                    'Missing Tables',
                     'The following tables do not exist:\n- {0}\n{1}'.format(
                         tables_msg,
-                        'Please re-run the configuration wizard to create the tables.'
+                        'Please contact the system administrator to re-run configuration.'
                     )
                 )
             return False, tables_not_exist
