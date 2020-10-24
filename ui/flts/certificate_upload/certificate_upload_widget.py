@@ -154,7 +154,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         # Check if no schemes loaded
         if not sch_data:
             msg = self.tr(
-                'Schemes could not be loaded.'
+                'No schemes in the database.'
             )
             self.show_error_message(msg)
         else:
