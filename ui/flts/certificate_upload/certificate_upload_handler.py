@@ -313,7 +313,7 @@ class CertificateUploadHandler(QObject):
         """
         return self._certificate_upload_error.get(certificate_number, '')
 
-    def persist_certificates(self, cert_number):
+    def persist_certificate(self, cert_number):
         """
         Moves the certificates from the Temp folder to the permanent
         certificate directory in the CMIS server. The document object
@@ -322,7 +322,6 @@ class CertificateUploadHandler(QObject):
         :type cert_number: str
         """
         self._cert_doc_mapper.entity_name = self.CERT_ENTITY_NAME
-
         cert_objects = self._cert_doc_mapper.persist_documents(
             cert_number
         )

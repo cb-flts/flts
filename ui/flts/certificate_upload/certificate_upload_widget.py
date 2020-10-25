@@ -110,6 +110,12 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self.btn_close.clicked.connect(
             self._on_close
         )
+        self.btn_upload_certificate.clicked.connect(
+            self._on_upload_button_clicked
+        )
+
+        self._can_upload = False
+        self.cert_upload_handler_items = OrderedDict()
 
     def _check_cmis_connection(self):
         """
@@ -165,6 +171,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         Slot raised when the scheme selection combobox is changed.
         """
+        self.cert_upload_handler_items.clear()
         self._cert_model.clear()
         self._update_record_count()
         if self.cbo_scheme_number.currentText():
@@ -227,7 +234,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         cert_info_items = []
         if len(file_infos) == 0:
             msg = self.tr(
-                'There are no files in the selected directory.'
+                'There are no PDF files in the selected directory.'
             )
             self.show_error_message(msg)
             self._cert_model.clear()
@@ -252,17 +259,6 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         :type cert_info_items: list
         """
         self._cert_model.cert_info_items = cert_info_items
-
-        # Check if certificate items is empty
-        if len(cert_info_items) == 0:
-            self.notif_bar.clear()
-            self.notif_bar.insertWarningNotification(
-                self.tr(
-                    "There are no certificates to be uploaded."
-                )
-            )
-            return
-
         self._update_record_count()
 
         # Validation function call
@@ -270,7 +266,16 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
 
     def _update_record_count(self):
         """
-        Show the number of records loaded in the view.
+        Update the number of records loaded in the view.
+        """
+        rec_count = self._cert_model.rowCount()
+        self.lbl_records_count.setText(
+            '{0} files'.format(rec_count)
+        )
+
+    def _update_status_text(self):
+        """
+        Update the status label text informing the user.
         """
         rec_count = self._cert_model.rowCount()
         self.lbl_records_count.setText(
@@ -300,89 +305,56 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self._cert_model.update_validation_status(
             cert_info.certificate_number
         )
-        upload_handler = CertificateUploadHandler(
-            cmis_mngr=self._cmis_mngr,
-            parent=self
-        )
 
         # Upload only if status is can upload
         if cert_info.validation_status == CertificateInfo.CAN_UPLOAD:
-            self._upload_certificates(
-                cert_info.filename,
-                upload_handler
-            )
+            self._can_upload = True
+            # Upload the certificate to the Temp CMIS folder
+            self._upload_certificate(cert_info)
 
         # Populate upload items
-        self._populate_uploaded_items(
-            cert_info, upload_handler
-        )
+        # self._populate_uploaded_items(
+        #     cert_info, upload_handler
+        # )
 
     def _on_validation_complete(self):
         """
         Slot raised when the validation is complete.
         """
-        # Get loaded certificates from the model
-        cert_info_items = self._cert_model.cert_info_items
-
-        # Create an empty list to store certificate statuses
-        # status_res = []
-        # for cert in cert_info_items:
-        #     status = cert.validation_status
-        #     status_res.append(status)
-
-        status_res = [cert.validation_status for cert in cert_info_items]
-
-        can_upload = CertificateInfo.CAN_UPLOAD
-
-        # Check if any of the loaded certificates can be uploaded
-        if can_upload not in status_res:
-            self.btn_upload_certificate.setEnabled(False)
-            self.lbl_status.setText(self._status_txt + 'Cannot upload')
-        else:
+        if self._can_upload:
             self.btn_upload_certificate.setEnabled(True)
             self.lbl_status.setText(self._status_txt + 'Ready to upload')
 
-    def _upload_certificates(self, filepath, uploader):
+    def _upload_certificate(self, cert_info):
         """
-        Upload the certificates to the Temp folder in CMIS document
-        repository.
-        :param filepath: The path to the certificate document.
-        :type filepath: str
-        :param uploader: Certificate upload handler.
-        :type uploader: CertificateUploadHandler
+        Updates the certificate upload handler. Upload the certificate to
+        the Temp folder in CMIS document repository.
+        :param cert_info: Certificate upload handler.
+        :type cert_info: CertificateUploadHandler
         """
-        uploader.upload_certificate(filepath)
-
-    def _populate_uploaded_items(self, cert_info, uploader):
-        """
-        Map the uploaded items to their corresponding upload handlers.
-        :param cert_info: Certificate info items of the uploaded certificate.
-        :type cert_info: CertificateInfo
-        :param uploader: Certificate upload handler.
-        :type uploader: CertificateUploadHandler
-        """
-        self._upload_items.update({cert_info: uploader})
-
-        self.btn_upload_certificate.clicked.connect(
-            lambda: self._on_upload_button_clicked(
-                self._upload_items
-            )
+        upload_handler = CertificateUploadHandler(
+            cmis_mngr=self._cmis_mngr,
+            parent=self
         )
+        self.cert_upload_handler_items[cert_info.certificate_number] = \
+            upload_handler
 
-        self.btn_close.clicked.connect(
-            self._on_close
-        )
+        upload_handler.upload_certificate(cert_info.filename)
 
-    def _on_upload_button_clicked(self, upload_items):
+    def _on_upload_button_clicked(self):
         """
         Slot raised when the upload button is clicked.
         """
-        for k, v in upload_items.iteritems():
-            cert_number = str(k.certificate_number).replace('/', '.')
-            upload_handler = v
-            upload_handler.persist_certificates(
-                cert_number
-            )
+        self._persist_certificate()
+
+    def _persist_certificate(self):
+        """
+        Moves the certificates from the Temp folder to the permanent CMIS
+        folder.
+        """
+        for num, handler in self.cert_upload_handler_items.iteritems():
+            cert_num = str(num).replace('/', '.')
+            handler.persist_certificate(cert_num)
 
     def _on_preview_certificate(self, index):
         """
@@ -459,12 +431,14 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self._cert_model.clear()
         self._update_record_count()
         self._cert_validator.clear()
+        self.cert_upload_handler_items.clear()
 
         if len(self._upload_items) > 0:
-            for k, v in self._upload_items.iteritems():
-                v.remove_certificate(
-                    k.filename
-                )
+            for k, v in self.cert_upload_handler_items.iteritems():
+                print('key: ', )
+                # v.remove_certificate(
+                #     k.filename
+                # )
 
         # Close the widget
         self.close()
