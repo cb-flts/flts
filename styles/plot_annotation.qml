@@ -4,27 +4,6 @@
     <edittype widgetv2type="TextEdit" name="id">
       <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
     </edittype>
-    <edittype widgetv2type="TextEdit" name="upi">
-      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-    </edittype>
-    <edittype widgetv2type="TextEdit" name="use">
-      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-    </edittype>
-    <edittype widgetv2type="TextEdit" name="plot_number">
-      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-    </edittype>
-    <edittype widgetv2type="TextEdit" name="area">
-      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-    </edittype>
-    <edittype widgetv2type="TextEdit" name="scheme_id">
-      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-    </edittype>
-    <edittype widgetv2type="TextEdit" name="crs_id">
-      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-    </edittype>
-    <edittype widgetv2type="TextEdit" name="scheme_field_book_id">
-      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-    </edittype>
   </edittypes>
   <renderer-v2 forceraster="0" symbollevels="0" type="singleSymbol" enableorderby="0">
     <symbols>
@@ -66,7 +45,7 @@
                     <layer pass="0" class="FontMarker" locked="0">
                       <prop k="angle" v="0"/>
                       <prop k="char_dd_active" v="1"/>
-                      <prop k="char_dd_expression" v="format_number(&#xd;&#xa;&#x9;length(make_line(&#xd;&#xa;&#x9;transform(point_n($geometry,(@geometry_part_num)), 'EPSG:4326', 'EPSG:29375'),&#xd;&#xa;&#x9;transform(point_n( $geometry,(@geometry_part_num+1)), 'EPSG:4326', 'EPSG:29375')&#xd;&#xa;&#x9;)),&#xd;&#xa;&#x9;2&#xd;&#xa;) ||' m'"/>
+                      <prop k="char_dd_expression" v="format_number(&#xd;&#xa;&#x9;length(make_line(&#xd;&#xa;&#x9;transform(point_n($geometry,(@geometry_part_num)), 'EPSG:4326',  @flts_source_crs ),&#xd;&#xa;&#x9;transform(point_n( $geometry,(@geometry_part_num+1)), 'EPSG:4326',  @flts_source_crs )&#xd;&#xa;&#x9;)),&#xd;&#xa;&#x9;2&#xd;&#xa;) ||' m'"/>
                       <prop k="char_dd_field" v=""/>
                       <prop k="char_dd_useexpr" v="1"/>
                       <prop k="chr" v="A"/>
@@ -93,7 +72,7 @@
             <layer pass="0" class="FontMarker" locked="0">
               <prop k="angle" v="0"/>
               <prop k="char_dd_active" v="1"/>
-              <prop k="char_dd_expression" v="'Y = ' || round(x(&#xd;&#xa;&#x9;transform(point_n($geometry, @geometry_part_num), 'EPSG:4326', 'EPSG:29375')&#xd;&#xa;&#x9;), &#xd;&#xa;&#x9;3&#xd;&#xa;)"/>
+              <prop k="char_dd_expression" v="'Y = ' || round(x(&#xd;&#xa;&#x9;transform(point_n($geometry, @geometry_part_num), 'EPSG:4326',  @flts_source_crs )&#xd;&#xa;&#x9;), &#xd;&#xa;&#x9;3&#xd;&#xa;)"/>
               <prop k="char_dd_field" v=""/>
               <prop k="char_dd_useexpr" v="1"/>
               <prop k="chr" v="A"/>
@@ -182,7 +161,7 @@
             <layer pass="0" class="FontMarker" locked="0">
               <prop k="angle" v="0"/>
               <prop k="char_dd_active" v="1"/>
-              <prop k="char_dd_expression" v="'X = ' || round(y(&#xd;&#xa;&#x9;transform(point_n($geometry, @geometry_part_num), 'EPSG:4326', 'EPSG:29375')&#xd;&#xa;&#x9;), &#xd;&#xa;&#x9;3&#xd;&#xa;)"/>
+              <prop k="char_dd_expression" v="'X = ' || round(y(&#xd;&#xa;&#x9;transform(point_n($geometry, @geometry_part_num), 'EPSG:4326',  @flts_source_crs )&#xd;&#xa;&#x9;), &#xd;&#xa;&#x9;3&#xd;&#xa;)"/>
               <prop k="char_dd_field" v=""/>
               <prop k="char_dd_useexpr" v="1"/>
               <prop k="chr" v="A"/>
@@ -201,7 +180,7 @@
               <prop k="outline_width" v="0"/>
               <prop k="outline_width_map_unit_scale" v="0,0,0,0,0,0"/>
               <prop k="outline_width_unit" v="MM"/>
-              <prop k="size" v="2.4"/>
+              <prop k="size" v="5"/>
               <prop k="size_map_unit_scale" v="0,0,0,0,0,0"/>
               <prop k="size_unit" v="MM"/>
               <prop k="vertical_anchor_point" v="1"/>
@@ -475,13 +454,6 @@
   <annotationform>.</annotationform>
   <aliases>
     <alias field="id" index="0" name=""/>
-    <alias field="upi" index="1" name=""/>
-    <alias field="use" index="2" name=""/>
-    <alias field="plot_number" index="3" name=""/>
-    <alias field="area" index="4" name=""/>
-    <alias field="scheme_id" index="5" name=""/>
-    <alias field="crs_id" index="6" name=""/>
-    <alias field="scheme_field_book_id" index="7" name=""/>
   </aliases>
   <excludeAttributesWMS/>
   <excludeAttributesWFS/>
@@ -490,13 +462,6 @@
     <columns>
       <column width="-1" hidden="0" type="field" name="id"/>
       <column width="-1" hidden="1" type="actions"/>
-      <column width="-1" hidden="0" type="field" name="upi"/>
-      <column width="-1" hidden="0" type="field" name="use"/>
-      <column width="-1" hidden="0" type="field" name="plot_number"/>
-      <column width="-1" hidden="0" type="field" name="area"/>
-      <column width="-1" hidden="0" type="field" name="scheme_id"/>
-      <column width="-1" hidden="0" type="field" name="crs_id"/>
-      <column width="-1" hidden="0" type="field" name="scheme_field_book_id"/>
     </columns>
   </attributetableconfig>
   <editform>.</editform>
@@ -529,13 +494,6 @@ def my_form_open(dialog, layer, feature):
   </conditionalstyles>
   <defaults>
     <default field="id" expression=""/>
-    <default field="upi" expression=""/>
-    <default field="use" expression=""/>
-    <default field="plot_number" expression=""/>
-    <default field="area" expression=""/>
-    <default field="scheme_id" expression=""/>
-    <default field="crs_id" expression=""/>
-    <default field="scheme_field_book_id" expression=""/>
   </defaults>
   <previewExpression></previewExpression>
   <layerGeometryType>2</layerGeometryType>
