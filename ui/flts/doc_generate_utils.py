@@ -29,18 +29,22 @@ from qgis.core import (
     QgsSymbolV2
 )
 from qgis.utils import iface
-from qgis.core import QgsApplication
+from qgis.core import (
+    QgsApplication,
+    QgsExpressionContextUtils
+)
 
 from sqlalchemy.sql.expression import text
 
 from stdm.settings import current_profile
 from stdm.data.configuration import entity_model
-from stdm.data.pg_utils import _execute
+from stdm.data.pg_utils import _execute, export_data
 import stdm.data
 from stdm.utils.flts import lht_plot_layer
 from stdm import STYLES_DIR
 
 CERTIFICATE_PLOT = 'Certificate Plot'
+
 # STYLE_FILE = '{0}/scheme_plots_label.qml'.format(STYLES_DIR)
 
 
@@ -51,6 +55,12 @@ def certificate_preprocess(plot, plots):
     """
     scheme_plot_layer = lht_plot_layer(plot.scheme_id, CERTIFICATE_PLOT)
     QgsMapLayerRegistry.instance().addMapLayer(scheme_plot_layer)
+    # Get the EPSG code of the plot
+    epsg_code = plot.cb_check_lht_plot_crs.value
+    # Setting the project CRS variable
+    QgsExpressionContextUtils.setProjectVariable(
+        'flts_source_crs', epsg_code
+    )
 
     # Styling reference plot using primary key
     filter_exp = '"id" = ' + str(plot.id)
