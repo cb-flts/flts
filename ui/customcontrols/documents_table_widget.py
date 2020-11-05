@@ -349,13 +349,15 @@ class DocumentTableWidget(QTableWidget):
         # Emit signal
         self.browsed.emit(doc_info)
 
-    def upload_document(self, doc_file_path, doc_type):
+    def upload_document(self, doc_file_path, doc_type=None):
         """
-        Upload the document in doc_file_path to the document repository. The
-        entity document mapper should have been set as it handles the
-        communication to the CMIS server.
-        :param doc_file_path: Path to the document to be uploaded.
-        :type doc_file_path: str
+        Upload one or more documents in doc_file_path to the document
+        repository. The entity document mapper should have been set as it
+        handles the communication to the CMIS server.
+        :param doc_file_path: Path to the document to be uploaded. If of
+        'dict' type then the key should be doc_type and the corresponding
+        value should be the doc_file_path.
+        :type doc_file_path: str or dict
         :param doc_type: Type of the document.
         :type doc_type: str
         """
@@ -382,7 +384,12 @@ class DocumentTableWidget(QTableWidget):
             )
 
             # Disable widgets and show upload progress bar
-            self._before_upload(doc_type)
+            if isinstance(doc_file_path, dict):
+                doc_types = doc_file_path.keys()
+                for dt in doc_types:
+                    self._before_upload(dt)
+            else:
+                self._before_upload(doc_type)
 
             upload_thread.start()
 
@@ -743,10 +750,10 @@ class CmisDocumentUploadThread(QThread):
     error = pyqtSignal(tuple) # (doc_type, error_msg)
     succeeded = pyqtSignal(tuple) # (doc_type, Document)
 
-    def __init__(self, path, cmis_doc_mapper, doc_type, parent=None):
+    def __init__(self, path, cmis_doc_mapper, doc_type=None, parent=None):
         super(CmisDocumentUploadThread, self).__init__(parent)
         self._doc_mapper = cmis_doc_mapper
-        self._file_path = path
+        self._file_paths = path
         self._doc_type = doc_type
 
     @property
@@ -756,22 +763,30 @@ class CmisDocumentUploadThread(QThread):
         attempted to be uploaded.
         :rtype: str
         """
-        return self._file_path
+        return self._file_paths
 
-    def run(self):
-        # Upload the document content through the doc mapper
+    def _upload_document(self, doc_type, path):
+        # Upload each document in path
         try:
             doc = self._doc_mapper.upload_document(
-                self._file_path,
-                self._doc_type
+                path,
+                doc_type
             )
-            self.succeeded.emit((self._doc_type, doc))
+            self.succeeded.emit((doc_type, doc))
         except CmisDocumentMapperException as cdmex:
-            self.error.emit((self._doc_type, str(cdmex)))
+            self.error.emit((doc_type, str(cdmex)))
         except CmisException as cex:
-            self.error.emit((self._doc_type, cex.status))
+            self.error.emit((doc_type, cex.status))
         except Exception as ex:
-            self.error.emit((self._doc_type, str(ex)))
+            self.error.emit((doc_type, str(ex)))
+
+    def run(self):
+        # If multiple files specified then iter the file path collection
+        if isinstance(self._file_paths, basestring):
+            self._upload_document(self._doc_type, self._file_paths)
+        else:
+            for doc_type, path in self._file_paths.iteritems():
+                self._upload_document(doc_type, path)
 
 
 class CmisDocumentDeleteThread(QThread):

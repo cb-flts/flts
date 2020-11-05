@@ -910,13 +910,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         if res == QDialog.Accepted:
             # Get document types selected by the user
             selected_doc_types = dir_doc_dlg.selected_document_types
-
-            # Upload the files
-            for d_type, d_path in selected_doc_types.iteritems():
-                self.tbw_documents.upload_document(
-                    d_path,
-                    d_type
-                )
+            self.tbw_documents.upload_document(selected_doc_types)
 
     def register_col_widgets(self):
         """
