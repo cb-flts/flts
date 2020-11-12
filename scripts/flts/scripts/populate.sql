@@ -1264,55 +1264,40 @@ END;$BODY$
 
 --- Converts integer values to text
 CREATE OR REPLACE FUNCTION "public"."flts_integer_to_text"(int4)
-  RETURNS "pg_catalog"."text" AS $BODY$SELECT CASE WHEN $1<1 THEN NULL
-              WHEN $1=1 THEN 'One'
-              WHEN $1=2 THEN 'Two'
-              WHEN $1=3 THEN 'Three'
-              WHEN $1=4 THEN 'Four'
-              WHEN $1=5 THEN 'Five'
-              WHEN $1=6 THEN 'Six'
-              WHEN $1=7 THEN 'Seven'
-              WHEN $1=8 THEN 'Eight'
-              WHEN $1=9 THEN 'Nine'
-              WHEN $1=10 THEN 'Ten'
-              WHEN $1=10 THEN ' One Zero'
-              WHEN $1=11 THEN ' One One'
-              WHEN $1=12 THEN ' One Two'
-              WHEN $1=13 THEN ' One Three'
-              WHEN $1=14 THEN ' One Four'
-              WHEN $1=15 THEN ' One Five'
-              WHEN $1=16 THEN ' One Six'
-              WHEN $1=17 THEN ' One Seven'
-              WHEN $1=18 THEN ' One Eight'
-              WHEN $1=19 THEN ' One Nine'
-              WHEN $1<100 THEN CASE
-                 WHEN $1/10=2 THEN ' Two' || COALESCE(' ' || flts_integer_to_text($1%10), '')
-                 WHEN $1/10=3 THEN ' Three' || COALESCE(' ' || flts_integer_to_text($1%10), '')
-                 WHEN $1/10=4 THEN ' Four' || COALESCE(' ' || flts_integer_to_text($1%10), '')
-                 WHEN $1/10=5 THEN ' Five' || COALESCE(' ' || flts_integer_to_text($1%10), '')
-                 WHEN $1/10=6 THEN ' Six' || COALESCE(' ' || flts_integer_to_text($1%10), '')
-                 WHEN $1/10=7 THEN ' Seven' || COALESCE(' ' || flts_integer_to_text($1%10), '')
-                 WHEN $1/10=8 THEN ' Eight' || COALESCE(' ' || flts_integer_to_text($1%10), '')
-                 WHEN $1/10=9 THEN ' Nine' || COALESCE(' ' || flts_integer_to_text($1%10), '')
-              END
-              WHEN $1<1000
-                 THEN flts_integer_to_text($1/100) || '' ||
-                      COALESCE('' || flts_integer_to_text($1%100), '')
---               WHEN $1<1000000
---                  THEN flts_integer_to_text($1/1000) || ' Thousand' ||
---                       CASE WHEN $1%1000 < 100
---                          THEN COALESCE(' and ' || flts_integer_to_text($1%1000), '')
---                          ELSE COALESCE(' ' || flts_integer_to_text($1%1000), '')
---                       END
---               WHEN $1<1000000000
---                  THEN flts_integer_to_text($1/1000000) || ' Million' ||
---                       CASE WHEN $1%1000000 < 100
---                          THEN COALESCE(' and ' || flts_integer_to_text($1%1000000), '')
---                          ELSE COALESCE(' ' || flts_integer_to_text($1%1000000), '')
---                       END
-              ELSE NULL
-         END$BODY$
+  RETURNS "pg_catalog"."text" AS $BODY$
+    SELECT CASE
+        WHEN $1=0 THEN 'Zero'
+        WHEN $1=1 THEN 'One'
+        WHEN $1=2 THEN 'Two'
+        WHEN $1=3 THEN 'Three'
+        WHEN $1=4 THEN 'Four'
+        WHEN $1=5 THEN 'Five'
+        WHEN $1=6 THEN 'Six'
+        WHEN $1=7 THEN 'Seven'
+        WHEN $1=8 THEN 'Eight'
+        WHEN $1=9 THEN 'Nine'
+		END
+        $BODY$
   LANGUAGE sql IMMUTABLE STRICT
+  COST 100;
+
+--- Converts array of numbers to text
+
+CREATE OR REPLACE FUNCTION "public"."flts_text_from_numbers"(int4)
+  RETURNS "pg_catalog"."text" AS $BODY$
+	DECLARE
+    num_text text = cast($1 as text);
+    text_num text [];
+    name_num text;
+	BEGIN
+		FOR i IN 1.. length(num_text) LOOP
+            name_num := "public".flts_integer_to_text( cast(substr(num_text,i,1) as int));
+            text_num  := "pg_catalog".array_append(text_num, name_num );
+
+        END LOOP;
+	RETURN array_to_string(text_num, ' ');
+END$BODY$
+  LANGUAGE plpgsql VOLATILE
   COST 100;
 
 --- Converts plot area value to text in the certificate
@@ -1331,7 +1316,7 @@ BEGIN
 		units := 'Hectares';
 	END IF;
 
-	RETURN rounded_area::TEXT || ' (' || flts_integer_to_text(rounded_area) || ') ' || units || measurement_txt;
+	RETURN rounded_area::TEXT || ' (' || flts_text_from_numbers(rounded_area) || ') ' || units || measurement_txt;
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
