@@ -4,27 +4,6 @@
     <edittype widgetv2type="TextEdit" name="id">
       <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
     </edittype>
-    <edittype widgetv2type="TextEdit" name="upi">
-      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-    </edittype>
-    <edittype widgetv2type="TextEdit" name="use">
-      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-    </edittype>
-    <edittype widgetv2type="TextEdit" name="plot_number">
-      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-    </edittype>
-    <edittype widgetv2type="TextEdit" name="area">
-      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-    </edittype>
-    <edittype widgetv2type="TextEdit" name="scheme_id">
-      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-    </edittype>
-    <edittype widgetv2type="TextEdit" name="crs_id">
-      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-    </edittype>
-    <edittype widgetv2type="TextEdit" name="scheme_field_book_id">
-      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
-    </edittype>
   </edittypes>
   <renderer-v2 forceraster="0" symbollevels="0" type="singleSymbol" enableorderby="0">
     <symbols>
@@ -54,7 +33,7 @@
                   <prop k="interval" v="3"/>
                   <prop k="interval_map_unit_scale" v="0,0,0,0,0,0"/>
                   <prop k="interval_unit" v="MM"/>
-                  <prop k="offset" v="-3"/>
+                  <prop k="offset" v="2"/>
                   <prop k="offset_along_line" v="0"/>
                   <prop k="offset_along_line_map_unit_scale" v="0,0,0,0,0,0"/>
                   <prop k="offset_along_line_unit" v="MM"/>
@@ -79,17 +58,17 @@
                       <prop k="horizontal_anchor_point" v="1"/>
                       <prop k="joinstyle" v="bevel"/>
                       <prop k="offset" v="0,0"/>
-                      <prop k="offset_dd_active" v="1"/>
-                      <prop k="offset_dd_expression" v="CASE WHEN degrees(&#xd;&#xa;&#x9;azimuth(point_n($geometry, @geometry_part_num), point_n($geometry, @geometry_part_num+1))&#xd;&#xa;&#x9;) > 180 AND degrees(&#xd;&#xa;&#x9;azimuth(point_n($geometry, @geometry_part_num), point_n($geometry, @geometry_part_num+1))&#xd;&#xa;&#x9;) &lt; 360&#xd;&#xa;&#x9;THEN '-6.0000, -6.0000'&#xd;&#xa;ELSE&#xd;&#xa;&#x9;'5.0000, 5.0000'&#xd;&#xa;END"/>
+                      <prop k="offset_dd_active" v="0"/>
+                      <prop k="offset_dd_expression" v=""/>
                       <prop k="offset_dd_field" v=""/>
-                      <prop k="offset_dd_useexpr" v="1"/>
+                      <prop k="offset_dd_useexpr" v="0"/>
                       <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
                       <prop k="offset_unit" v="MM"/>
                       <prop k="outline_color" v="0,0,0,255"/>
                       <prop k="outline_width" v="0"/>
                       <prop k="outline_width_map_unit_scale" v="0,0,0,0,0,0"/>
                       <prop k="outline_width_unit" v="MM"/>
-                      <prop k="size" v="2.4"/>
+                      <prop k="size" v="1.8"/>
                       <prop k="size_map_unit_scale" v="0,0,0,0,0,0"/>
                       <prop k="size_unit" v="MM"/>
                       <prop k="vertical_anchor_point" v="1"/>
@@ -120,7 +99,7 @@
               <prop k="outline_width" v="0"/>
               <prop k="outline_width_map_unit_scale" v="0,0,0,0,0,0"/>
               <prop k="outline_width_unit" v="MM"/>
-              <prop k="size" v="2.4"/>
+              <prop k="size" v="1.8"/>
               <prop k="size_map_unit_scale" v="0,0,0,0,0,0"/>
               <prop k="size_unit" v="MM"/>
               <prop k="vertical_anchor_point" v="1"/>
@@ -209,7 +188,7 @@
               <prop k="outline_width" v="0"/>
               <prop k="outline_width_map_unit_scale" v="0,0,0,0,0,0"/>
               <prop k="outline_width_unit" v="MM"/>
-              <prop k="size" v="2.4"/>
+              <prop k="size" v="1.8"/>
               <prop k="size_map_unit_scale" v="0,0,0,0,0,0"/>
               <prop k="size_unit" v="MM"/>
               <prop k="vertical_anchor_point" v="1"/>
@@ -454,7 +433,8 @@
   </labelattributes>
   <SingleCategoryDiagramRenderer diagramType="Histogram" sizeLegend="0" attributeLegend="1">
     <DiagramCategory penColor="#000000" labelPlacementMethod="XHeight" penWidth="0" diagramOrientation="Up" sizeScale="0,0,0,0,0,0" minimumSize="0" barWidth="5" penAlpha="255" maxScaleDenominator="1e+08" backgroundColor="#ffffff" transparency="0" width="15" scaleDependency="Area" backgroundAlpha="255" angleOffset="1440" scaleBasedVisibility="0" enabled="0" height="15" lineSizeScale="0,0,0,0,0,0" sizeType="MM" lineSizeType="MM" minScaleDenominator="inf">
-      <fontProperties description="MS Shell Dlg 2,7.5,-1,5,50,0,0,0,0,0" style=""/>
+      <fontProperties description="MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0" style=""/>
+      <attribute field="" color="#000000" label=""/>
     </DiagramCategory>
     <symbol alpha="1" clip_to_extent="1" type="marker" name="sizeSymbol">
       <layer pass="0" class="SimpleMarker" locked="0">
@@ -483,13 +463,6 @@
   <annotationform>.</annotationform>
   <aliases>
     <alias field="id" index="0" name=""/>
-    <alias field="upi" index="1" name=""/>
-    <alias field="use" index="2" name=""/>
-    <alias field="plot_number" index="3" name=""/>
-    <alias field="area" index="4" name=""/>
-    <alias field="scheme_id" index="5" name=""/>
-    <alias field="crs_id" index="6" name=""/>
-    <alias field="scheme_field_book_id" index="7" name=""/>
   </aliases>
   <excludeAttributesWMS/>
   <excludeAttributesWFS/>
@@ -498,13 +471,6 @@
     <columns>
       <column width="-1" hidden="1" type="actions"/>
       <column width="-1" hidden="0" type="field" name="id"/>
-      <column width="-1" hidden="0" type="field" name="upi"/>
-      <column width="-1" hidden="0" type="field" name="use"/>
-      <column width="-1" hidden="0" type="field" name="plot_number"/>
-      <column width="-1" hidden="0" type="field" name="area"/>
-      <column width="-1" hidden="0" type="field" name="scheme_id"/>
-      <column width="-1" hidden="0" type="field" name="crs_id"/>
-      <column width="-1" hidden="0" type="field" name="scheme_field_book_id"/>
     </columns>
   </attributetableconfig>
   <editform>.</editform>
@@ -537,13 +503,6 @@ def my_form_open(dialog, layer, feature):
   </conditionalstyles>
   <defaults>
     <default field="id" expression=""/>
-    <default field="upi" expression=""/>
-    <default field="use" expression=""/>
-    <default field="plot_number" expression=""/>
-    <default field="area" expression=""/>
-    <default field="scheme_id" expression=""/>
-    <default field="crs_id" expression=""/>
-    <default field="scheme_field_book_id" expression=""/>
   </defaults>
   <previewExpression></previewExpression>
   <layerGeometryType>2</layerGeometryType>
