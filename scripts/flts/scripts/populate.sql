@@ -1453,7 +1453,7 @@ CREATE OR REPLACE VIEW cb_plot_vw_lht_certificate_template AS
      JOIN cb_scheme ON ((cb_plot.scheme_id = cb_scheme.id)))
      JOIN cb_check_lht_land_rights_office ON ((cb_scheme.land_rights_office = cb_check_lht_land_rights_office.id)))
      JOIN cb_holder ON ((cb_social_tenure_relationship.holder_id = cb_holder.id)))
-     JOIN cb_relevant_authority ON (((cb_relevant_authority.au_code)::text = 'OSHKTI'::text)))
+     JOIN cb_relevant_authority ON (((cb_relevant_authority.au_code = substr(cb_plot.upi, 3, 6)))))
      JOIN cb_check_lht_relevant_authority ON ((cb_check_lht_relevant_authority.id = cb_scheme.relevant_authority)))
      JOIN cb_check_lht_reg_division ON ((cb_check_lht_reg_division.id = cb_scheme.registration_division)))
      JOIN cb_check_lht_region ON ((cb_check_lht_region.id = cb_scheme.region)))
