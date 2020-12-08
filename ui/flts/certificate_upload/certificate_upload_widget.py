@@ -118,7 +118,6 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         # Certificate upload flag
         self._can_upload = False
         self.cert_upload_handler_items = OrderedDict()
-        # Create a widget with view icon
         self.view_link = QLabel()
         self.view_link.setAlignment(Qt.AlignHCenter)
         self.view_link.setText(
@@ -126,7 +125,6 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
                 VIEW_IMG
             )
         )
-        self.view_link.autoFillBackground()
         self.view_link.setTextInteractionFlags(Qt.TextBrowserInteraction)
         self.view_link.linkActivated.connect(
             self._on_view_activated
@@ -158,20 +156,26 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         Slot raised when the view link is clicked on the table widget.
         """
-        cert_items = self._cert_model.cert_info_items
-        cert_info = cert_items[self._idx.row()]
-        path = str(cert_info.filename)
-        cert_num = cert_info.certificate_number
-        upload_handler = self.cert_upload_handler_items[
-            cert_num
-        ]
-        cert_uuid = upload_handler.certificate_uuid(path)
-        cert_name = upload_handler.certificate_name(path)
-        pdf_viewer = PDFViewerWidget(
-            cert_uuid,
-            cert_name
-        )
-        pdf_viewer.view_document()
+        try:
+            cert_items = self._cert_model.cert_info_items
+            cert_info = cert_items[self._idx.row()]
+            path = str(cert_info.filename)
+            cert_num = cert_info.certificate_number
+            upload_handler = self.cert_upload_handler_items[
+                cert_num
+            ]
+            cert_uuid = upload_handler.certificate_uuid(path)
+            cert_name = upload_handler.certificate_name(path)
+            pdf_viewer = PDFViewerWidget(
+                cert_uuid,
+                cert_name
+            )
+            pdf_viewer.view_document()
+        except KeyError:
+            msg = self.tr(
+                'The certificate {} cannot be previewed'.format(cert_num)
+            )
+            self.show_error_message(msg)
 
     def _check_cmis_connection(self):
         """
