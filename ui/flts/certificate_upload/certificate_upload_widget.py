@@ -118,17 +118,6 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         # Certificate upload flag
         self._can_upload = False
         self.cert_upload_handler_items = OrderedDict()
-        self.view_link = QLabel()
-        self.view_link.setAlignment(Qt.AlignHCenter)
-        self.view_link.setText(
-            '<a href="placeholder"><img src=\'{0}\'/></a>'.format(
-                VIEW_IMG
-            )
-        )
-        self.view_link.setTextInteractionFlags(Qt.TextBrowserInteraction)
-        self.view_link.linkActivated.connect(
-            self._on_view_activated
-        )
         # Flag for checking if there is an active upload
         self._has_active_operation = False
         if self._has_active_operation:
@@ -140,8 +129,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
                     'Are you sure you want to exit the certificate upload?'
                 )
             )
-
         self._idx = QModelIndex()
+        self.lbl_link = QLabel()
 
     @property
     def has_active_operation(self):
@@ -151,6 +140,27 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         :rtype: bool
         """
         return self._has_active_operation
+
+    def create_hyperlink_widget(self, img_src):
+        """
+        Creates a clickable QLabel widget that appears like a hyperlink.
+        :param img_src: Image source.
+        :type img_src: str
+        :return: Returns the QLabel widget with appearance of a hyperlink.
+        :rtype: QLabel
+        """
+        self.lbl_link.setAlignment(Qt.AlignHCenter)
+        self.lbl_link.setText(
+            '<a href="placeholder"><img src=\'{0}\'/></a>'.format(
+                img_src
+            )
+        )
+        self.lbl_link.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        # lbl_link.setProperty(self._doc_prop, document_info)
+        self.lbl_link.linkActivated.connect(
+            self._on_view_activated
+        )
+        return self.lbl_link
 
     def _on_view_activated(self):
         """
@@ -319,9 +329,12 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         self._cert_model.cert_info_items = cert_info_items
         # Add view icon for each row in table view
-        for row, cert in enumerate(cert_info_items):
-            idx = self.tbvw_certificate.model().index(row, 2)
-            self._insert_view_label(idx)
+        for cert in cert_info_items:
+            cert_idx = cert_info_items.index(cert)
+            tbl_idx = self.tbvw_certificate.model().index(cert_idx, 2)
+            self._insert_view_label(
+                tbl_idx
+            )
 
         self._update_record_count()
 
@@ -336,7 +349,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         self.tbvw_certificate.setIndexWidget(
             index,
-            self.view_link
+            self.create_hyperlink_widget(VIEW_IMG)
         )
 
     def _update_record_count(self):

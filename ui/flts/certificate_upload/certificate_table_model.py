@@ -134,9 +134,6 @@ class CertificateTableModel(QAbstractTableModel):
                 else:
                     return cert_info.upload_status_icon()
 
-            if col == 2:
-                return cert_info.view_document_icon()
-
         return None
 
     def _notify_cert_status_changed(self, cert_number):

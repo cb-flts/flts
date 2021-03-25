@@ -45,8 +45,7 @@ class CertificateInfo(object):
             'can_upload': QIcon(":/plugins/stdm/images/icons/flts_cert_can_upload.png"),
             'error': QIcon(":/plugins/stdm/images/icons/flts_cert_upload_error.png"),
             'not_uploaded': QIcon(":/plugins/stdm/images/icons/flts_success.png"),
-            'success': QIcon(":/plugins/stdm/images/icons/flts_cert_success.png"),
-            'view': QIcon(":/plugins/stdm/images/icons/flts_document_view.png")
+            'success': QIcon(":/plugins/stdm/images/icons/flts_cert_success.png")
         }
 
     def upload_status_text(self):
@@ -96,17 +95,6 @@ class CertificateInfo(object):
             upload_icon = self.icons.get('not_uploaded')
         elif upload_status == CertificateInfo.SUCCESS:
             upload_icon = self.icons.get('success')
-
-        return upload_icon
-
-    def view_document_icon(self):
-        """
-        Returns validation status icon of the certificate corresponding
-        to the validation status value.
-        :return: Returns the upload status icon.
-        :rtype: QIcon
-        """
-        upload_icon = self.icons.get('view')
 
         return upload_icon
 
