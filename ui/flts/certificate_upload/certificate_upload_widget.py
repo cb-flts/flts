@@ -130,7 +130,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
                 )
             )
         self._idx = QModelIndex()
-        self.lbl_link = QLabel()
+        self._lbl_idx_prop = 'label_index'
 
     @property
     def has_active_operation(self):
@@ -141,7 +141,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         return self._has_active_operation
 
-    def create_hyperlink_widget(self, img_src):
+    def create_hyperlink_widget(self, img_src, lbl_index):
         """
         Creates a clickable QLabel widget that appears like a hyperlink.
         :param img_src: Image source.
@@ -149,26 +149,33 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         :return: Returns the QLabel widget with appearance of a hyperlink.
         :rtype: QLabel
         """
-        self.lbl_link.setAlignment(Qt.AlignHCenter)
-        self.lbl_link.setText(
+        lbl_link = QLabel()
+        lbl_link.setAlignment(Qt.AlignHCenter)
+        lbl_link.setText(
             '<a href="placeholder"><img src=\'{0}\'/></a>'.format(
                 img_src
             )
         )
-        self.lbl_link.setTextInteractionFlags(Qt.TextBrowserInteraction)
-        # lbl_link.setProperty(self._doc_prop, document_info)
-        self.lbl_link.linkActivated.connect(
+        lbl_link.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        lbl_link.setProperty(self._lbl_idx_prop, lbl_index)
+        lbl_link.linkActivated.connect(
             self._on_view_activated
         )
-        return self.lbl_link
+        return lbl_link
 
     def _on_view_activated(self):
         """
         Slot raised when the view link is clicked on the table widget.
         """
+        view_label = self.sender()
+        if not view_label:
+            return
+
+        idx = view_label.property(self._lbl_idx_prop)
+
         try:
             cert_items = self._cert_model.cert_info_items
-            cert_info = cert_items[self._idx.row()]
+            cert_info = cert_items[idx.row()]
             path = str(cert_info.filename)
             cert_num = cert_info.certificate_number
             upload_handler = self.cert_upload_handler_items[
@@ -349,7 +356,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         self.tbvw_certificate.setIndexWidget(
             index,
-            self.create_hyperlink_widget(VIEW_IMG)
+            self.create_hyperlink_widget(VIEW_IMG, index)
         )
 
     def _update_record_count(self):
@@ -449,8 +456,6 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         Clears uploaded items from the CMIS Temp folder.
         """
         cert_items = self._cert_model.cert_info_items
-        for cert in cert_items:
-            print(dir(cert))
 
     def show_error_message(self, message):
         """
@@ -477,8 +482,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self._cert_model.clear()
         self._update_record_count()
         self._cert_validator.clear()
-        # self.cert_upload_handler_items.clear()
         self._clear_uploaded_items()
-
+        # Clear the document view labels
+        self.lbl_link = QLabel()
         # Close the widget
         self.close()
