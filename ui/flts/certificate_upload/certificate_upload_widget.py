@@ -409,16 +409,20 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         Slot raised when the validation is complete.
         """
+        doc_count = str(self._cert_model.rowCount())
+        msg = ' certificates have been validated'
         QMessageBox.information(
             self,
             self.tr('Certificate Upload'),
-            self.tr('Certificates have been validated')
+            self.tr(doc_count + msg)
         )
         self._has_active_operation = False
 
         if self._can_upload:
             self.btn_upload_certificate.setEnabled(True)
             self._update_status_text('Ready to upload')
+        else:
+            self._update_status_text('Cannot upload')
 
     def _upload_certificate(self, cert_info):
         """
