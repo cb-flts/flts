@@ -190,7 +190,6 @@ class CertificateUploadHandler(QObject):
         :param cert_path: Certificate path.
         :type cert_path: str
         """
-        # Upload certificates and supporting docs
         self._upload_cert_info(
             cert_path,
             self.CERT_DOC_TYPE

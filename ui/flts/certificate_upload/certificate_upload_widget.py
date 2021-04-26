@@ -59,7 +59,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
     Parent widget containing all the widgets for uploading the certificates.
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, cmis_mngr=None):
         super(CertificateUploadWidget, self).__init__(parent)
         self.setupUi(self)
         self.notif_bar = NotificationBar(
@@ -71,7 +71,9 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self._update_status_text('Select scheme')
         self._enable_controls(False)
         # CMIS Manager
-        self._cmis_mngr = CmisManager()
+        self._cmis_mngr = cmis_mngr
+        if not self._cmis_mngr:
+            self._cmis_mngr = CmisManager()
         # Certificate table model
         self._cert_model = CertificateTableModel(parent=self)
         # Set the table view model
@@ -183,10 +185,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             ]
             cert_uuid = upload_handler.certificate_uuid(path)
             cert_name = upload_handler.certificate_name(path)
-            pdf_viewer = PDFViewerWidget(
-                cert_uuid,
-                cert_name
-            )
+            pdf_viewer = PDFViewerWidget(cert_uuid, cert_name, self)
             pdf_viewer.view_document()
         except KeyError:
             msg = self.tr(
@@ -421,8 +420,6 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         if self._can_upload:
             self.btn_upload_certificate.setEnabled(True)
             self._update_status_text('Ready to upload')
-        else:
-            self._update_status_text('Cannot upload')
 
     def _upload_certificate(self, cert_info):
         """
@@ -435,10 +432,9 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             cmis_mngr=self._cmis_mngr,
             parent=self
         )
-        self.cert_upload_handler_items[cert_info.certificate_number] = \
-            upload_handler
-
-        upload_handler.upload_certificate(cert_info.filename)
+        self.cert_upload_handler_items[cert_info.certificate_number] = upload_handler
+        upload_handler.upload_certificate(
+            str(cert_info.filename))
 
     def _on_upload_button_clicked(self):
         """
