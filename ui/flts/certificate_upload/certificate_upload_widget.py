@@ -420,6 +420,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         if self._can_upload:
             self.btn_upload_certificate.setEnabled(True)
             self._update_status_text('Ready to upload')
+        else:
+            self._update_status_text('')
 
     def _upload_certificate(self, cert_info):
         """
@@ -440,6 +442,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         Slot raised when the upload button is clicked.
         """
+        self._update_status_text('Uploading...')
         self._persist_certificate()
 
     def _persist_certificate(self):
@@ -447,9 +450,23 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         Moves the certificates from the Temp folder to the permanent CMIS
         folder.
         """
+        self._has_active_operation = True
         for num, handler in self.cert_upload_handler_items.iteritems():
             cert_num = str(num).replace('/', '.')
             handler.persist_certificate(cert_num)
+        self.persist_complete()
+
+    def persist_complete(self):
+        """
+        Show message to show the user that certificates have been uploaded
+        into the permanent folder completing the upload process.
+        """
+        QMessageBox.information(
+            self,
+            self.tr('Certificate Upload'),
+            self.tr('Certificate upload completed')
+        )
+        self._update_status_text('')
 
     def _clear_uploaded_items(self):
         """
