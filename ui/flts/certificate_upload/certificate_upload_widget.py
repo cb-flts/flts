@@ -420,6 +420,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         if self._can_upload:
             self.btn_upload_certificate.setEnabled(True)
             self._update_status_text('Ready to upload')
+        else:
+            self._update_status_text('')
 
     def _upload_certificate(self, cert_info):
         """
@@ -440,6 +442,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         Slot raised when the upload button is clicked.
         """
+        self._update_status_text('Uploading...')
         self._persist_certificate()
 
     def _persist_certificate(self):
@@ -447,15 +450,41 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         Moves the certificates from the Temp folder to the permanent CMIS
         folder.
         """
+        self._has_active_operation = True
         for num, handler in self.cert_upload_handler_items.iteritems():
             cert_num = str(num).replace('/', '.')
             handler.persist_certificate(cert_num)
 
-    def _clear_uploaded_items(self):
+        view_label = self.sender()
+        if not view_label:
+            return
+
+        self.persist_complete()
+
+    def persist_complete(self):
         """
-        Clears uploaded items from the CMIS Temp folder.
+        Show message to show the user that certificates have been uploaded
+        into the permanent folder completing the upload process.
         """
-        cert_items = self._cert_model.cert_info_items
+        QMessageBox.information(
+            self,
+            self.tr('Certificate Upload'),
+            self.tr('Upload has been completed.')
+        )
+        self._update_status_text('')
+        self.btn_upload_certificate.setEnabled(False)
+
+    def _clear_temp_folder(self):
+        """
+        Clears uploaded items from the CMIS Temp folder when the upload
+        widget is closed.
+        """
+        uploaded_items = self.cert_upload_handler_items
+        cert_infos = self._cert_model.cert_info_items
+        for cert_name, handler in uploaded_items.iteritems():
+            uploaded_item = handler
+            for info in cert_infos:
+                uploaded_item.remove_certificate(info.filename)
 
     def show_error_message(self, message):
         """
@@ -476,13 +505,14 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         Slot raised when the close button is clicked.
         """
+        self._clear_temp_folder()
         # Default combo box index
         self.cbo_scheme_number.setCurrentIndex(0)
         # Clear the model and validation items
         self._cert_model.clear()
         self._update_record_count()
         self._cert_validator.clear()
-        self._clear_uploaded_items()
+        self._clear_temp_folder()
         # Clear the document view labels
         self.lbl_link = QLabel()
         # Close the widget
