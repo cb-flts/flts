@@ -4,6 +4,27 @@
     <edittype widgetv2type="TextEdit" name="id">
       <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
     </edittype>
+    <edittype widgetv2type="TextEdit" name="upi">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="use">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="plot_numbe">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="area">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="scheme_id">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="crs_id">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
+    <edittype widgetv2type="TextEdit" name="scheme_fie">
+      <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+    </edittype>
   </edittypes>
   <renderer-v2 forceraster="0" symbollevels="0" type="singleSymbol" enableorderby="0">
     <symbols>
@@ -90,7 +111,7 @@
               <prop k="joinstyle" v="miter"/>
               <prop k="offset" v="-2,-1"/>
               <prop k="offset_dd_active" v="1"/>
-              <prop k="offset_dd_expression" v="CASE WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 90 THEN '6.0000, -7.5000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 180 THEN '6.0000, 4.3000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 270 THEN '-6.0000, 4.3000'&#xd;&#xa;ELSE&#xd;&#xa;&#x9;'-6.0000, -7.5000'&#xd;&#xa;END"/>
+              <prop k="offset_dd_expression" v="CASE WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 90 THEN '6.0000, -7.0000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 180 THEN '6.0000, 4.0000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 270 THEN '-5.8000, 4.0000'&#xd;&#xa;ELSE&#xd;&#xa;&#x9;'-5.8000, -7.0000'&#xd;&#xa;END"/>
               <prop k="offset_dd_field" v=""/>
               <prop k="offset_dd_useexpr" v="1"/>
               <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
@@ -179,7 +200,7 @@
               <prop k="joinstyle" v="bevel"/>
               <prop k="offset" v="-2,-1"/>
               <prop k="offset_dd_active" v="1"/>
-              <prop k="offset_dd_expression" v="CASE WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 90 THEN '5.0000, -4.3000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 180 THEN '5.0000, 7.5000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 270 THEN '-5.0000, 7.5000'&#xd;&#xa;ELSE&#xd;&#xa;&#x9;'-5.0000, -4.3000'&#xd;&#xa;END"/>
+              <prop k="offset_dd_expression" v="CASE WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 90 THEN '6.5000, -4.8000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 180 THEN '6.3000, 6.2000'&#xd;&#xa;&#x9;WHEN degrees(&#xd;&#xa;&#x9;azimuth(centroid($geometry), point_n($geometry, @geometry_part_num))&#xd;&#xa;&#x9;) &lt; 270 THEN '-5.2000, 6.2000'&#xd;&#xa;ELSE&#xd;&#xa;&#x9;'-5.0000, -4.3000'&#xd;&#xa;END"/>
               <prop k="offset_dd_field" v=""/>
               <prop k="offset_dd_useexpr" v="1"/>
               <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
@@ -463,6 +484,13 @@
   <annotationform>.</annotationform>
   <aliases>
     <alias field="id" index="0" name=""/>
+    <alias field="upi" index="1" name=""/>
+    <alias field="use" index="2" name=""/>
+    <alias field="plot_numbe" index="3" name=""/>
+    <alias field="area" index="4" name=""/>
+    <alias field="scheme_id" index="5" name=""/>
+    <alias field="crs_id" index="6" name=""/>
+    <alias field="scheme_fie" index="7" name=""/>
   </aliases>
   <excludeAttributesWMS/>
   <excludeAttributesWFS/>
@@ -471,6 +499,13 @@
     <columns>
       <column width="-1" hidden="1" type="actions"/>
       <column width="-1" hidden="0" type="field" name="id"/>
+      <column width="-1" hidden="0" type="field" name="upi"/>
+      <column width="-1" hidden="0" type="field" name="use"/>
+      <column width="-1" hidden="0" type="field" name="plot_numbe"/>
+      <column width="-1" hidden="0" type="field" name="area"/>
+      <column width="-1" hidden="0" type="field" name="scheme_id"/>
+      <column width="-1" hidden="0" type="field" name="crs_id"/>
+      <column width="-1" hidden="0" type="field" name="scheme_fie"/>
     </columns>
   </attributetableconfig>
   <editform>.</editform>
@@ -503,6 +538,13 @@ def my_form_open(dialog, layer, feature):
   </conditionalstyles>
   <defaults>
     <default field="id" expression=""/>
+    <default field="upi" expression=""/>
+    <default field="use" expression=""/>
+    <default field="plot_numbe" expression=""/>
+    <default field="area" expression=""/>
+    <default field="scheme_id" expression=""/>
+    <default field="crs_id" expression=""/>
+    <default field="scheme_fie" expression=""/>
   </defaults>
   <previewExpression></previewExpression>
   <layerGeometryType>2</layerGeometryType>
