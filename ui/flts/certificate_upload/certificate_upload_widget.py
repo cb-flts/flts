@@ -430,11 +430,12 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         :param cert_info: Certificate upload handler.
         :type cert_info: CertificateUploadHandler
         """
+        upload_items = self.cert_upload_handler_items
         upload_handler = CertificateUploadHandler(
             cmis_mngr=self._cmis_mngr,
             parent=self
         )
-        self.cert_upload_handler_items[cert_info.certificate_number] = upload_handler
+        upload_items[cert_info.certificate_number] = upload_handler
         upload_handler.upload_certificate(
             str(cert_info.filename))
 
@@ -506,14 +507,11 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         Slot raised when the close button is clicked.
         """
         self._clear_temp_folder()
-        # Default combo box index
         self.cbo_scheme_number.setCurrentIndex(0)
-        # Clear the model and validation items
+        self.btn_select_folder.setEnabled(False)
+        self.btn_upload_certificate.setEnabled(False)
         self._cert_model.clear()
         self._update_record_count()
         self._cert_validator.clear()
-        self._clear_temp_folder()
-        # Clear the document view labels
         self.lbl_link = QLabel()
-        # Close the widget
         self.close()

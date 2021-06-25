@@ -50,7 +50,7 @@ class CertificateUploadHandler(QObject):
     CERT_DOC_TYPE = 'Archive'
 
     # Signals
-    uploaded = pyqtSignal(unicode)
+    uploaded = pyqtSignal(tuple)
     upload_completed = pyqtSignal()
     removed = pyqtSignal(tuple)
     persisted = pyqtSignal()
@@ -251,7 +251,7 @@ class CertificateUploadHandler(QObject):
             self._cert_upload_status[file_path] = CertificateInfo.SUCCESS
             self._uploaded_certs[file_path] = doc_obj
             # Emit signal
-            self.uploaded.emit(file_path)
+            self.uploaded.emit(status_info)
 
     def _on_upload_error(self, error_info):
         """
@@ -267,7 +267,7 @@ class CertificateUploadHandler(QObject):
             self._cert_upload_status[file_path] = CertificateInfo.ERROR
             self._uploaded_certs[file_path] = doc_obj
             # Emit signal
-            self.uploaded.emit(file_path)
+            self.uploaded.emit(error_info)
 
     def _on_upload_finished(self):
         """
