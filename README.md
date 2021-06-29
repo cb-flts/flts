@@ -1,6 +1,6 @@
 **Computer-Based Flexible Land Tenure System**
 ==============================
-A Computer-Based Flexible Land Tenure System (CB-FLTS), based on the Social Tenure Domain Model (STDM), for deployment at the Ministry of Land Reform (MLR), Namibia. The goal of the FLTS is to establish an interchangeable tenure registration system that is parallel and complementary to the formal freehold system. The FLTS is designed to provide affordable tenure security to informal settlement dwellers in Namibia.
+A Computer-Based Flexible Land Tenure System (CB-FLTS), based on the Social Tenure Domain Model (STDM), for deployment at the Ministry of Water, Agriculture and Land Reform (MWALR), Namibia. The goal of the FLTS is to establish an interchangeable tenure registration system that is parallel and complementary to the formal freehold system. The FLTS is designed to provide affordable tenure security to informal settlement dwellers in Namibia.
 
 **Social Tenure Domain Model**
 ==============================
