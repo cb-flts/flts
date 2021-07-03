@@ -178,13 +178,13 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         try:
             cert_items = self._cert_model.cert_info_items
             cert_info = cert_items[idx.row()]
-            path = str(cert_info.filename)
+            # path = str(cert_info.filename)
             cert_num = cert_info.certificate_number
             upload_handler = self.cert_upload_handler_items[
                 cert_num
             ]
-            cert_uuid = upload_handler.certificate_uuid(path)
-            cert_name = upload_handler.certificate_name(path)
+            cert_uuid = upload_handler.certificate_uuid()
+            cert_name = upload_handler.certificate_name()
             pdf_viewer = PDFViewerWidget(cert_uuid, cert_name, self)
             pdf_viewer.view_document()
         except KeyError:
@@ -196,8 +196,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
     def _check_cmis_connection(self):
         """
         Checks whether there is connection to the cmis repository.
-        :return: Returns true if the connection exists and false if there is
-        no connection.
+        :return: Returns true if the connection exists and false if there
+        is no connection.
         :rtype: bool
         """
         if not self._cmis_mngr.connect():
@@ -223,7 +223,6 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         Populate the schemes combobox with items from the database.
         """
-        # Clear combobox
         self.cbo_scheme_number.clear()
         self.cbo_scheme_number.addItem('')
         # Get scheme table data
@@ -430,14 +429,23 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         :param cert_info: Certificate upload handler.
         :type cert_info: CertificateUploadHandler
         """
-        upload_items = self.cert_upload_handler_items
+        # upload_items = self.cert_upload_handler_items
         upload_handler = CertificateUploadHandler(
+            cert_info,
             cmis_mngr=self._cmis_mngr,
             parent=self
         )
-        upload_items[cert_info.certificate_number] = upload_handler
-        upload_handler.upload_certificate(
-            str(cert_info.filename))
+        self.cert_upload_handler_items[cert_info.certificate_number] = upload_handler
+        upload_handler.upload_certificate()
+        upload_handler.uploaded.connect(self._on_cert_uploaded)
+
+    def _on_cert_uploaded(self, cert_number):
+        """
+        Slot raised when the certificate upload is done.
+        :param status_info:
+        :type tuple
+        """
+        pass
 
     def _on_upload_button_clicked(self):
         """
@@ -452,8 +460,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         folder.
         """
         self._has_active_operation = True
-        for num, handler in self.cert_upload_handler_items.iteritems():
-            cert_num = str(num).replace('/', '.')
+        for cert_num, handler in self.cert_upload_handler_items.iteritems():
             handler.persist_certificate(cert_num)
 
         view_label = self.sender()
@@ -485,7 +492,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         for cert_name, handler in uploaded_items.iteritems():
             uploaded_item = handler
             for info in cert_infos:
-                uploaded_item.remove_certificate(info.filename)
+                uploaded_item.remove_certificate(info)
 
     def show_error_message(self, message):
         """
@@ -507,11 +514,19 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         Slot raised when the close button is clicked.
         """
         self._clear_temp_folder()
+        self._reset_widget_items()
+        self._cert_model.clear()
+        self._cert_validator.clear()
+        self.cert_upload_handler_items.clear()
+        self.close()
+
+    def _reset_widget_items(self):
+        """
+        Resets the widgets to their initial state.
+        """
+        self.notif_bar.clear()
         self.cbo_scheme_number.setCurrentIndex(0)
         self.btn_select_folder.setEnabled(False)
         self.btn_upload_certificate.setEnabled(False)
-        self._cert_model.clear()
-        self._update_record_count()
-        self._cert_validator.clear()
         self.lbl_link = QLabel()
-        self.close()
+        self._update_record_count()

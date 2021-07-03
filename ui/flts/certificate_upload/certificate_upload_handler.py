@@ -48,28 +48,24 @@ class CertificateUploadHandler(QObject):
     """
     CERT_ENTITY_NAME = 'Certificate'
     CERT_DOC_TYPE = 'Archive'
-
     # Signals
-    uploaded = pyqtSignal(tuple)
-    upload_completed = pyqtSignal()
+    uploaded = pyqtSignal(unicode)
+    upload_failed = pyqtSignal(tuple)
     removed = pyqtSignal(tuple)
-    persisted = pyqtSignal()
+    persisted = pyqtSignal(unicode)
 
-    def __init__(self, cert_info=None, cmis_mngr=None, parent=None):
+    def __init__(self, cert_info, cmis_mngr=None, parent=None):
         super(CertificateUploadHandler, self).__init__(parent)
-        self._cert_info_items = cert_info
-        if not self._cert_info_items:
-            self._cert_info_items = []
-
+        self._cert_info = cert_info
         # CMIS Manager
         self._cmis_mngr = cmis_mngr
         if not self._cmis_mngr:
             self._cmis_mngr = CmisManager()
-
+        # CMIS document object
+        self._doc_obj = None
         # Initialize Certificate models variables
         self._cert_model = None
         self._cert_doc_model = None
-
         # Assign model factory
         cert_models = certificate_model_factory()
         if not cert_models:
@@ -78,18 +74,16 @@ class CertificateUploadHandler(QObject):
         # Assign models values
         self._cert_model = cert_models[0]
         self._cert_doc_model = cert_models[1]
-
         self._cert_doc_mapper = CmisEntityDocumentMapper(
             cmis_manager=self._cmis_mngr,
-            doc_model_cls=self._cert_doc_model
+            doc_model_cls=self._cert_doc_model,
+            entity_name=self.CERT_ENTITY_NAME
         )
 
         # Error messages as to why the upload handler is not responsive
         self._error_msg = []
-
         # Get current profile
         curr_profile = current_profile()
-
         if not curr_profile:
             self._error_msgs.append(
                 'Current profile is None'
@@ -125,28 +119,8 @@ class CertificateUploadHandler(QObject):
                 doc_type_id
             )
 
-        # Stores the upload status of each document with the certificate
-        # number as key
-        self._cert_upload_status = {}
-
-        # Map the certificate number to cmislib document for successfully uploaded docs
-        self._uploaded_certs = {}
-
-        # Error messages in document upload. Key: certificate number, Value:
-        # Error message
-        self._certificate_upload_error = {}
-
         # Flag for checking if there is an active certificate upload/removal
         self._has_active_operation = False
-
-    @property
-    def errors(self):
-        """
-        :return: Returns a list of errors that are causing the handler to be
-        inactive.
-        :rtype: list
-        """
-        return self._err_msg
 
     @property
     def has_active_operation(self):
@@ -167,23 +141,23 @@ class CertificateUploadHandler(QObject):
         return False if len(self._error_msg) > 0 else True
 
     @property
-    def cert_info_items(self):
+    def cert_info(self):
         """
-        :return: Returns values in the cert info dictionary.
-        :rtype: list
+        :return: Returns cert info object.
+        :rtype: CertificateInfo
         """
-        return self._cert_info_items
+        return self._cert_info
 
-    @cert_info_items.setter
-    def cert_info_items(self, cert_info):
+    @cert_info.setter
+    def cert_info(self, cert_info):
         """
         Sets the collection of the CertificateInfo objects to be uploaded.
         :param cert_info: Certificate number.
         :type cert_info: list
         """
-        self._cert_info_items = cert_info
+        self._cert_info = cert_info
 
-    def upload_certificate(self, cert_path):
+    def upload_certificate(self):
         """
         Upload the certificate to the temporary directory based on the
         information on the certificate info object.
@@ -191,7 +165,7 @@ class CertificateUploadHandler(QObject):
         :type cert_path: str
         """
         self._upload_cert_info(
-            cert_path,
+            self.cert_info.filename,
             self.CERT_DOC_TYPE
         )
 
@@ -222,17 +196,6 @@ class CertificateUploadHandler(QObject):
         upload_crt.started.connect(
             self._on_upload_remove_started
         )
-        upload_crt.finished.connect(
-            self._on_upload_remove_finished
-        )
-        upload_crt.finished.connect(
-            self._on_upload_finished
-        )
-
-        # Set the status of the document
-        self._cert_upload_status[
-            file_path
-        ] = CertificateInfo.NOT_UPLOADED
 
         upload_crt.start()
 
@@ -246,12 +209,9 @@ class CertificateUploadHandler(QObject):
         """
         sender = self.sender()
         if sender:
-            file_path = sender.file_path
-            doc_obj = status_info[1]
-            self._cert_upload_status[file_path] = CertificateInfo.SUCCESS
-            self._uploaded_certs[file_path] = doc_obj
+            self._doc_obj = status_info[1]
             # Emit signal
-            self.uploaded.emit(status_info)
+            self.uploaded.emit(self.cert_info.certificate_number)
 
     def _on_upload_error(self, error_info):
         """
@@ -262,18 +222,11 @@ class CertificateUploadHandler(QObject):
         """
         sender = self.sender()
         if sender:
-            file_path = sender.file_path
-            doc_obj = error_info[1]
-            self._cert_upload_status[file_path] = CertificateInfo.ERROR
-            self._uploaded_certs[file_path] = doc_obj
+            err_message = error_info[1]
             # Emit signal
-            self.uploaded.emit(error_info)
-
-    def _on_upload_finished(self):
-        """
-        Slot raised when uploading process has completed.
-        """
-        self.upload_completed.emit()
+            self.upload_failed.emit(
+                self.cert_info.certificate_number, err_message
+            )
 
     def _on_upload_remove_started(self):
         """
@@ -289,51 +242,27 @@ class CertificateUploadHandler(QObject):
         """
         self._has_active_operation = False
 
-    def _update_cert_upload_status(self, cert_number, status):
-        """
-        Update the status of the certificate that is being uploaded.
-        :param cert_number: Certificate number.
-        :param status: Upload status of the certificate info object.
-        """
-        if cert_number in self._cert_upload_status:
-            self._update_cert_upload_status[cert_number] = status
-
-    def upload_error_message(self, certificate_number):
-        """
-        Gets the error message that occurred during the upload of the given
-        file.
-        :param certificate_number: Certificate number of the certificate that
-        was being uploaded.
-        :type certificate_number: str
-        :return: Returns the error message associated with the upload of the
-        given cert, else return an empty string if the file was not logged as
-        having an error.
-        :rtype: str
-        """
-        return self._certificate_upload_error.get(certificate_number, '')
-
-    def persist_certificate(self, cert_number):
+    def persist_certificate(self, cert_num):
         """
         Moves the certificates from the Temp folder to the permanent
         certificate directory in the CMIS server. The document object
         models will also be created and returned as a list.
-        :param cert_number: certificate number
-        :type cert_number: str
         """
-        self._cert_doc_mapper.entity_name = self.CERT_ENTITY_NAME
-        cert_objects = self._cert_doc_mapper.persist_documents(
-            cert_number
-        )
-        cert_doc_obj = self._cert_doc_model()
-        cert_doc_obj.documents = cert_objects
-        cert_doc_obj.save()
-        cert_number = cert_number.replace('.', '/')
-        self._update_cert_metadata(cert_number)
+        if cert_num == self.cert_info.certificate_number:
+            cert_number = cert_num.replace('/', '.')
+            cert_objects = self._cert_doc_mapper.persist_documents(
+                cert_number
+            )
+            cert_doc_obj = self._cert_doc_model()
+            cert_doc_obj.documents = cert_objects
+            cert_doc_obj.save()
+            cert_number = cert_num.replace('.', '/')
+            self._update_cert_metadata(cert_number)
 
-        # Emit signal
-        self.persisted.emit()
+            # Emit signal
+            self.persisted.emit(self.cert_info.certificate_number)
 
-        return cert_doc_obj.id
+            return cert_doc_obj.id
 
     def _update_cert_metadata(self, cert_number):
         """
@@ -353,17 +282,6 @@ class CertificateUploadHandler(QObject):
                 obj.is_uploaded = 'true'
                 obj.update()
 
-        self.reset()
-
-    def reset(self):
-        """
-        Clear any certificates used in any previous sessions.
-        """
-        self._cert_info_items = []
-        self._cert_upload_status = {}
-        self._uploaded_certs = {}
-        self._certificate_upload_error = {}
-
     def _uuid_from_doc(self, doc):
         # Returns the UUID for the given document
         cmis_props = doc.getProperties()
@@ -374,19 +292,7 @@ class CertificateUploadHandler(QObject):
         cmis_props = doc.getProperties()
         return cmis_props['cmis:name']
 
-    def doc_from_cert_number(self, cert_number):
-        """
-        Gets the cmislib document object from the file path. This only
-        applies to those files that have been successfully uploaded.
-        :param cert_number: Certificate number of the certificate document.
-        :type cert_number: str
-        :return: Returns the cmislib document object from the given
-        certificate if it has been successfully uploaded, else None.
-        :rtype: cmislib.domain.Document
-        """
-        return self._uploaded_certs.get(cert_number, None)
-
-    def certificate_uuid(self, file_path):
+    def certificate_uuid(self):
         """
         Gets the document identifier from the cmislib document indexed by the
         given source file path. This only applies for those documents that
@@ -398,13 +304,12 @@ class CertificateUploadHandler(QObject):
         document was not successfully uploaded.
         :rtype: str
         """
-        if file_path in self._uploaded_certs:
-            doc = self.doc_from_cert_number(file_path)
-            return self._uuid_from_doc(doc)
+        if self._doc_obj:
+            return self._uuid_from_doc(self._doc_obj)
 
         return ''
 
-    def certificate_name(self, file_path):
+    def certificate_name(self):
         """
         Gets the document name from the cmislib document indexed by the
         given source file path. This only applies for those documents that
@@ -416,26 +321,10 @@ class CertificateUploadHandler(QObject):
         document was not successfully uploaded.
         :rtype: str
         """
-        if file_path in self._uploaded_certs:
-            doc = self.doc_from_cert_number(file_path)
-            return self._doc_name_from_doc(doc)
+        if self._doc_obj:
+            return self._doc_name_from_doc(self._doc_obj)
 
         return ''
-
-    def cert_path_from_uuid(self, uuid):
-        """
-        Gets the file path for the document with the given UUID.
-        :param uuid: UUID of the document.
-        :type uuid: str
-        :return: Returns the file path for the document with the given UUID
-        or an empty string if the UUID was not found.
-        :rtype: str
-        """
-        return next(
-            (path for path, doc in self._uploaded_certs.iteritems()
-             if self._uuid_from_doc(doc) == uuid),
-            None
-        )
 
     def document_type_count(self, document_type):
         """
@@ -455,7 +344,7 @@ class CertificateUploadHandler(QObject):
         else:
             return len(docs)
 
-    def remove_certificate(self, cert_path):
+    def remove_certificate(self, cert_info):
         """
         Remove the certificate with the given path from the document
         repository.
@@ -463,9 +352,12 @@ class CertificateUploadHandler(QObject):
         certificate to be removed.
         :type cert_path: str
         """
-        self._remove_certificate_supporting_document(cert_path, self.CERT_DOC_TYPE)
+        if cert_info == self.cert_info:
+            self._remove_certificate_supporting_document(
+                self.CERT_DOC_TYPE
+            )
 
-    def _remove_certificate_supporting_document(self, cert_path, cert_doc_type):
+    def _remove_certificate_supporting_document(self, cert_doc_type):
         """
         Removes the certificate indexed by the given certificate number and of
         the given type. Certificate must have been uploaded successfully
@@ -479,16 +371,10 @@ class CertificateUploadHandler(QObject):
         :type cert_doc_type: str
         """
         # Check if the certificate was previously uploaded.
-        crt = self.doc_from_cert_number(cert_path)
-        if not crt:
-            # Remove reference if there was an error while attempting to
-            # upload.
-            if cert_path in self._certificate_upload_error:
-                del self._certificate_upload_error[cert_path]
-
+        if not self._doc_obj:
             return
 
-        uuid = self._uuid_from_doc(crt)
+        uuid = self.certificate_uuid()
 
         delete_crt = CmisDocumentDeleteThread(
             self._cert_doc_mapper,
@@ -520,15 +406,9 @@ class CertificateUploadHandler(QObject):
         """
         sender = self.sender()
         if sender:
-            uuid = sender.document_uuid
-            path = self.cert_path_from_uuid(uuid)
-            if path in self._uploaded_certs:
-                # Remove all references
-                del self._uploaded_certs[path]
-                del self._cert_upload_status[path]
-
-                # Emit signal with status info
-                self.removed.emit((path, True, ''))
+            cert_number = self.cert_info.certificate_number
+            # Emit signal with status info
+            self.removed.emit((cert_number, True, ''))
 
     def _on_remove_certificate_error(self, error_info):
         """
@@ -539,24 +419,6 @@ class CertificateUploadHandler(QObject):
         sender = self.sender()
         if sender:
             err_msg = error_info[1]
-            uuid = sender.document_uuid
-            path = self.cert_path_from_uuid(uuid)
-            if path in self._uploaded_certs:
-                # Remove all references
-                del self._uploaded_certs[path]
-                del self._cert_upload_status[path]
-
-                # Emit signal with status info
-                self.removed.emit((path, False, err_msg))
-
-    def upload_status(self, file_path):
-        """
-        Gets the upload status of the document with the given path.
-        :param file_path: Certificate file path.
-        :type file_path: str
-        :return: Returns the status indicating whether the document is
-        NOT_UPLOADED, SUCCESSFUL or ERROR occurred, else returns -1 if
-        the given file path is not found.
-        ":rtype: int
-        """
-        return self._cert_upload_status.get(file_path, -1)
+            cert_number= self.cert_info.certificate_number
+            # Emit signal with status info
+            self.removed.emit((cert_number, False, err_msg))
