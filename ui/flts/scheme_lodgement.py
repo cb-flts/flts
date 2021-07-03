@@ -232,9 +232,9 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
     def _populate_combo(self, cbo, lookup_name):
         """
-        Populates comboboxes with items from the database
+        Populates comboboxes with items from the database.
         :param cbo: Combobox object
-        :param lookup_name: name of the lookup table
+        :param lookup_name: name of the lookup table.
         """
         res = export_data(lookup_name)
         cbo.clear()
@@ -246,7 +246,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
     def _populate_lookups(self):
         """
         Populate combobox dropdowns with values to be displayed when user
-        clicks the dropdown
+        clicks the dropdown.
         """
         # Check if the tables exists
         self._populate_combo(self.cbx_region,
@@ -255,22 +255,21 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
                              'cb_check_lht_relevant_authority')
         self._populate_combo(self.cbx_lro,
                              'cb_check_lht_land_rights_office')
-
-        # Sort region combobox items
         self.cbx_region.model().sort(0)
 
     def _configure_date_controls(self):
-        # Set maximum dates for date widgets
+        """
+        Set the configuration of the date widget controls.
+        """
         self.date_apprv.setMaximumDate(QDate.currentDate())
         self.date_establish.setMaximumDate(QDate.currentDate())
-
-        # Set the current dates
         self.date_establish.setDate(QDate.currentDate())
         self.date_apprv.setDate((QDate.currentDate()))
 
     def _update_entities_and_models(self):
-        # Update the entity objects and db models related to selecting
-        # relevant authority.
+        """
+        Update the entity objects and database models for the relevant authority.
+        """
         if not self._relv_auth_entity:
             self._relv_auth_entity = self.curr_p.entity(
                 self._rel_auth_entity_name
@@ -337,37 +336,27 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
     def update_relevant_authority(self):
         """
         Slot for updating the Relevant Authority combobox based on the
-        selections made in the two previous combo boxes
+        selections in related combo boxes.
         """
-        # Update the entity object and model references
         self._update_entities_and_models()
-
         # Entity object
         relv_entity_obj = self._relevant_auth_model()
-
         # Get the region ID
         region_id = self.cbx_region.itemData(self.cbx_region.currentIndex())
-
         # Get the relevant authority ID
         ra_id_type = self.cbx_relv_auth.itemData(
             self.cbx_relv_auth.currentIndex()
         )
-
         # Check if region combobox is selected
         if not region_id and not ra_id_type:
             return
 
-        # Initial clear elements
         self.cbx_relv_auth_name.clear()
         self.cbx_reg_div.clear()
         self.lnedit_sg_num.clear()
-
-        # Add an empty itemData
         self.cbx_relv_auth_name.addItem('')
         self.cbx_reg_div.addItem('')
-
         # Query object for filtering items on name of relevant authority
-        # combobox based on selected items in region and type
         res = relv_entity_obj.queryObject().filter(
             self._relevant_auth_model.region == region_id,
             self._relevant_auth_model.type_of_relevant_authority ==
@@ -396,36 +385,30 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
     def on_ra_name_changed(self):
         """
         Slot for updating the scheme number based on selection of name of
-        relevant authority combobox selection
+        relevant authority combobox.
         """
-        # Clear scheme number
         self.lnedit_schm_num.clear()
         self.lnedit_landhold_num.clear()
         self.cbx_reg_div.clear()
-
         if not self.cbx_relv_auth_name.currentText():
             return
 
         authority_id, code, last_value, reg_divs = self.cbx_relv_auth_name.itemData(
             self.cbx_relv_auth_name.currentIndex()
         )
-
-        # Registration division
         self.cbx_reg_div.addItem('')
-
         for regdiv in reg_divs:
             self.cbx_reg_div.addItem(regdiv[1], regdiv[0])
-
         # Select the first item automatically if there is only one division
         if self.cbx_reg_div.count() == 2:
             self.cbx_reg_div.setCurrentIndex(1)
-
         scheme_code = self._gen_scheme_number(code, last_value)
-
         self.lnedit_schm_num.setText(scheme_code)
 
     def _gen_scheme_number(self, code, last_value):
-        # Generates a new scheme number
+        """
+        Generate the scheme number.
+        """
         if not last_value:
             last_value = 0
         last_value += 1
@@ -437,7 +420,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
     def _on_hectares_clicked(self):
         """
-        When the hectares radio button is selected
+        Slot raised when the hectares radio button is selected.
         """
         self.dbl_spinbx_block_area.setDecimals(4)
         self.dbl_spinbx_block_area.setSuffix(" Ha")
@@ -447,7 +430,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
     def _on_sq_meters_clicked(self):
         """
-        When the area radio button is clicked
+        Slot raised when the area radio button is clicked.
         """
         self.dbl_spinbx_block_area.setDecimals(0)
         self.dbl_spinbx_block_area.setSuffix(" Sq.m")
@@ -457,9 +440,8 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
     def validate_block_area(self):
         """
-        Check whether the block area value is zero
+        Validate the block area value input.
         """
-        # Preset minimum value equals to zero
         min_value = self.dbl_spinbx_block_area.minimum()
 
         if self.dbl_spinbx_block_area.value() == min_value:
@@ -482,31 +464,28 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             str(self._num_pages)
         )
         self.setWindowTitle(win_title)
-
         # First page
         # Set entity document mapper if connection to CMIS is successful
         if idx == 0:
             self._init_cmis_doc_mapper()
-
         # Load scheme supporting documents
         elif idx == 1:
             self._load_scheme_document_types()
-
             # Disable widget if doc mapper could not be initialized
             if not self._cmis_doc_mapper:
                 self.tbw_documents.setEnabled(False)
-
-        # Initialize holders stuff
+        # Initialize holders information
         elif idx == 2:
             self._init_holder_helpers()
-
         # Last page
         elif idx == 3:
             # Populate summary widget
             self.populate_summary()
 
     def _init_holder_helpers(self):
-        # Init helper classes for holders data
+        """
+        Initialize helper classes for holder's data.
+        """
         if not self._holder_entity:
             self._holder_entity = self.curr_p.entity(
                 self._holders_entity_name
@@ -525,7 +504,9 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
                 return
 
     def _init_cmis_doc_mapper(self):
-        # Initializes CMIS stuff
+        """
+        Initialize CMIS class methods.
+        """
         conn_status = self._cmis_mgr.connect()
         if not conn_status:
             msg = self.tr(
@@ -566,7 +547,7 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
     def browse_holders_file(self):
         """
-        Browse for the holders file in the file directory
+        Browse the holders file in the file directory.
         """
         last_doc_path = last_document_path()
         if not last_doc_path:
@@ -654,16 +635,15 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
         :param toggled: Toggle status
         :type toggled: bool
         """
-        # Notify user that validation will be done prior to moving to
-        # the next page.
         if not toggled:
             msg = 'Validation of the holders data will be performed prior to ' \
                   'loading the summary page upon clicking Next.'
             self.holders_notif_bar.insertInformationNotification(msg)
 
     def _validate_holders(self):
-        # Validates holders data
-        # Reset the validator
+        """
+        Reset and validate loaded holders information.
+        """
         self._holders_validator.reset()
 
         try:
@@ -740,25 +720,26 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             )
 
     def _on_holder_feat_validated(self, results):
-        # Slot raised when a feature in the data source has been validated.
-        # Highlight warning or error cells
+        """
+        Slot raised when a feature in the data source has been validated.
+        """
         for r in results:
             if len(r.warnings) > 0 or len(r.errors) > 0:
                 self.tw_hld_prv.current_sheet_view(). \
                     highlight_validation_cell(r)
-
         # Update progress bar
         curr_val = self._h_validation_prog_dlg.value()
         curr_val += 1
         self._h_validation_prog_dlg.setValue(curr_val)
 
     def _on_holder_validation_complete(self):
-        # Slot raised when holder validation is complete.
+        """
+        Slot raised when holder validation is complete.
+        """
         num_features = self._holders_validator.count
         num_err_features = len(
             self._holders_validator.row_warnings_errors.keys()
         )
-
         # Get features that have warnings or errors
         msg = self.tr(
             u'Validation process complete.\nOut of the {0} features in the '
@@ -784,9 +765,10 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             self._holders_validator.cancel()
 
     def _on_holders_table_selection_changed(self):
-        # Slot raised when selection changes in the holders table widget.
+        """
+        Slot raised when selection changes in the holders table widget.
+        """
         self.lbl_validation_description.setText('')
-
         # Check if validator has been initialized
         if not self._holders_validator:
             return
@@ -824,11 +806,11 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
 
     def _load_scheme_document_types(self):
         """
-        This is used in uploading and viewing of the scheme supporting
-        documents
+        Handles Uploading and viewing of the scheme supporting documents.
         """
-        # Check if the document type lookup exists
-        doc_type_entity = self.curr_p.entity_by_name(self._scheme_doc_type_lookup)
+        doc_type_entity = self.curr_p.entity_by_name(
+            self._scheme_doc_type_lookup
+        )
         if doc_type_entity is None:
             QMessageBox.critical(
                 self,
@@ -1015,7 +997,9 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             return True
 
     def validateCurrentPage(self):
-        # Validate each page
+        """
+        Validate each wizard page.
+        """
         current_id = self.currentId()
         ret_status = False
         self.notif_bar.clear()
@@ -1189,8 +1173,8 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
     def _on_summary_link_clicked(self, code):
         """
         Slot raised when the hyperlink in summary widget is clicked
-        :param code:
-        :return:
+        :param code: Code identifier of the wizard page.
+        :type code: str
         """
         ref_id = -1
         if code == 'DOC':
@@ -1205,7 +1189,9 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
             self.back()
 
     def _save_ra_last_value(self, scheme_number):
-        # Save the last value for the given relevant authority
+        """
+        Save the most recent value for the relevant authority.
+        """
         if not self._abs_last_scheme_value:
             return
 
@@ -1468,7 +1454,6 @@ class LodgementWizard(QWizard, Ui_ldg_wzd, MapperMixin):
     def populate_third_workflow(self):
         """
         Update the workflow link table with import plot as unapproved.
-        :return: None
         """
         # Entity objects
         scheme_obj = self.schm_model()
