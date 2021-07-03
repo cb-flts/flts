@@ -15,7 +15,7 @@ def certificate_model_factory():
     cert_entity = curr_profile.entity(
         'Certificate'
     )
-
+    # Check if certificate entity exits
     if not cert_entity:
         return None
 

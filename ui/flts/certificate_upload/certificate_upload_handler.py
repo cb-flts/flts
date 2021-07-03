@@ -79,11 +79,11 @@ class CertificateUploadHandler(QObject):
             doc_model_cls=self._cert_doc_model,
             entity_name=self.CERT_ENTITY_NAME
         )
-
         # Error messages as to why the upload handler is not responsive
         self._error_msg = []
         # Get current profile
         curr_profile = current_profile()
+        # Check if current profile exists
         if not curr_profile:
             self._error_msgs.append(
                 'Current profile is None'
@@ -314,8 +314,6 @@ class CertificateUploadHandler(QObject):
         Gets the document name from the cmislib document indexed by the
         given source file path. This only applies for those documents that
         had been successfully uploaded.
-        :param file_path: File path of the source document.
-        :type file_path: str
         :return: Returns the document name from the cmislib document
         indexed by the given source file path, else an empty string if the
         document was not successfully uploaded.

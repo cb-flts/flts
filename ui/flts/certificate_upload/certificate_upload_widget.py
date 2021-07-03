@@ -74,13 +74,13 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self._cmis_mngr = cmis_mngr
         if not self._cmis_mngr:
             self._cmis_mngr = CmisManager()
-        # Certificate table model
+        # Certificate table model class
         self._cert_model = CertificateTableModel(parent=self)
-        # Set the table view model
+        # Set model for the table view
         self.tbvw_certificate.setModel(self._cert_model)
-        # Certificate validator
+        # Certificate validator class
         self._cert_validator = CertificateValidator(parent=self)
-        # Uploaded items
+        # Container for storing uploaded items
         self._upload_items = OrderedDict()
         # Get table horizontal header count
         tbvw_h_header = self.tbvw_certificate.horizontalHeader()
@@ -94,11 +94,9 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self.tbvw_certificate.setItemDelegate(
             icon_delegate
         )
-        # Records count
         self._update_record_count()
-        # Check connection to CMIS repository
         self._check_cmis_connection()
-        # Connecting signals
+        # Connecting signals to their slots
         self.cbo_scheme_number.currentIndexChanged.connect(
             self._on_cbo_scheme_changed
         )
@@ -117,10 +115,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self.btn_upload_certificate.clicked.connect(
             self._on_upload_button_clicked
         )
-        # Certificate upload flag
         self._can_upload = False
         self.cert_upload_handler_items = OrderedDict()
-        # Flag for checking if there is an active upload
         self._has_active_operation = False
         if self._has_active_operation:
             msg_box = QMessageBox()
@@ -148,6 +144,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         Creates a clickable QLabel widget that appears like a hyperlink.
         :param img_src: Image source.
         :type img_src: str
+        :param lbl_index: Model index for the label
+        :type lbl_index: QModelIndex
         :return: Returns the QLabel widget with appearance of a hyperlink.
         :rtype: QLabel
         """
@@ -296,6 +294,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
     def _cert_info_from_dir(self, path):
         """
         Create certificate info items from the user selected directory.
+        :param path: Path of the selected directory.
+        :type path: str
         :return: cert_info_items: List of certificate info items.
         :rtype cert_info_items: list
         """
@@ -370,6 +370,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         Update the status label text informing the user of the status for the
         certificate upload.
+        :param status_text: Text showing status of the widget.
+        :type status_text: str
         """
         self.lbl_status.setText('Status: ' + status_text)
 
@@ -391,6 +393,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         Slot raised when the certificate info item has been validated.
         :param cert_info: Validated certificate info object.
+        :type cert_info: CertificateInfo
         """
         # Update the validation status icon and tooltip
         self._cert_model.update_validation_status(
@@ -507,6 +510,11 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         )
 
     def closeEvent(self, event):
+        """
+        Initiates a closing event for the wisget.
+        :param event:
+        :type event:
+        """
         self._on_close()
 
     def _on_close(self):
