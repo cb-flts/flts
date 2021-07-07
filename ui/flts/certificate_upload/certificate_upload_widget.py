@@ -266,7 +266,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         if scheme_num:
             ''.join(scheme_num.split())
-            return scheme_num.replace('/', '.')
+            scheme_num.replace('/', '.')
+            return scheme_num
 
     def _on_select_folder(self):
         """
