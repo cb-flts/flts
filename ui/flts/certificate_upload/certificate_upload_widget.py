@@ -246,15 +246,27 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         self.cert_upload_handler_items.clear()
         self._cert_model.clear()
         self._update_record_count()
-        if self.cbo_scheme_number.currentText():
+        combo_text = self.cbo_scheme_number.currentText()
+        if combo_text:
             self.btn_select_folder.setEnabled(True)
             self.tbvw_certificate.setEnabled(True)
             self._update_status_text('Select certificates folder')
             self.notif_bar.clear()
             self._update_record_count()
+            self._cert_scheme_number(
+                combo_text
+            )
         else:
             self.btn_select_folder.setEnabled(False)
             self._update_status_text('Select scheme')
+
+    def _cert_scheme_number(self, scheme_num):
+        """
+        Return the scheme number selected in the combo box.
+        """
+        if scheme_num:
+            ''.join(scheme_num.split())
+            return scheme_num.replace('/', '.')
 
     def _on_select_folder(self):
         """
