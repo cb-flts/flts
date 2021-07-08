@@ -62,6 +62,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
     def __init__(self, parent=None, cmis_mngr=None):
         super(CertificateUploadWidget, self).__init__(parent)
         self.setupUi(self)
+        self.pgbar_upload.hide()
         self.notif_bar = NotificationBar(
             self.vlNotification
         )
@@ -418,19 +419,25 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         Slot raised when the validation is complete.
         """
-        doc_count = str(self._cert_model.rowCount())
-        msg = ' certificates have been validated'
+        valid_docs = len(self.cert_upload_handler_items)
+        total_docs = len(self._cert_model.cert_info_items)
+        msg = '{0} out of {1} certificates are valid and can be uploaded.'.format(
+            valid_docs, total_docs
+        )
         QMessageBox.information(
             self,
-            self.tr('Certificate Upload'),
-            self.tr(doc_count + msg)
+            self.tr('Validation status update'),
+            self.tr(msg)
         )
         self._has_active_operation = False
 
-        if self._can_upload:
+        if valid_docs > 0:
             self.btn_upload_certificate.setEnabled(True)
-            self._update_status_text('Ready to upload')
-        else:
+            status_text = 'Ready to upload {} certificate(s)'.format(
+                valid_docs
+            )
+            self._update_status_text(status_text)
+        elif valid_docs == 0:
             self._update_status_text('')
 
     def _upload_certificate(self, cert_info, scheme_number):

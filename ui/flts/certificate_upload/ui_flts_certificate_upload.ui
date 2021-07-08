@@ -23,6 +23,58 @@
    <string>Upload Scanned Certificate</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
+   <item row="2" column="0" colspan="3">
+    <widget class="QTableView" name="tbvw_certificate">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>300</height>
+      </size>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="lbl_status">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>160</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Status:  </string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="QLabel" name="lbl_records_count">
+     <property name="text">
+      <string>  files</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0" colspan="3">
     <layout class="QVBoxLayout" name="vlNotification">
      <property name="spacing">
@@ -153,59 +205,7 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="0" colspan="3">
-    <widget class="QTableView" name="tbvw_certificate">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>300</height>
-      </size>
-     </property>
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="lbl_status">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>160</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Status:  </string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="QLabel" name="lbl_records_count">
-     <property name="text">
-      <string>  files</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="3">
+   <item row="5" column="0" colspan="3">
     <widget class="QFrame" name="frame">
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
@@ -249,6 +249,16 @@
      </layout>
     </widget>
    </item>
+   <item row="3" column="0" colspan="3">
+    <widget class="QProgressBar" name="pgbar_upload">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
+   </item>
   </layout>
   <zorder>tbvw_certificate</zorder>
   <zorder>lbl_status</zorder>
@@ -257,6 +267,7 @@
   <zorder>frame</zorder>
   <zorder></zorder>
   <zorder>frame_2</zorder>
+  <zorder>pgbar_upload</zorder>
  </widget>
  <resources>
   <include location="../../../resources.qrc"/>
