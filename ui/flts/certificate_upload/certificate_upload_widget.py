@@ -253,21 +253,16 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             self._update_status_text('Select certificates folder')
             self.notif_bar.clear()
             self._update_record_count()
-            self._cert_scheme_number(
-                combo_text
-            )
         else:
             self.btn_select_folder.setEnabled(False)
             self._update_status_text('Select scheme')
 
-    def _cert_scheme_number(self, scheme_num):
+    def _cert_scheme_number(self):
         """
         Return the scheme number selected in the combo box.
         """
-        if scheme_num:
-            ''.join(scheme_num.split())
-            scheme_num.replace('/', '.')
-            return scheme_num
+        scheme_number = self.cbo_scheme_number.currentText()
+        return scheme_number
 
     def _on_select_folder(self):
         """
@@ -417,7 +412,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         if cert_info.validation_status == CertificateInfo.CAN_UPLOAD:
             self._can_upload = True
             # Upload the certificate to the Temp CMIS folder
-            self._upload_certificate(cert_info)
+            self._upload_certificate(cert_info, self._cert_scheme_number())
 
     def _on_validation_complete(self):
         """
@@ -438,16 +433,16 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         else:
             self._update_status_text('')
 
-    def _upload_certificate(self, cert_info):
+    def _upload_certificate(self, cert_info, scheme_number):
         """
         Updates the certificate upload handler. Upload the certificate to
         the Temp folder in CMIS document repository.
         :param cert_info: Certificate upload handler.
         :type cert_info: CertificateUploadHandler
         """
-        # upload_items = self.cert_upload_handler_items
         upload_handler = CertificateUploadHandler(
             cert_info,
+            scheme_number,
             cmis_mngr=self._cmis_mngr,
             parent=self
         )

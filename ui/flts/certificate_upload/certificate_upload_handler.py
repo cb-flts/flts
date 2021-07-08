@@ -54,9 +54,10 @@ class CertificateUploadHandler(QObject):
     removed = pyqtSignal(tuple)
     persisted = pyqtSignal(unicode)
 
-    def __init__(self, cert_info, cmis_mngr=None, parent=None):
+    def __init__(self, cert_info, scheme_number, cmis_mngr=None, parent=None):
         super(CertificateUploadHandler, self).__init__(parent)
         self._cert_info = cert_info
+        self._scheme_number = scheme_number
         # CMIS Manager
         self._cmis_mngr = cmis_mngr
         if not self._cmis_mngr:
