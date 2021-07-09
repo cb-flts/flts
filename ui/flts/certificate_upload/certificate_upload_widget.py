@@ -478,8 +478,16 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         folder.
         """
         self._has_active_operation = True
+        max_uploads = len(self.cert_upload_handler_items)
+        # Show and start upload progress dialog
+        self.pgbar_upload.show()
+        count = 0
+        self.pgbar_upload.setMinimum(count)
+        self.pgbar_upload.setMaximum(max_uploads)
         for cert_num, handler in self.cert_upload_handler_items.iteritems():
             handler.persist_certificate(cert_num)
+            count = count + 1
+            self.pgbar_upload.setValue(count)
 
         view_label = self.sender()
         if not view_label:
