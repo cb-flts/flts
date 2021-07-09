@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui\flts\certificate_upload\ui_flts_certificate_upload.ui'
+# Form implementation generated from reading ui file 'ui_flts_certificate_upload.ui'
 #
-# Created: Thu Jul 08 05:25:29 2021
+# Created: Fri Jul 09 10:16:56 2021
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -47,7 +47,7 @@ class Ui_FltsCertUploadWidget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.lbl_status.sizePolicy().hasHeightForWidth())
         self.lbl_status.setSizePolicy(sizePolicy)
-        self.lbl_status.setMaximumSize(QtCore.QSize(160, 16777215))
+        self.lbl_status.setMaximumSize(QtCore.QSize(190, 16777215))
         self.lbl_status.setObjectName(_fromUtf8("lbl_status"))
         self.gridLayout_2.addWidget(self.lbl_status, 4, 0, 1, 1)
         self.line = QtGui.QFrame(FltsCertUploadWidget)

@@ -67,6 +67,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             self.vlNotification
         )
         # Disables the maximize button
+        self.setWindowTitle('Archive Signed Certificate')
         self.setWindowFlags(Qt.WindowMinimizeButtonHint)
         # Set the default status label
         self._update_status_text('Select scheme')
@@ -421,7 +422,7 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         """
         valid_docs = len(self.cert_upload_handler_items)
         total_docs = len(self._cert_model.cert_info_items)
-        msg = '{0} out of {1} certificates are valid and can be uploaded.'.format(
+        msg = '{0} out of {1} certificates can be uploaded.'.format(
             valid_docs, total_docs
         )
         QMessageBox.information(
@@ -453,7 +454,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
             cmis_mngr=self._cmis_mngr,
             parent=self
         )
-        self.cert_upload_handler_items[cert_info.certificate_number] = upload_handler
+        self.cert_upload_handler_items[cert_info.certificate_number]\
+            = upload_handler
         upload_handler.upload_certificate()
         upload_handler.uploaded.connect(self._on_cert_uploaded)
 
@@ -493,20 +495,36 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         if not view_label:
             return
 
-        self.persist_complete()
+        self.persist_complete(max_uploads)
 
-    def persist_complete(self):
+    def persist_complete(self, certs_uploaded):
         """
         Show message to show the user that certificates have been uploaded
         into the permanent folder completing the upload process.
+        :param certs_uploaded: Number of certificates that have been
+        uploaded.
+        :type certs_uploaded: int
         """
-        QMessageBox.information(
-            self,
-            self.tr('Certificate Upload'),
-            self.tr('Upload has been completed.')
-        )
-        self._update_status_text('')
+        self._update_status_text('Upload complete')
         self.btn_upload_certificate.setEnabled(False)
+        msg = '{} certificates have been uploaded successfully.' \
+              ' Do you want to upload more certificates?'.format(
+                certs_uploaded
+                )
+        QMessageBox.question(
+            self,
+            self.tr('Upload status update'),
+            self.tr(msg),
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No
+        )
+        if QMessageBox.Yes:
+            self._cert_model.clear()
+            self._cert_validator.clear()
+            self.cert_upload_handler_items.clear()
+            self.pgbar_upload.setMinimum(0)
+            self.pgbar_upload.hide()
+        elif QMessageBox.No:
+            self._on_close()
 
     def _clear_temp_folder(self):
         """
@@ -534,21 +552,30 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
 
     def closeEvent(self, event):
         """
-        Initiates a closing event for the wisget.
+        Initiates a closing event for the widget.
         :param event:
         :type event:
         """
-        self._on_close()
+        reply = QMessageBox.question(
+            self,
+            'Quit certificate archiving',
+            'Are you sure you want to quit the archiving process?',
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No
+        )
+        if reply == QMessageBox.Yes:
+            event.accept()
+            self._clear_temp_folder()
+            self.cert_upload_handler_items.clear()
+            self._cert_validator.clear()
+            self._reset_widget_items()
+            self._cert_model.clear()
+        else:
+            event.ignore()
 
     def _on_close(self):
         """
         Slot raised when the close button is clicked.
         """
-        self._clear_temp_folder()
-        self._reset_widget_items()
-        self._cert_model.clear()
-        self._cert_validator.clear()
-        self.cert_upload_handler_items.clear()
         self.close()
 
     def _reset_widget_items(self):
@@ -556,6 +583,8 @@ class CertificateUploadWidget(QWidget, Ui_FltsCertUploadWidget):
         Resets the widgets to their initial state.
         """
         self.notif_bar.clear()
+        self.pgbar_upload.setMinimum(0)
+        self.pgbar_upload.hide()
         self.cbo_scheme_number.setCurrentIndex(0)
         self.btn_select_folder.setEnabled(False)
         self.btn_upload_certificate.setEnabled(False)
